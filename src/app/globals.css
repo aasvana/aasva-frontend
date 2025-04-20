@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "preline/variants.css";
+@source "../../node_modules/preline/dist/*.js";
+
 
 @custom-variant dark (&:is(.dark *));
 
