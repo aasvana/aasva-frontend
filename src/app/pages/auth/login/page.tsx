@@ -1,6 +1,65 @@
+'use client';
+import { useApiRequest } from "@/hooks/useRequestHandler";
+import { useAuthStore } from "@/stores/AuthStore";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
+import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from "sonner";
+
+type FormData = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
+  const { request } = useApiRequest();
+  const { setToken } = useAuthStore((state => ({
+    setToken: state.setToken,
+  })));
+  const router = useRouter();
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: FormData) => {
+      const pushData = {
+        ...data,
+        provider: 'email',
+        passport: 'signin',
+      };  
+      return await request(
+        {
+          method: 'POST',
+          url: '/auth',
+          showToast: false,
+        },
+        pushData
+      );
+    },
+    retry: 0,
+    onSuccess: (res: any) => {
+      const token = res?.data?.token;
+      console.log(res);
+      
+      if (token) {
+        setToken(token);
+        toast.success('Logged in successfully!');
+        router.push('/dashboard');
+      }
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+  
+
+  const onSubmit = async (data: FormData) => {
+    loginMutation.mutate(data);
+  };
+  
   return (
     <div className="min-h-screen flex fle-col items-center justify-center py-6 px-4">
       <div className="grid md:grid-cols-2 items-center gap-10 max-w-6xl max-md:max-w-md w-full">
@@ -9,22 +68,40 @@ export default function LoginPage() {
             Seamless Login for Exclusive Access
           </h2>
           <p className="text-sm mt-6 text-slate-500 leading-relaxed">Power up your access with our smart, lightning-fast login. Designed for speed. Built for you. To effortlessly access your account.</p>
-          <p className="text-sm mt-12 text-slate-500">Don&apos;t have an account <a href="javascript:void(0);" className="text-blue-600 font-medium hover:underline ml-1">Register here</a></p>
+          <p className="text-sm mt-12 text-slate-500">Don&apos;t have an account <Link href="/signup" className="text-blue-600 font-medium hover:underline ml-1">Register here</Link></p>
         </div>
 
-        <form className="max-w-md md:ml-auto w-full">
+        <form
+          className="max-w-md md:ml-auto w-full"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <h3 className="text-slate-900 lg:text-3xl text-2xl font-bold mb-8">
             Sign in
           </h3>
-
           <div className="space-y-6">
             <div>
               <label className='text-sm text-slate-800 font-medium mb-2 block'>Email</label>
-              <input name="email" type="email" required className="bg-slate-100 w-full text-sm text-slate-800 px-4 py-3 rounded-md outline-none border focus:border-blue-600 focus:bg-transparent" placeholder="Enter Email" />
+              <input
+                type="email"
+                className="bg-slate-100 w-full text-sm text-slate-800 px-4 py-3 rounded-md outline-none border focus:border-blue-600 focus:bg-transparent"
+                placeholder="Enter Email"
+                {...register('email', { required: 'Email is required' })}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-2">{errors.email.message}</p>
+              )}
             </div>
             <div>
               <label className='text-sm text-slate-800 font-medium mb-2 block'>Password</label>
-              <input name="password" type="password" required className="bg-slate-100 w-full text-sm text-slate-800 px-4 py-3 rounded-md outline-none border focus:border-blue-600 focus:bg-transparent" placeholder="Enter Password" />
+              <input
+                type="password"
+                className="bg-slate-100 w-full text-sm text-slate-800 px-4 py-3 rounded-md outline-none border focus:border-blue-600 focus:bg-transparent"
+                placeholder="Enter Password"
+                {...register('password', { required: 'Password is required' })}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-2">{errors.password.message}</p>
+              )}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center">
@@ -42,8 +119,12 @@ export default function LoginPage() {
           </div>
 
           <div className="!mt-12">
-            <button type="button" className="w-full shadow-xl py-2.5 px-4 text-sm font-semibold rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
-              Log in
+            <button
+              type="submit"
+              className="w-full cursor-pointer shadow-xl py-2.5 px-4 text-sm font-semibold rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? 'Logging in...' : 'Login'}
             </button>
           </div>
 

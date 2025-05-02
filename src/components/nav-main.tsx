@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 
 export function NavMain({
@@ -46,8 +47,10 @@ export function NavMain({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton className="cursor-pointer" tooltip={item.title}>
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
+                <SidebarMenuSubButton href={item.url} className="flex items-center gap-2 text-sm">
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuSubButton>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}

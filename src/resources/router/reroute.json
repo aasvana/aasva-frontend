@@ -1,0 +1,30 @@
+[
+    {
+      "source": "/about",
+      "destination": "/pages/about"
+    },
+    {
+      "source": "/auth",
+      "destination": "/pages/auth"
+    },
+    {
+      "source": "/login",
+      "destination": "/pages/auth/login"
+    },
+    {
+      "source": "/signup",
+      "destination": "/pages/auth/signup"
+    },
+    {
+      "source": "/profile",
+      "destination": "/user/profile"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/pages/dashboard"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers",
+      "destination": "/pages/dashboard/confirmationvouchers"
+    }
+  ]

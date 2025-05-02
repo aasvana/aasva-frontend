@@ -35,6 +35,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { brand } from "@/constants/brand"
+import Link from "next/link"
 
 const data = {
   user: {
@@ -50,7 +51,7 @@ const data = {
     },
     {
       title: "Confirmation Voucher",
-      url: "#",
+      url: "/dashboard/confirmation-vouchers",
       icon: IconFileDescription,
     },
     {
@@ -168,10 +169,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link href="/dashboard">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">{brand.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

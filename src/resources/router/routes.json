@@ -1,26 +1,37 @@
 [
   {
     "source": "/about",
-    "destination": "/pages/about"
+    "destination": "/pages/about",
+    "label": "About"
   },
   {
     "source": "/auth",
-    "destination": "/pages/auth"
+    "destination": "/pages/auth",
+    "label": "Auth"
   },
   {
     "source": "/login",
-    "destination": "/pages/auth/login"
+    "destination": "/pages/auth/login",
+    "label": "Login"
   },
   {
     "source": "/signup",
-    "destination": "/pages/auth/signup"
+    "destination": "/pages/auth/signup",
+    "label": "Signup"
   },
   {
     "source": "/profile",
-    "destination": "/user/profile"
+    "destination": "/user/profile",
+    "label": "Profile"
   },
   {
     "source": "/dashboard",
-    "destination": "/pages/dashboard"
+    "destination": "/pages/dashboard",
+    "label": "Dashboard"
+  },
+  {
+    "source": "/dashboard/confirmation-vouchers",
+    "destination": "/pages/dashboard/confirmationvouchers",
+    "label": "Confirmation Vouchers"
   }
 ]

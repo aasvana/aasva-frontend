@@ -7,7 +7,6 @@ export default function Home() {
   return (
     <>
       <Header />
-      {/* <!-- ========== END HEADER ========== --> */}
 
       {/* <!-- ========== MAIN CONTENT ========== --> */}
       <main id="content">

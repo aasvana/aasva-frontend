@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { brand } from "@/constants/brand";
 import PrelineScriptWrapper from "@/components/PrelineScriptWrapper";
+import { Toaster } from "@/components/ui/sonner"
+import { Providers } from "@/middleware/QueryClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +41,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          <main>{children}</main>
+        </Providers>
+        <Toaster />
         <PrelineScriptWrapper />
       </body>
     </html>

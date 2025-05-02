@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
-import routes from "./src/resources/router/routes.json";
+import reroutes from "./src/resources/router/reroute.json";
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    return routes;
+    return reroutes;
   },
   images: {
     remotePatterns: [
