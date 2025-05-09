@@ -20,9 +20,8 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<FormData>();
   const { request } = useApiRequest();
-  const { setToken } = useAuthStore((state => ({
-    setToken: state.setToken,
-  })));
+  const setToken = useAuthStore((state) => state.setToken);
+
   const router = useRouter();
 
   const loginMutation = useMutation({
@@ -43,9 +42,7 @@ export default function LoginPage() {
     },
     retry: 0,
     onSuccess: (res: any) => {
-      const token = res?.data?.token;
-      console.log(res);
-      
+      const token = res?.data?.token;      
       if (token) {
         setToken(token);
         toast.success('Logged in successfully!');
