@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { ChevronRight } from "lucide-react"
 
 export function SiteHeader() {
   return (
@@ -11,8 +12,10 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-sm font-medium">
-          Dashboard &gt; Create Confirmation Voucher
+        <h1 className="text-sm font-medium flex flex-row justify-center items-center">
+          <span>Dashboard </span>
+          <ChevronRight className="w-4 h-4" /> 
+          <span>Create Confirmation Voucher</span>
         </h1>
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">

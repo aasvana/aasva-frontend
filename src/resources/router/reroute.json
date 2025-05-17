@@ -26,5 +26,9 @@
     {
       "source": "/dashboard/confirmation-vouchers",
       "destination": "/pages/dashboard/confirmationvouchers"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/create",
+      "destination": "/pages/dashboard/confirmationvouchers/create"
     }
   ]
