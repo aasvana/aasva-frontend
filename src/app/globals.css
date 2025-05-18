@@ -3,7 +3,6 @@
 @import "preline/variants.css";
 @source "../../node_modules/preline/dist/*.js";
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -124,6 +123,9 @@
   }
 }
 
-button{
+button {
   @apply cursor-pointer;
+}
+textarea {
+  resize: none;
 }

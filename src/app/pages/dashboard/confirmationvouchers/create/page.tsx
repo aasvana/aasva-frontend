@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { SaveIcon } from "lucide-react";
 import BackButton from "@/components/generic/back-button";
 import { getSteps } from "../steps";
-import { cn } from "@/lib/utils";
 
 export default function ConfirmationVouchers() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -31,9 +30,7 @@ export default function ConfirmationVouchers() {
         </button>
       </div>
       <div
-        className="flex flex-col gap-4 p-4 md:gap-6 md:px-6 md:py-4"
-        data-hs-stepper=""
-        data-hs-stepper-current={currentStep}
+        className="flex flex-col p-4 md:px-6 md:py-4"
       >
         <div className="flex justify-center gap-2 mb-6">
           <ul className="flex justify-center items-center w-full max-w-3xl mx-auto">
@@ -43,16 +40,15 @@ export default function ConfirmationVouchers() {
 
               return (
                 <li key={index} className="flex items-center flex-1">
-                  {/* Step Circle */}
                   <div
                     className={`z-10 size-7 flex justify-center items-center rounded-full font-medium 
-          ${
-            isCompleted
-              ? "bg-teal-500 text-white"
-              : isActive
-              ? "bg-gray-600 text-white"
-              : "bg-gray-100 text-gray-800"
-          }`}
+                    ${
+                        isCompleted
+                        ? "bg-teal-500 text-white"
+                        : isActive
+                        ? "bg-gray-600 text-white"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
                   >
                     {!isCompleted ? (
                       index + 1
@@ -72,11 +68,10 @@ export default function ConfirmationVouchers() {
                     )}
                   </div>
 
-                  {/* Line to next step */}
                   {index < steps.length - 1 && (
                     <div
                       className={`flex-1 h-0.5 mx-2 
-            ${isCompleted ? "bg-teal-500" : "bg-gray-200"}`}
+                      ${isCompleted ? "bg-teal-500" : "bg-gray-200"}`}
                     />
                   )}
                 </li>
@@ -85,7 +80,7 @@ export default function ConfirmationVouchers() {
           </ul>
         </div>
 
-        <div className="min-h-[300px] border p-6 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700">
+        <div className="min-h-[300px] max-h-[460px] overflow-auto border p-6 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700">
           {steps[currentStep].content}
         </div>
 
