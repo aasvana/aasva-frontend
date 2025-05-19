@@ -30,5 +30,13 @@
     {
       "source": "/dashboard/confirmation-vouchers/create",
       "destination": "/pages/dashboard/confirmationvouchers/create"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/:id/edit",
+      "destination": "/pages/dashboard/confirmationvouchers/[id]/edit"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/:id/view",
+      "destination": "/pages/dashboard/confirmationvouchers/[id]/view"
     }
   ]

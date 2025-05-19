@@ -175,7 +175,7 @@ export default function ConfirmationVouchers() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50 dark:bg-neutral-700">
                     <tr>
-                      {["cvId", "customerName", "agent", "date", "Action"].map(
+                      {["cvId", "customerName", "agent", "payment", "date","Action"].map(
                         (header, idx) => (
                           <th
                             key={idx}
@@ -199,6 +199,9 @@ export default function ConfirmationVouchers() {
                         </td>
                         <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                           {data.agent}
+                        </td>
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                          {data.paymentType}
                         </td>
                         <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                           {data.date}

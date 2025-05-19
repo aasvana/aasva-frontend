@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
 import { CalendarIcon, X } from "lucide-react";
 import React, { useState } from "react";
@@ -45,7 +46,7 @@ const ItineraryDetails = () => {
       {itineraries.map((itinerary, index) => (
         <div
           key={itinerary.id}
-          className="relative grid grid-cols-1 md:grid-cols-2 gap-6 border rounded-md p-4 mb-4"
+          className="relative grid grid-cols-1 gap-4 border rounded-md p-4 mb-4"
         >
           {index !== 0 && (
             <button
@@ -56,8 +57,9 @@ const ItineraryDetails = () => {
               <X className="w-4 h-4" />
             </button>
           )}
-          <div className="grid gap-1.5">
-            <Label htmlFor="journeyDate">Date</Label>
+          <div className="grid grid-cols-3">
+            <div className="grid gap-1.5">
+              <Label htmlFor="journeyDate">Date</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -77,13 +79,14 @@ const ItineraryDetails = () => {
                 />
               </PopoverContent>
             </Popover>
+            </div>
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor={`name-${itinerary.id}`}>Subject</Label>
             <Input
               type="text"
               id={`room-${itinerary.id}`}
-              placeholder="0"
+              placeholder="Local Sightseeing Tour"
               className="bg-white"
               value={itinerary.name}
               onChange={(e) =>
@@ -93,16 +96,7 @@ const ItineraryDetails = () => {
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor={`name-${itinerary.id}`}>Itinerary</Label>
-            <Input
-              type="text"
-              id={`room-${itinerary.id}`}
-              placeholder="0"
-              className="bg-white"
-              value={itinerary.name}
-              onChange={(e) =>
-                handleChange(itinerary.id, "name", e.target.value)
-              }
-            />
+            <Textarea placeholder="Type here..." id="included" className="min-h-[140px] bg-white" spellCheck="true" />
           </div>
         </div>
       ))}

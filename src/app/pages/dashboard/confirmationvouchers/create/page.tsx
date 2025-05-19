@@ -6,7 +6,7 @@ import { SaveIcon } from "lucide-react";
 import BackButton from "@/components/generic/back-button";
 import { getSteps } from "../steps";
 
-export default function ConfirmationVouchers() {
+export default function CreateConfirmationVouchers() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -17,17 +17,16 @@ export default function ConfirmationVouchers() {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row items-center justify-between border-b pb-4">
+      <div className="flex flex-row items-center justify-between border-b pb-4 gap-4">
         <BackButton />
         <h1 className="text-2xl font-bold">{steps[currentStep].title}</h1>
-
-        <button
-          type="button"
-          className="inline-flex items-center gap-x-2 py-1 px-1.5 mx-4 text-xs font-medium rounded border border-transparent bg-gray-600 text-white hover:bg-gray-700 focus:outline-hidden focus:bg-gray-700 disabled:opacity-50 disabled:pointer-events-none"
+        <Button
+          variant="outline"
+          className="md:mx-6"
         >
           <SaveIcon className="shrink-0 size-3" />
           Save
-        </button>
+        </Button>
       </div>
       <div
         className="flex flex-col p-4 md:px-6 md:py-4"
