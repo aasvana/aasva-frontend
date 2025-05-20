@@ -20,17 +20,12 @@ export default function CreateConfirmationVouchers() {
       <div className="flex flex-row items-center justify-between border-b pb-4 gap-4">
         <BackButton />
         <h1 className="text-2xl font-bold">{steps[currentStep].title}</h1>
-        <Button
-          variant="outline"
-          className="md:mx-6"
-        >
+        <Button variant="outline" className="md:mx-6">
           <SaveIcon className="shrink-0 size-3" />
           Save
         </Button>
       </div>
-      <div
-        className="flex flex-col p-4 md:px-6 md:py-4"
-      >
+      <div className="flex flex-col p-4 md:px-6 md:py-4">
         <div className="flex justify-center gap-2 mb-6">
           <ul className="flex justify-center items-center w-full max-w-3xl mx-auto">
             {steps.map((_, index) => {
@@ -42,7 +37,7 @@ export default function CreateConfirmationVouchers() {
                   <div
                     className={`z-10 size-7 flex justify-center items-center rounded-full font-medium 
                     ${
-                        isCompleted
+                      isCompleted
                         ? "bg-teal-500 text-white"
                         : isActive
                         ? "bg-gray-600 text-white"
@@ -78,11 +73,11 @@ export default function CreateConfirmationVouchers() {
             })}
           </ul>
         </div>
-
-        <div className="min-h-[300px] max-h-[460px] overflow-auto border p-6 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700">
-          {steps[currentStep].content}
+        <div className="h-[460px] w-full flex items-center justify-center">
+          <div className="min-h-[300px] max-h-[460px] w-full overflow-auto border p-6 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700">
+            {steps[currentStep].content}
+          </div>
         </div>
-
         <div className="mt-6 flex justify-between">
           <Button
             variant="outline"

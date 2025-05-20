@@ -153,6 +153,9 @@ export default function ConfirmationVouchers() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="left" align="start">
+                      <DropdownMenuItem className="bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-neutral-200 mb-2">
+                        Sort By
+                      </DropdownMenuItem>
                       {sortOptions.map((option) => (
                         <DropdownMenuItem
                           key={option.key}
@@ -175,17 +178,22 @@ export default function ConfirmationVouchers() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50 dark:bg-neutral-700">
                     <tr>
-                      {["cvId", "customerName", "agent", "payment", "date","Action"].map(
-                        (header, idx) => (
-                          <th
-                            key={idx}
-                            scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500"
-                          >
-                            {header}
-                          </th>
-                        )
-                      )}
+                      {[
+                        "cvId",
+                        "customerName",
+                        "agent",
+                        "payment",
+                        "date",
+                        "Action",
+                      ].map((header, idx) => (
+                        <th
+                          key={idx}
+                          scope="col"
+                          className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500"
+                        >
+                          {header}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
