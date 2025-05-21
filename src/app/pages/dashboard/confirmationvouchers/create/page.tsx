@@ -2,9 +2,15 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SaveIcon } from "lucide-react";
+import { EyeIcon, SaveIcon } from "lucide-react";
 import BackButton from "@/components/generic/back-button";
 import { getSteps } from "../steps";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function CreateConfirmationVouchers() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -20,10 +26,32 @@ export default function CreateConfirmationVouchers() {
       <div className="flex flex-row items-center justify-between border-b pb-4 gap-4">
         <BackButton />
         <h1 className="text-2xl font-bold">{steps[currentStep].title}</h1>
-        <Button variant="outline" className="md:mx-6">
-          <SaveIcon className="shrink-0 size-3" />
-          Save
-        </Button>
+        <div className="flex items-center gap-2 md:mx-6">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" className="">
+                  <SaveIcon className="shrink-0 size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Save Confirmation Voucher</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" className="">
+                  <EyeIcon className="shrink-0 size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Preview Confirmation Voucher</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
       <div className="flex flex-col p-4 md:px-6 md:py-4">
         <div className="flex justify-center gap-2 mb-6">
@@ -92,11 +120,7 @@ export default function CreateConfirmationVouchers() {
               Next
             </Button>
           ) : (
-            <Button
-              onClick={() => {
-                alert("Form submitted!");
-              }}
-            >
+            <Button>
               Finish
             </Button>
           )}
