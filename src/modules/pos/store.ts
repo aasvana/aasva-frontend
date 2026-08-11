@@ -10,6 +10,7 @@ import {
   deleteProduct,
   saveSale,
   deleteSale,
+  assignDefaultOutlet,
   newId,
 } from "./storage";
 import {
@@ -23,6 +24,7 @@ import {
   buildPosSale,
   CheckoutOptions,
 } from "./invoice-builder";
+import { useOutletStore } from "@/stores/outletStore";
 
 const canUseWindow = typeof window !== "undefined";
 
@@ -49,10 +51,18 @@ export const usePosStore = create<PosStoreState>()((set, get) => ({
 
   hydrate: () => {
     if (!canUseWindow) return;
-    set({ products: getProducts(), sales: getSales() });
+    const activeId = useOutletStore.getState().activeOutletId;
+    set({
+      products: assignDefaultOutlet(getProducts(), activeId),
+      sales: getSales(),
+    });
   },
   addProduct: (data) => {
-    const product: PosProduct = { ...data, id: newId() };
+    const product: PosProduct = {
+      ...data,
+      outletId: data.outletId || useOutletStore.getState().activeOutletId,
+      id: newId(),
+    };
     saveProduct(product);
     set((state) => ({ products: [...state.products, product] }));
     return product;
@@ -139,6 +149,7 @@ export const usePosStore = create<PosStoreState>()((set, get) => ({
       customerName: options.customerName,
       paymentMode: options.paymentMode,
       currency: options.currency,
+      outletId: useOutletStore.getState().activeOutletId,
     });
     saveSale(sale);
     set((state) => ({ sales: [sale, ...state.sales], cart: [] }));

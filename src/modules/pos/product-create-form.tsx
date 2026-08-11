@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { notify } from "@/lib/notify";
 import {
   ArrowLeft,
   ChevronLeft,
@@ -25,6 +26,8 @@ import {
 } from "./constants";
 import { PosProduct, PosProductInput, posProductSchema } from "./schema";
 import { usePosStore } from "./store";
+import { useOutletStore } from "@/stores/outletStore";
+import { usePosSettingsStore } from "@/stores/posSettingsStore";
 import {
   Button,
   Input,
@@ -335,12 +338,27 @@ export function ProductCreateForm({
   const router = useRouter();
   const addProduct = usePosStore((s) => s.addProduct);
   const updateProductById = usePosStore((s) => s.updateProductById);
+  const activeOutletId = useOutletStore((s) => s.activeOutletId);
+  const threshold = usePosSettingsStore((s) => s.settings.lowStockThreshold);
 
   const [categories, setCategories] = useState<string[]>(() => [
     ...PRODUCT_CATEGORIES,
   ]);
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+
+  const [subcategoriesMap, setSubcategoriesMap] = useState<
+    Record<string, string[]>
+  >(() =>
+    Object.fromEntries(
+      Object.entries(PRODUCT_SUBCATEGORIES).map(([key, values]) => [
+        key,
+        [...values],
+      ])
+    )
+  );
+  const [addingSubcategory, setAddingSubcategory] = useState(false);
+  const [newSubcategory, setNewSubcategory] = useState("");
 
   const isEdit = Boolean(product);
 
@@ -355,6 +373,7 @@ export function ProductCreateForm({
     defaultValues: {
       name: product?.name ?? "",
       sku: product?.sku ?? "",
+      outletId: product?.outletId ?? activeOutletId,
       category: product?.category ?? "General",
       subcategory: product?.subcategory ?? "",
       price: product?.price ?? 0,
@@ -376,7 +395,7 @@ export function ProductCreateForm({
   const category = watch("category");
   const subcategory = watch("subcategory");
 
-  const subcategories = PRODUCT_SUBCATEGORIES[category] ?? [];
+  const subcategories = subcategoriesMap[category] ?? [];
 
   const setImages = (next: string[]) =>
     setValue("images", next, { shouldDirty: true });
@@ -394,13 +413,49 @@ export function ProductCreateForm({
     setAddingCategory(false);
   };
 
+  const confirmAddSubcategory = () => {
+    const trimmed = newSubcategory.trim();
+    if (!trimmed) return;
+    const existing = subcategoriesMap[category] ?? [];
+    if (!existing.includes(trimmed)) {
+      setSubcategoriesMap((prev) => ({
+        ...prev,
+        [category]: [...(prev[category] ?? []), trimmed],
+      }));
+    }
+    setValue("subcategory", trimmed, { shouldValidate: true });
+    setNewSubcategory("");
+    setAddingSubcategory(false);
+  };
+
   const onSubmit = (data: PosProductInput) => {
     if (isEdit && product) {
       updateProductById(product.id, data);
-      toast.success("Product updated successfully!");
+      notify({
+        type: "info",
+        category: "inventory",
+        title: "Product updated",
+        message: data.name,
+      });
     } else {
       addProduct(data);
-      toast.success("Product added successfully!");
+      if (Number(data.stock) <= threshold) {
+        notify({
+          type: "warning",
+          category: "inventory",
+          title: "Low stock alert",
+          message: `${data.name} is running low (${data.stock} left).`,
+          link: "/dashboard/pos/stock/low-stock",
+        });
+      } else {
+        notify({
+          type: "success",
+          category: "inventory",
+          title: "Product added",
+          message: data.name,
+          link: "/dashboard/pos/products",
+        });
+      }
     }
     router.push("/dashboard/pos/products");
   };
@@ -418,11 +473,10 @@ export function ProductCreateForm({
     register(name, { valueAsNumber: true });
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl">
       <div className="mb-8 flex items-center justify-between gap-4">
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="size-4" />
-          Back
         </Button>
         <h1 className="text-2xl font-bold">
           {isEdit ? "Edit Product" : "Add Product"}
@@ -665,6 +719,42 @@ export function ProductCreateForm({
                   </Select>
                   {fieldError("subcategory")}
                 </div>
+              )}
+
+              {addingSubcategory ? (
+                <div className="flex gap-2">
+                  <Input
+                    autoFocus
+                    value={newSubcategory}
+                    onChange={(e) => setNewSubcategory(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        confirmAddSubcategory();
+                      }
+                      if (e.key === "Escape") setAddingSubcategory(false);
+                    }}
+                    placeholder="New sub category name"
+                    className={inputClasses}
+                  />
+                  <Button
+                    type="button"
+                    onClick={confirmAddSubcategory}
+                    className="h-12 bg-emerald-600 px-5 text-white shadow-sm hover:bg-emerald-700"
+                  >
+                    Add
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setAddingSubcategory(true)}
+                  className="h-11 w-full cursor-pointer border-emerald-600 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-700"
+                >
+                  <Plus className="size-4" />
+                  Add Sub Category
+                </Button>
               )}
 
               {addingCategory ? (

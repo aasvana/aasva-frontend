@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CirclePlusIcon, MinusIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { CirclePlusIcon, LayoutGridIcon, ListIcon, MinusIcon, PlusIcon, ShoppingCartIcon, Trash2Icon, XIcon } from "lucide-react";
+import { notify } from "@/lib/notify";
+import { OutletSwitcher } from "./outlet-switcher";
+import { useOutletStore } from "@/stores/outletStore";
 import { CURRENCIES, PAYMENT_MODES, PAYMENT_MODE_LABELS, formatMoney } from "./constants";
 import { computePosTotals } from "./schema";
 import { usePosStore } from "./store";
@@ -17,7 +20,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  cn,
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -49,16 +54,25 @@ export function PosTerminal() {
   const setCartQty = usePosStore((s) => s.setCartQty);
   const removeFromCart = usePosStore((s) => s.removeFromCart);
   const checkout = usePosStore((s) => s.checkout);
+  const activeOutletId = useOutletStore((s) => s.activeOutletId);
+  const outlets = useOutletStore((s) => s.outlets);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const totals = computePosTotals(cart);
 
+  const outletProducts = useMemo(
+    () => products.filter((p) => p.outletId === activeOutletId),
+    [products, activeOutletId]
+  );
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return outletProducts.filter((product) => {
       const matchesSearch =
         product.name.toLowerCase().includes(search.toLowerCase()) ||
         product.sku.toLowerCase().includes(search.toLowerCase());
@@ -66,7 +80,7 @@ export function PosTerminal() {
         category === "all" || product.category === category;
       return matchesSearch && matchesCategory;
     });
-  }, [products, search, category]);
+  }, [outletProducts, search, category]);
 
   const {
     register,
@@ -76,7 +90,12 @@ export function PosTerminal() {
     formState: { errors },
   } = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
-    defaultValues: { customerName: "", paymentMode: "cash", currency: "USD" },
+    defaultValues: {
+      customerName: "",
+      paymentMode: "cash",
+      currency:
+        outlets.find((o) => o.id === activeOutletId)?.currency ?? "USD",
+    },
   });
 
   const onSubmit = (values: CheckoutForm) => {
@@ -88,7 +107,14 @@ export function PosTerminal() {
         paymentMode: values.paymentMode,
         currency: values.currency,
       });
-      toast.success(`Invoice ${invoice.data.invoiceNo} created!`);
+      notify({
+        type: "success",
+        category: "sales",
+        title: "Sale completed",
+        message: `Invoice ${invoice.data.invoiceNo} was created.`,
+        customer: values.customerName,
+        link: `/dashboard/invoices/${invoice.id}/view`,
+      });
       setCheckoutOpen(false);
       router.push(`/dashboard/invoices/${invoice.id}/view`);
     } catch {
@@ -98,12 +124,12 @@ export function PosTerminal() {
     }
   };
 
-  if (products.length === 0) {
+  if (outletProducts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-gray-300 py-24 text-center">
+      <div className="flex flex-col items-center justify-center gap-4 rounded-[20px] border border-dashed border-gray-200 py-24 text-center">
         <p className="text-lg font-medium text-gray-800">No products yet</p>
         <p className="text-sm text-gray-500">
-          Add your first product to start taking orders at the store.
+          Add your first product to start taking orders at this outlet.
         </p>
         <Button asChild>
           <Link href="/dashboard/pos/products">
@@ -117,86 +143,189 @@ export function PosTerminal() {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="grid gap-4">
-          <div className="grid gap-3 sm:grid-cols-[1fr_200px]">
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search products..."
-            />
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="All categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All categories</SelectItem>
-                {[
-                  "General",
-                  "Food & Beverage",
-                  "Electronics",
-                  "Apparel",
-                  "Services",
-                  "Other",
-                ].map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {filteredProducts.length === 0 ? (
-            <p className="py-16 text-center text-sm text-gray-500">
-              No products match your search.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-              {filteredProducts.map((product) => (
-                <Card key={product.id} className="overflow-hidden">
-                  <CardHeader className="p-3 pb-0">
-                    <CardTitle className="text-sm font-semibold text-gray-800">
-                      {product.name}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {product.sku || product.category}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-3">
-                    <p className="text-base font-bold text-gray-900">
-                      {formatMoney(product.price, "USD")}
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      {product.taxRate}% tax · {product.stock} in stock
-                    </p>
-                    <Button
-                      className="mt-3 w-full"
-                      size="sm"
-                      onClick={() => addToCart(product)}
-                    >
-                      <PlusIcon className="size-4" />
-                      Add to cart
-                    </Button>
-                  </CardContent>
-                </Card>
+      <div className="grid grid-cols-1 gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <OutletSwitcher />
+          <Button
+            variant="secondary"
+            className="cursor-pointer sm:hidden"
+            onClick={() => setCartOpen(true)}
+          >
+            <ShoppingCartIcon className="size-4" />
+            <span className="ml-1">
+              {cart.reduce((sum, item) => sum + item.qty, 0)}
+            </span>
+          </Button>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_200px]">
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search products..."
+          />
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger>
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              {[
+                "General",
+                "Food & Beverage",
+                "Electronics",
+                "Apparel",
+                "Services",
+                "Other",
+              ].map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
               ))}
-            </div>
-          )}
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="lg:sticky lg:top-0 self-start">
-          <Card>
-            <CardHeader className="border-b p-4">
-              <CardTitle className="text-base">Cart</CardTitle>
-              <CardDescription className="text-xs">
-                {cart.length} item{cart.length === 1 ? "" : "s"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-pressed={view === "grid"}
+              className={cn(
+                "flex size-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                view === "grid"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              )}
+            >
+              <LayoutGridIcon className="size-4" />
+              <span className="sr-only">Grid view</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              aria-pressed={view === "list"}
+              className={cn(
+                "flex size-9 cursor-pointer items-center justify-center rounded-lg transition-colors",
+                view === "list"
+                  ? "bg-white text-emerald-700 shadow-sm"
+                  : "text-gray-500 hover:text-gray-700"
+              )}
+            >
+              <ListIcon className="size-4" />
+              <span className="sr-only">List view</span>
+            </button>
+          </div>
+
+          <Button
+            onClick={() => setCartOpen(true)}
+            className="h-11 gap-2 bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+          >
+            <ShoppingCartIcon className="size-4" />
+            Cart
+            <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold">
+              {cart.length}
+            </span>
+          </Button>
+        </div>
+
+        {filteredProducts.length === 0 ? (
+          <p className="py-16 text-center text-sm text-gray-500">
+            No products match your search.
+          </p>
+        ) : view === "grid" ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="overflow-hidden transition-colors hover:border-emerald-200">
+                <CardHeader className="p-3 pb-0">
+                  <CardTitle className="text-sm font-semibold text-gray-800">
+                    {product.name}
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    {product.sku || product.category}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-3">
+                  <p className="text-base font-bold text-gray-900">
+                    {formatMoney(product.price, "USD")}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {product.taxRate}% tax · {product.stock} in stock
+                  </p>
+                  <Button
+                    className="mt-3 w-full"
+                    size="sm"
+                    onClick={() => addToCart(product)}
+                  >
+                    <PlusIcon className="size-4" />
+                    Add to cart
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-2.5">
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-gray-800">
+                    {product.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {product.sku || product.category}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-gray-900">
+                    {formatMoney(product.price, "USD")}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {product.taxRate}% tax · {product.stock} in stock
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  className="shrink-0 bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                  onClick={() => addToCart(product)}
+                >
+                  <PlusIcon className="size-4" />
+                  Add
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Drawer
+        direction="right"
+        open={cartOpen}
+        onOpenChange={(open) => !open && setCartOpen(false)}
+      >
+        <DrawerContent className="w-full max-w-md rounded-none border-l">
+          <div className="flex h-full flex-col">
+            <DrawerHeader className="border-b">
+              <div className="flex items-center justify-between pr-1">
+                <DrawerTitle className="text-base">Cart</DrawerTitle>
+                <DrawerClose asChild>
+                  <Button variant="ghost" size="icon" className="size-8">
+                    <XIcon className="size-4" />
+                  </Button>
+                </DrawerClose>
+              </div>
+              <DrawerDescription className="text-xs">
+                {cart.length} item{cart.length === 1 ? "" : "s"} in your cart
+              </DrawerDescription>
+            </DrawerHeader>
+
+            <div className="flex-1 overflow-y-auto p-4">
               {cart.length === 0 ? (
                 <p className="py-10 text-center text-sm text-gray-500">
-                  Your cart is empty.
+                  Your cart is empty. Add products to get started.
                 </p>
               ) : (
                 <div className="grid gap-3">
@@ -205,7 +334,7 @@ export function PosTerminal() {
                     return (
                       <div
                         key={item.productId}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-2.5"
+                        className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-2.5"
                       >
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-gray-800">
@@ -256,7 +385,8 @@ export function PosTerminal() {
                   })}
                 </div>
               )}
-            </CardContent>
+            </div>
+
             {cart.length > 0 && (
               <>
                 <div className="grid gap-1.5 border-t border-gray-200 p-4 text-sm">
@@ -273,20 +403,22 @@ export function PosTerminal() {
                     <span>{formatMoney(totals.total, "USD")}</span>
                   </div>
                 </div>
-                <div className="p-4 pt-0">
+                <div className="border-t border-gray-200 p-4">
                   <Button
-                    className="w-full"
-                    size="lg"
-                    onClick={() => setCheckoutOpen(true)}
+                    className="h-12 w-full bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                    onClick={() => {
+                      setCartOpen(false);
+                      setCheckoutOpen(true);
+                    }}
                   >
                     Checkout
                   </Button>
                 </div>
               </>
             )}
-          </Card>
-        </div>
-      </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       <Drawer
         direction="right"

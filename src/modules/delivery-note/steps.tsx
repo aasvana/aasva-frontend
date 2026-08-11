@@ -45,12 +45,12 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
-        <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+    <section className="rounded-[20px] border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
         {actions}
       </div>
-      <div className="p-4">{children}</div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -260,14 +260,14 @@ export function LineItemsSection() {
                   <TableRow key={field.id}>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         placeholder="Description"
                         {...register(`items.${index}.description`)}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         type="number"
                         min={0}
                         {...register(`items.${index}.qty`, {
@@ -277,7 +277,7 @@ export function LineItemsSection() {
                     </TableCell>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         type="number"
                         min={0}
                         step="0.01"
@@ -295,7 +295,7 @@ export function LineItemsSection() {
                             value={String(taxField.value ?? 0)}
                             onValueChange={(v) => taxField.onChange(Number(v))}
                           >
-                            <SelectTrigger className="bg-white w-full">
+                            <SelectTrigger className="w-full">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -361,7 +361,7 @@ export function LineItemsSection() {
                   type="number"
                   min={0}
                   step="0.01"
-                  className="bg-white"
+                  className="bg-gray-50"
                   {...register("discountValue", { valueAsNumber: true })}
                 />
               </div>
@@ -415,7 +415,7 @@ export function NotesSection() {
           <textarea
             id="notes"
             rows={3}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-xs"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-[15px] shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
             placeholder="Handle with care..."
             {...register("notes")}
           />
@@ -428,7 +428,7 @@ export function NotesSection() {
           <textarea
             id="terms"
             rows={3}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-xs"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-[15px] shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
             placeholder="Subject to our standard terms..."
             {...register("terms")}
           />

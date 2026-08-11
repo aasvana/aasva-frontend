@@ -43,6 +43,7 @@ export {
   getSale,
   saveSale,
   deleteSale,
+  assignDefaultOutlet,
 } from "./storage";
 
 export { nextInvoiceNo, buildInvoiceFromCart, buildPosSale } from "./invoice-builder";
@@ -53,3 +54,6 @@ export { usePosStore } from "./store";
 export { ProductCreateForm } from "./product-create-form";
 export { PosTerminal } from "./pos-terminal";
 export { PosProductPicker } from "./pos-product-picker";
+export { OutletSwitcher } from "./outlet-switcher";
+export { LabelPrintDialog } from "./label-print-dialog";
+export { ProductLabel, Barcode, printProductLabels } from "./product-label";

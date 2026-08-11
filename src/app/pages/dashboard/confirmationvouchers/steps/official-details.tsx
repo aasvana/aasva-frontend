@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { paymentTypes } from "@/constants/paymentTypes";
+import { useCvConfigStore } from "@/stores/cvConfigStore";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React, { useEffect } from "react";
@@ -34,6 +35,10 @@ const OfficialDetails = () => {
   const paymentType = watch("paymentType");
   const totalAmount = watch("totalAmount");
   const amountReceived = watch("amountReceived");
+
+  const defaultCurrency = useCvConfigStore(
+    (s) => s.settings.defaultCurrency
+  );
 
   useEffect(() => {
     const total = Number(totalAmount);
@@ -62,7 +67,7 @@ const OfficialDetails = () => {
           type="text"
           id="voucherNo"
           placeholder="Xmerge/Kol/A/001"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.voucherNo}
           {...register("voucherNo")}
         />
@@ -76,8 +81,8 @@ const OfficialDetails = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                errors.bookingDate ? "border-red-500" : ""
+              className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                errors.bookingDate ? "border-red-500" : "border-gray-200"
               }`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -104,12 +109,14 @@ const OfficialDetails = () => {
         )}
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="totalAmount">Total Amount</Label>
+        <Label htmlFor="totalAmount">
+          Total Amount ({defaultCurrency})
+        </Label>
         <Input
           type="number"
           id="totalAmount"
           placeholder="2450"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.totalAmount}
           {...register("totalAmount")}
         />
@@ -150,7 +157,7 @@ const OfficialDetails = () => {
           type="number"
           id="amountReceived"
           placeholder="2450"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.amountReceived}
           {...register("amountReceived")}
         />
@@ -165,7 +172,7 @@ const OfficialDetails = () => {
           id="amountBalanced"
           placeholder="0"
           readOnly
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.amountBalanced}
           {...register("amountBalanced")}
         />

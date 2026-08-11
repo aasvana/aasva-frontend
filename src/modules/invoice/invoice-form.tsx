@@ -28,6 +28,7 @@ import {
   PaymentSection,
 } from "./steps";
 import { InvoicePreviewDrawer } from "./invoice-preview-drawer";
+import { notify } from "@/lib/notify";
 import {
   Button,
   Tooltip,
@@ -138,9 +139,21 @@ export function InvoiceForm({
         }
         if (mode === "create") {
           clearDraft();
-          toast.success("Invoice created successfully!");
+          notify({
+            type: "success",
+            category: "invoice",
+            title: "Invoice created",
+            message: `Invoice ${normalized.invoiceNo} has been created.`,
+            customer: normalized.billTo?.name,
+            link: `/dashboard/invoices/${record.id}/view`,
+          });
         } else {
-          toast.success("Invoice updated successfully!");
+          notify({
+            type: "info",
+            category: "invoice",
+            title: "Invoice updated",
+            message: `Invoice ${normalized.invoiceNo} was updated.`,
+          });
         }
         router.push(`/dashboard/invoices/${record.id}/view`);
       };
@@ -180,7 +193,10 @@ export function InvoiceForm({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handleSave}>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                  >
                     <SaveIcon className="shrink-0 size-4" />
                   </Button>
                 </TooltipTrigger>

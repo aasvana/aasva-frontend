@@ -9,7 +9,7 @@ export default function PosStorePage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold text-gray-800">Store</h1>
+        <h1 className="text-xl font-semibold text-gray-800">Register</h1>
         <p className="text-sm text-gray-500">
           Add products to the cart and complete sales to generate invoices.
         </p>

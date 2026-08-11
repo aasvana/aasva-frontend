@@ -72,7 +72,7 @@ export function TextField({
         id={name}
         type={type}
         placeholder={placeholder}
-        className="bg-white"
+        className="bg-gray-50"
         disabled={disabled}
         readOnly={readOnly}
         aria-invalid={!!error}
@@ -112,9 +112,9 @@ export function DateField({
                 variant="outline"
                 disabled={disabled}
                 className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !field.value && "text-muted-foreground",
-                  error && "border-red-500"
+                  "h-12 w-full justify-start rounded-xl bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100",
+                  error ? "border-red-500" : "border-gray-200",
+                  !field.value && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />

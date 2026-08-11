@@ -63,6 +63,19 @@ export function deleteProduct(id: string): void {
   writeProducts(readProducts().filter((p) => p.id !== id));
 }
 
+export function assignDefaultOutlet(
+  products: PosProduct[],
+  outletId: string
+): PosProduct[] {
+  const migrated = products.map((p) =>
+    p.outletId ? p : { ...p, outletId }
+  );
+  if (migrated.some((p, i) => p !== products[i])) {
+    writeProducts(migrated);
+  }
+  return migrated;
+}
+
 // ---- Sales ----
 
 function readSales(): PosSale[] {

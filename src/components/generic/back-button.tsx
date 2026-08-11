@@ -14,10 +14,10 @@ const BackButton = () => {
 }
 
   return (
-    <div className="flex items-center justify-between border-gray-200 md:px-6 dark:border-neutral-700">
+    <div className="flex items-center justify-between border-gray-200 dark:border-neutral-700">
       <Button
         variant="secondary"
-        className="hover:bg-black hover:text-white cursor-pointer"
+        className="hover:bg-emerald-50 hover:text-emerald-700 cursor-pointer"
         onClick={() => goBack()}
       >
         <MoveLeft />

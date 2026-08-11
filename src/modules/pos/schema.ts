@@ -15,6 +15,7 @@ const nonNegativeNumber = (message: string) =>
 export const posProductSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   sku: z.string().default(""),
+  outletId: z.string().min(1, "Outlet is required"),
   category: z.string().min(1, "Category is required"),
   subcategory: z.string().default(""),
   price: nonNegativeNumber("Price must be a valid number"),
@@ -58,6 +59,7 @@ export type PosSaleItem = {
 
 export type PosSale = {
   id: string;
+  outletId: string;
   invoiceId: string;
   customerName: string;
   items: PosSaleItem[];

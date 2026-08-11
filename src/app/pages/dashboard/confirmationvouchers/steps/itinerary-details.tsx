@@ -72,8 +72,8 @@ const ItineraryDetails = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className={`w-full justify-start text-left font-normal ${
-                        errors.itineraries?.[index]?.date ? "border-red-500" : ""
+                      className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                        errors.itineraries?.[index]?.date ? "border-red-500" : "border-gray-200"
                       }`}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -113,7 +113,7 @@ const ItineraryDetails = () => {
               <Input
                 type="text"
                 placeholder="Local Sightseeing Tour"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.itineraries?.[index]?.subject}
                 {...control.register(`itineraries.${index}.subject`)}
               />

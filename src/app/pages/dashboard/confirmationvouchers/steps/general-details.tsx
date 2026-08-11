@@ -18,7 +18,7 @@ const GeneralDetails = () => {
           <Input
             type="time"
             id="checkinTime"
-            className="bg-white"
+            className="bg-gray-50"
             aria-invalid={!!errors.checkinTime}
             {...register("checkinTime")}
           />
@@ -31,7 +31,7 @@ const GeneralDetails = () => {
           <Input
             type="time"
             id="checkoutTime"
-            className="bg-white"
+            className="bg-gray-50"
             aria-invalid={!!errors.checkoutTime}
             {...register("checkoutTime")}
           />
@@ -45,7 +45,7 @@ const GeneralDetails = () => {
             type="text"
             id="smokingPolicy"
             placeholder="As per the hotel policy"
-            className="bg-white"
+            className="bg-gray-50"
             aria-invalid={!!errors.smokingPolicy}
             {...register("smokingPolicy")}
           />
@@ -59,7 +59,7 @@ const GeneralDetails = () => {
             type="text"
             id="consumptionOfLiquor"
             placeholder="As per the hotel policy"
-            className="bg-white"
+            className="bg-gray-50"
             aria-invalid={!!errors.consumptionOfLiquor}
             {...register("consumptionOfLiquor")}
           />
@@ -78,7 +78,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="John Doe"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.assistanceName}
                 {...register("assistanceName")}
               />
@@ -92,7 +92,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="9876543210"
-                className="bg-white"
+                className="bg-gray-50"
                 maxLength={10}
                 aria-invalid={!!errors.assistancePhone}
                 {...register("assistancePhone")}
@@ -112,7 +112,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="John Doe"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.supportName}
                 {...register("supportName")}
               />
@@ -126,7 +126,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="9876543210"
-                className="bg-white"
+                className="bg-gray-50"
                 maxLength={10}
                 aria-invalid={!!errors.supportPhone}
                 {...register("supportPhone")}
@@ -146,7 +146,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="John Doe"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.emergencyName}
                 {...register("emergencyName")}
               />
@@ -160,7 +160,7 @@ const GeneralDetails = () => {
               <Input
                 type="text"
                 placeholder="9876543210"
-                className="bg-white"
+                className="bg-gray-50"
                 maxLength={10}
                 aria-invalid={!!errors.emergencyPhone}
                 {...register("emergencyPhone")}

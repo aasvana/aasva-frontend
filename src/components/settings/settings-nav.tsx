@@ -5,8 +5,11 @@ import {
   Bell,
   Building2,
   CreditCard,
+  ImageIcon,
   KeyRound,
   Palette,
+  ReceiptText,
+  ScrollText,
   Shield,
   User,
   Users,
@@ -17,6 +20,9 @@ import { cn } from "@/lib/utils";
 export type SettingsSectionId =
   | "user-profile"
   | "company-profile"
+  | "company-branding"
+  | "company-tax"
+  | "company-registration"
   | "appearance"
   | "team"
   | "billing"
@@ -47,16 +53,39 @@ export const settingsGroups: SettingsGroup[] = [
         icon: User,
       },
       {
-        id: "company-profile",
-        label: "Company Profile",
-        description: "Company details and branding",
-        icon: Building2,
-      },
-      {
         id: "appearance",
         label: "Appearance",
         description: "Theme and display preferences",
         icon: Palette,
+      },
+    ],
+  },
+  {
+    label: "Company",
+    sections: [
+      {
+        id: "company-profile",
+        label: "Company Profile",
+        description: "Company details and contact info",
+        icon: Building2,
+      },
+      {
+        id: "company-branding",
+        label: "Branding & Logo",
+        description: "Logo, tagline and branding",
+        icon: ImageIcon,
+      },
+      {
+        id: "company-tax",
+        label: "Tax & GST",
+        description: "GST, PAN and tax details",
+        icon: ReceiptText,
+      },
+      {
+        id: "company-registration",
+        label: "Registration",
+        description: "Registration and legal details",
+        icon: ScrollText,
       },
     ],
   },
@@ -122,15 +151,15 @@ export function SettingsNav({
                 className={cn(
                   "flex items-start gap-3 rounded-lg px-3 py-2 text-left transition-colors",
                   isActive
-                    ? "bg-accent text-accent-foreground"
-                    : "hover:bg-accent/50 hover:text-accent-foreground"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "hover:bg-emerald-50/60 hover:text-emerald-700"
                 )}
               >
                 <Icon
                   className={cn(
                     "mt-0.5 size-4 shrink-0",
                     isActive
-                      ? "text-foreground"
+                      ? "text-emerald-600"
                       : "text-muted-foreground"
                   )}
                 />

@@ -22,11 +22,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useHydrate } from "@/hooks/useHydrate";
 import {
+  OutletSwitcher,
   PAYMENT_MODE_LABELS,
   PosSale,
   formatMoney,
   usePosStore,
 } from "@/modules/pos";
+import { DEFAULT_OUTLET_ID, useOutletStore } from "@/stores/outletStore";
 import { toast } from "sonner";
 
 const sortOptions = [
@@ -44,6 +46,7 @@ export default function PosSalesPage() {
   const router = useRouter();
   const sales = usePosStore((s) => s.sales);
   const deleteSaleById = usePosStore((s) => s.deleteSaleById);
+  const activeOutletId = useOutletStore((s) => s.activeOutletId);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
@@ -51,8 +54,17 @@ export default function PosSalesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const outletSales = useMemo(() => {
+    const id = activeOutletId;
+    return sales.filter(
+      (sale) =>
+        sale.outletId === id ||
+        (!sale.outletId && id === DEFAULT_OUTLET_ID)
+    );
+  }, [sales, activeOutletId]);
+
   const sorted = useMemo(() => {
-    const filtered = sales.filter((sale) =>
+    const filtered = outletSales.filter((sale) =>
       `${sale.customerName} ${sale.invoiceId}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
@@ -70,7 +82,7 @@ export default function PosSalesPage() {
         (sortOrder === "asc" ? 1 : -1)
       );
     });
-  }, [sales, searchTerm, sortKey, sortOrder]);
+  }, [outletSales, searchTerm, sortKey, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
   const paginated = sorted.slice(
@@ -101,20 +113,23 @@ export default function PosSalesPage() {
         <div>
           <h1 className="text-xl font-semibold text-gray-800">Sales</h1>
           <p className="text-sm text-gray-500">
-            History of completed sales at your store.
+            History of completed sales at this outlet.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/pos/store">
-            <CirclePlusIcon /> New Sale
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <OutletSwitcher />
+          <Button asChild>
+            <Link href="/dashboard/pos/store">
+              <CirclePlusIcon /> New Sale
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col p-1.5">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
-            <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 dark:border-neutral-700 dark:divide-neutral-700">
+            <div className="border border-gray-100 rounded-[20px] divide-y divide-gray-100 dark:border-neutral-700 dark:divide-neutral-700">
               <div className="py-3 px-4 flex flex-row justify-between">
                 <div className="relative w-lg max-w-sm">
                   <label className="sr-only">Search</label>
@@ -126,7 +141,7 @@ export default function PosSalesPage() {
                       setCurrentPage(1);
                     }}
                     placeholder="Search sales..."
-                    className="py-1.5 sm:py-2 px-3 ps-9 block w-full border border-gray-200 shadow-2xs rounded-lg sm:text-sm"
+                    className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 ps-9 pe-3 block text-sm shadow-2xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
                   />
                   <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3">
                     <Search className="h-4 w-4 text-gray-400" />
@@ -149,7 +164,7 @@ export default function PosSalesPage() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="secondary"
-                        className="hover:bg-black hover:text-white"
+                        className="hover:bg-emerald-50 hover:text-emerald-700"
                       >
                         <ArrowDownUp className="w-4" />
                       </Button>
@@ -171,17 +186,17 @@ export default function PosSalesPage() {
                 </div>
               </div>
               <div className="overflow-hidden min-h-[550px]">
-                {sales.length === 0 ? (
+                {outletSales.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-4 h-[550px] text-center">
                     <p className="text-lg font-medium text-gray-800">
                       No sales yet
                     </p>
                     <p className="text-sm text-gray-500">
-                      Complete a sale at the store to see it here.
+                      Complete a sale at this outlet to see it here.
                     </p>
                     <Button asChild>
                       <Link href="/dashboard/pos/store">
-                        <CirclePlusIcon /> Go to Store
+                        <CirclePlusIcon /> Go to Outlet
                       </Link>
                     </Button>
                   </div>
@@ -259,7 +274,7 @@ export default function PosSalesPage() {
                         disabled:pointer-events-none
                         cursor-pointer ${
                           currentPage === i + 1
-                            ? "bg-black text-white hover:bg-black"
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
                             : "text-gray-800 hover:bg-gray-100"
                         }`}
                     >

@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
-import { Check, Copy, Plus, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { Check, Copy, ImageIcon, Plus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,8 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { brand } from "@/constants/brand";
 import { cn } from "@/lib/utils";
+import { CURRENCIES } from "@/modules/invoice";
+import { useCompanyStore } from "@/stores/companyStore";
 
 function Switch({
   checked,
@@ -109,6 +110,35 @@ function CardActions({ onSave }: { onSave: () => void }) {
 const notifySaved = (what: string) =>
   toast.success(`${what} updated successfully!`);
 
+function fileToDataUrl(file: File, maxDim = 512, quality = 0.9): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const width = Math.max(1, Math.round(img.width * scale));
+        const height = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(reader.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const mime = file.type === "image/png" ? "image/png" : "image/jpeg";
+        resolve(canvas.toDataURL(mime, quality));
+      };
+      img.onerror = () => resolve(reader.result as string);
+      img.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error("Could not read the file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function UserProfileSection() {
   const [name, setName] = useState("Admin");
   const [email, setEmail] = useState("m@example.com");
@@ -172,11 +202,20 @@ export function UserProfileSection() {
 }
 
 export function CompanyProfileSection() {
-  const [companyName, setCompanyName] = useState(brand.travelName);
-  const [contactEmail, setContactEmail] = useState(brand.contact.email);
-  const [phone, setPhone] = useState(brand.contact.mobile);
-  const [address, setAddress] = useState(brand.contact.address);
-  const [website, setWebsite] = useState(brand.url);
+  const company = useCompanyStore((s) => s.company);
+  const updateCompany = useCompanyStore((s) => s.updateCompany);
+
+  const [name, setName] = useState(company.name);
+  const [shortName, setShortName] = useState(company.shortName);
+  const [email, setEmail] = useState(company.email);
+  const [phone, setPhone] = useState(company.phone);
+  const [address, setAddress] = useState(company.address);
+  const [website, setWebsite] = useState(company.website);
+
+  const handleSave = () => {
+    updateCompany({ name, shortName, email, phone, address, website });
+    notifySaved("Company profile");
+  };
 
   return (
     <Card>
@@ -189,16 +228,29 @@ export function CompanyProfileSection() {
       <CardContent className="flex flex-col gap-4">
         <Field label="Company Name">
           <Input
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Short Name">
+            <Input
+              value={shortName}
+              onChange={(e) => setShortName(e.target.value)}
+            />
+          </Field>
+          <Field label="Website">
+            <Input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </Field>
           <Field label="Contact Email">
             <Input
               type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Field>
           <Field label="Phone">
@@ -211,15 +263,282 @@ export function CompanyProfileSection() {
             onChange={(e) => setAddress(e.target.value)}
           />
         </Field>
-        <Field label="Website">
+      </CardContent>
+      <CardActions onSave={handleSave} />
+    </Card>
+  );
+}
+
+export function BrandingSection() {
+  const company = useCompanyStore((s) => s.company);
+  const updateCompany = useCompanyStore((s) => s.updateCompany);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [logo, setLogo] = useState<string | null>(company.logo);
+  const [tagline, setTagline] = useState(company.tagline);
+  const [uploading, setUploading] = useState(false);
+
+  const handleLogoFile = async (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const url = await fileToDataUrl(file);
+      setLogo(url);
+    } catch {
+      toast.error("Failed to process the logo image.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = () => {
+    updateCompany({ logo, tagline });
+    notifySaved("Branding");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Branding & Logo</CardTitle>
+        <CardDescription>
+          Upload your company logo and set a tagline for your documents.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6">
+        <div className="flex items-center gap-4">
+          <div className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-2xl border border-gray-200 bg-gray-50">
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logo}
+                alt="Company logo"
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <ImageIcon className="size-8 text-gray-400" />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => inputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Upload className="size-4" />
+                {uploading ? "Uploading..." : "Upload Logo"}
+              </Button>
+              {logo && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLogo(null)}
+                >
+                  <Trash2 className="size-4" />
+                  Remove
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              PNG or JPG. Shown on your invoices and documents.
+            </p>
+          </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              handleLogoFile(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </div>
+        <Separator />
+        <Field label="Tagline">
           <Input
-            type="url"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
+            value={tagline}
+            onChange={(e) => setTagline(e.target.value)}
+            placeholder="A short description of your company"
           />
         </Field>
       </CardContent>
-      <CardActions onSave={() => notifySaved("Company profile")} />
+      <CardActions onSave={handleSave} />
+    </Card>
+  );
+}
+
+const BUSINESS_TYPES = [
+  "Sole Proprietorship",
+  "Partnership",
+  "Limited Liability Partnership (LLP)",
+  "Private Limited",
+  "Public Limited",
+  "Non-profit Organization",
+] as const;
+
+export function TaxGstSection() {
+  const company = useCompanyStore((s) => s.company);
+  const updateCompany = useCompanyStore((s) => s.updateCompany);
+
+  const [gstin, setGstin] = useState(company.gstin);
+  const [pan, setPan] = useState(company.pan);
+  const [tan, setTan] = useState(company.tan);
+  const [currency, setCurrency] = useState(company.currency);
+  const [defaultTaxRate, setDefaultTaxRate] = useState(
+    String(company.defaultTaxRate)
+  );
+
+  const handleSave = () => {
+    updateCompany({
+      gstin,
+      pan,
+      tan,
+      currency,
+      defaultTaxRate: Number(defaultTaxRate) || 0,
+    });
+    notifySaved("Tax & GST");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Tax & GST</CardTitle>
+        <CardDescription>
+          Tax registration details used on your invoices and documents.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="GSTIN">
+            <Input
+              value={gstin}
+              onChange={(e) => setGstin(e.target.value)}
+              placeholder="e.g. 27AABCU9603R1ZM"
+            />
+          </Field>
+          <Field label="Default Tax Rate (%)">
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={defaultTaxRate}
+              onChange={(e) => setDefaultTaxRate(e.target.value)}
+              placeholder="e.g. 18"
+            />
+          </Field>
+          <Field label="PAN">
+            <Input
+              value={pan}
+              onChange={(e) => setPan(e.target.value)}
+              placeholder="e.g. AABCT1234F"
+            />
+          </Field>
+          <Field label="TAN">
+            <Input
+              value={tan}
+              onChange={(e) => setTan(e.target.value)}
+              placeholder="e.g. BLRD12345E"
+            />
+          </Field>
+        </div>
+        <Field label="Currency">
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c.value} value={c.value}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+      </CardContent>
+      <CardActions onSave={handleSave} />
+    </Card>
+  );
+}
+
+export function RegistrationSection() {
+  const company = useCompanyStore((s) => s.company);
+  const updateCompany = useCompanyStore((s) => s.updateCompany);
+
+  const [businessType, setBusinessType] = useState(company.businessType);
+  const [cin, setCin] = useState(company.cin);
+  const [incorporationDate, setIncorporationDate] = useState(
+    company.incorporationDate
+  );
+  const [authorizedSignatory, setAuthorizedSignatory] = useState(
+    company.authorizedSignatory
+  );
+
+  const handleSave = () => {
+    updateCompany({
+      businessType,
+      cin,
+      incorporationDate,
+      authorizedSignatory,
+    });
+    notifySaved("Registration details");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Registration</CardTitle>
+        <CardDescription>
+          Legal and registration details for your company.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Business Type">
+            <Select value={businessType} onValueChange={setBusinessType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BUSINESS_TYPES.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="CIN / Registration No.">
+            <Input
+              value={cin}
+              onChange={(e) => setCin(e.target.value)}
+              placeholder="e.g. U74999MH2016PTC123456"
+            />
+          </Field>
+          <Field label="Incorporation Date">
+            <Input
+              type="date"
+              value={incorporationDate}
+              onChange={(e) => setIncorporationDate(e.target.value)}
+            />
+          </Field>
+          <Field label="Authorized Signatory">
+            <Input
+              value={authorizedSignatory}
+              onChange={(e) => setAuthorizedSignatory(e.target.value)}
+            />
+          </Field>
+        </div>
+      </CardContent>
+      <CardActions onSave={handleSave} />
     </Card>
   );
 }

@@ -60,7 +60,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between font-normal",
+            "h-12 w-full justify-between rounded-xl border-gray-200 bg-gray-50 px-4 text-[15px] font-normal hover:bg-gray-50 hover:text-foreground focus-visible:border-emerald-400 focus-visible:ring-emerald-100",
             invalid && "border-red-500",
             !value && "text-muted-foreground",
             className

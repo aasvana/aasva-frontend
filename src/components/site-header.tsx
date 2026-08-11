@@ -1,7 +1,8 @@
+import { AppBreadcrumb } from "@/components/app-breadcrumb"
+import { NotificationBell } from "@/components/notification-bell"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { ChevronRight } from "lucide-react"
 
 export function SiteHeader() {
   return (
@@ -12,12 +13,9 @@ export function SiteHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <h1 className="text-sm font-medium flex flex-row justify-center items-center">
-          <span>Dashboard </span>
-          <ChevronRight className="w-4 h-4" /> 
-          <span>Create Confirmation Voucher</span>
-        </h1>
+        <AppBreadcrumb />
         <div className="ml-auto flex items-center gap-2">
+          <NotificationBell />
           <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
             <a
               href="#"

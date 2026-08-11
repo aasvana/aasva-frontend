@@ -174,7 +174,10 @@ export function DeliveryNoteForm({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handleSave}>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                  >
                     <SaveIcon className="shrink-0 size-4" />
                   </Button>
                 </TooltipTrigger>

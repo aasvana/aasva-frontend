@@ -282,7 +282,7 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-md border bg-white shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px] dark:bg-input/30",
+        "overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-xs transition-[color,box-shadow] focus-within:border-emerald-400 focus-within:ring-emerald-100 focus-within:ring-[3px] dark:bg-input/30",
         invalid && "border-destructive",
         disabled && "opacity-60",
         className

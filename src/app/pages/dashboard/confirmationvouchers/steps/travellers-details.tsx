@@ -64,7 +64,7 @@ const TravellersDetails = () => {
               type="text"
               id={`travellers.${index}.name`}
               placeholder="John Doe"
-              className="bg-white"
+              className="bg-gray-50"
               aria-invalid={!!errors.travellers?.[index]?.name}
               {...control.register(`travellers.${index}.name`)}
             />
@@ -81,7 +81,7 @@ const TravellersDetails = () => {
               type="number"
               id={`travellers.${index}.age`}
               placeholder="30"
-              className="bg-white"
+              className="bg-gray-50"
               aria-invalid={!!errors.travellers?.[index]?.age}
               {...control.register(`travellers.${index}.age`)}
             />

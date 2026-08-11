@@ -29,7 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { hotelMealPlans } from "@/constants/hotelMealPlans";
 import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
 import { destinations as defaultDestinations } from "@/constants/destinations";
-import { hotels as defaultHotels } from "@/constants/hotels";
+import { useCvConfigStore } from "@/stores/cvConfigStore";
 import { format } from "date-fns";
 import { CalendarIcon, X } from "lucide-react";
 import React, { useState } from "react";
@@ -66,7 +66,8 @@ const HotelsDetails = () => {
 
   const [destinations, setDestinations] =
     useState<DestinationItem[]>(defaultDestinations);
-  const [hotelsList, setHotelsList] = useState<HotelItem[]>(defaultHotels);
+  const hotelsList = useCvConfigStore((s) => s.hotels);
+  const addHotel = useCvConfigStore((s) => s.addHotel);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerState, setDrawerState] = useState<DrawerState>({
@@ -135,11 +136,12 @@ const HotelsDetails = () => {
     } else {
       const name = newHotel.name.trim();
       if (!name) return;
-      setHotelsList((prev) =>
-        prev.some((h) => h.name.toLowerCase() === name.toLowerCase())
-          ? prev
-          : [...prev, { ...newHotel, name }]
-      );
+      addHotel({
+        name,
+        destination: newHotel.destination ?? "",
+        rating: newHotel.rating ?? "",
+        notes: newHotel.notes,
+      });
       setValue(`hotels.${drawerState.index}.hotelName`, name, {
         shouldValidate: true,
       });
@@ -263,7 +265,7 @@ const HotelsDetails = () => {
               <Input
                 type="number"
                 placeholder="1"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.hotels?.[index]?.room}
                 {...control.register(`hotels.${index}.room`)}
               />
@@ -309,7 +311,7 @@ const HotelsDetails = () => {
               <Input
                 type="number"
                 placeholder="3"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.hotels?.[index]?.maxOccupancy}
                 {...control.register(`hotels.${index}.maxOccupancy`)}
               />
@@ -324,7 +326,7 @@ const HotelsDetails = () => {
               <Input
                 type="number"
                 placeholder="2"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.hotels?.[index]?.adults}
                 {...control.register(`hotels.${index}.adults`)}
               />
@@ -339,7 +341,7 @@ const HotelsDetails = () => {
               <Input
                 type="number"
                 placeholder="0"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.hotels?.[index]?.children}
                 {...control.register(`hotels.${index}.children`)}
               />
@@ -354,7 +356,7 @@ const HotelsDetails = () => {
               <Input
                 type="number"
                 placeholder="0"
-                className="bg-white"
+                className="bg-gray-50"
                 aria-invalid={!!errors.hotels?.[index]?.extraMattress}
                 {...control.register(`hotels.${index}.extraMattress`)}
               />
@@ -370,8 +372,8 @@ const HotelsDetails = () => {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal ${
-                      errors.hotels?.[index]?.checkinDate ? "border-red-500" : ""
+                    className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                      errors.hotels?.[index]?.checkinDate ? "border-red-500" : "border-gray-200"
                     }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
@@ -411,8 +413,8 @@ const HotelsDetails = () => {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal ${
-                      errors.hotels?.[index]?.checkoutDate ? "border-red-500" : ""
+                    className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                      errors.hotels?.[index]?.checkoutDate ? "border-red-500" : "border-gray-200"
                     }`}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />

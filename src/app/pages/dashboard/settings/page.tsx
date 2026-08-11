@@ -9,10 +9,13 @@ import {
 import {
   AppearanceSection,
   BillingSection,
+  BrandingSection,
   CompanyProfileSection,
   IntegrationsSection,
   NotificationsSection,
+  RegistrationSection,
   SecuritySection,
+  TaxGstSection,
   TeamSection,
   UserProfileSection,
 } from "@/components/settings/settings-sections";
@@ -23,6 +26,12 @@ const sectionContent = (id: SettingsSectionId) => {
       return <UserProfileSection />;
     case "company-profile":
       return <CompanyProfileSection />;
+    case "company-branding":
+      return <BrandingSection />;
+    case "company-tax":
+      return <TaxGstSection />;
+    case "company-registration":
+      return <RegistrationSection />;
     case "appearance":
       return <AppearanceSection />;
     case "team":
@@ -57,7 +66,7 @@ export default function Settings() {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start px-2">
         <aside className="w-full shrink-0 lg:w-72">
-          <div className="rounded-xl border p-3">
+          <div className="rounded-[20px] border border-gray-100 p-3 shadow-sm">
             <SettingsNav active={active} onChange={setActive} />
           </div>
         </aside>

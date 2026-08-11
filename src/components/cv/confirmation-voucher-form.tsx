@@ -15,8 +15,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { notify } from "@/lib/notify";
 import { CvPreviewDrawer } from "@/components/cv/cv-preview-drawer";
 import { useCvStore } from "@/stores/useCvStore";
+import { useCvConfigStore } from "@/stores/cvConfigStore";
+import { getConfirmationVouchers } from "@/lib/cv-storage";
 import {
   useSaveConfirmationVoucher,
   useUpdateConfirmationVoucher,
@@ -81,6 +84,7 @@ const createDefaults: DefaultValues<ConfirmationVoucherFormData> = {
   emergencyName: "",
   emergencyPhone: "",
   voucherNo: "",
+  bookingDate: new Date(),
   totalAmount: "",
   paymentType: "",
   amountReceived: "",
@@ -121,6 +125,47 @@ export function ConfirmationVoucherForm({
     const draft = useCvStore.getState().draft;
     if (draft) {
       methods.reset(draft);
+    } else {
+      const config = useCvConfigStore.getState();
+      const existing = getConfirmationVouchers();
+      const { voucherPrefix, voucherSuffix, defaultPaymentType } =
+        config.settings;
+
+      let nextNumber = existing.length + 1;
+      if (voucherPrefix || voucherSuffix) {
+        const numbers = existing
+          .map((v) => v.data.voucherNo)
+          .filter((no) => {
+            const inner = no.slice(
+              voucherPrefix.length,
+              no.length - voucherSuffix.length
+            );
+            return (
+              no.startsWith(voucherPrefix) &&
+              no.endsWith(voucherSuffix) &&
+              /^\d+$/.test(inner)
+            );
+          })
+          .map((no) =>
+            Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
+          );
+        if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
+      }
+
+      const general: Partial<ConfirmationVoucherFormData> = {};
+      for (const detail of config.generalDetails) {
+        if (detail.value) {
+          (general as Record<string, unknown>)[detail.key] = detail.value;
+        }
+      }
+
+      methods.reset({
+        ...createDefaults,
+        ...general,
+        bookingDate: new Date(),
+        paymentType: defaultPaymentType,
+        voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
+      });
     }
     const subscription = methods.watch((values) => {
       setDraft(values as ConfirmationVoucherFormData);
@@ -176,9 +221,21 @@ export function ConfirmationVoucherForm({
         }
         if (mode === "create") {
           clearDraft();
-          toast.success("Confirmation voucher created successfully!");
+          notify({
+            type: "success",
+            category: "travel",
+            title: "Confirmation voucher created",
+            message: `Voucher ${data.voucherNo} has been created.`,
+            customer: data.customerName,
+            link: `/dashboard/confirmation-vouchers/${record.id}/view`,
+          });
         } else {
-          toast.success("Confirmation voucher updated successfully!");
+          notify({
+            type: "info",
+            category: "travel",
+            title: "Confirmation voucher updated",
+            message: `Voucher ${data.voucherNo} was updated.`,
+          });
         }
         router.push(`/dashboard/confirmation-vouchers/${record.id}/view`);
       };
@@ -225,11 +282,14 @@ export function ConfirmationVoucherForm({
         <div className="flex flex-row items-center justify-between border-b pb-4 gap-4">
           <BackButton />
           <h1 className="text-2xl font-bold">{steps[currentStep].title}</h1>
-          <div className="flex items-center gap-2 md:mx-6">
+          <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" onClick={handleSave}>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                  >
                     <SaveIcon className="shrink-0 size-4" />
                   </Button>
                 </TooltipTrigger>
@@ -269,9 +329,9 @@ export function ConfirmationVoucherForm({
                       className={`z-10 size-7 flex justify-center items-center rounded-full font-medium 
                     ${
                       isCompleted
-                        ? "bg-teal-500 text-white"
+                        ? "bg-emerald-500 text-white"
                         : isActive
-                        ? "bg-gray-600 text-white"
+                        ? "bg-emerald-600 text-white"
                         : "bg-gray-100 text-gray-800"
                     }`}
                     >
@@ -296,7 +356,7 @@ export function ConfirmationVoucherForm({
                     {index < steps.length - 1 && (
                       <div
                         className={`flex-1 h-0.5 mx-2 
-                      ${isCompleted ? "bg-teal-500" : "bg-gray-200"}`}
+                      ${isCompleted ? "bg-emerald-500" : "bg-gray-200"}`}
                       />
                     )}
                   </li>
@@ -305,7 +365,7 @@ export function ConfirmationVoucherForm({
             </ul>
           </div>
           <div className="h-[460px] w-full flex items-center justify-center">
-            <div className="min-h-[300px] max-h-[460px] w-full overflow-auto border p-6 rounded-lg bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700">
+            <div className="min-h-[300px] max-h-[460px] w-full overflow-auto rounded-[20px] border border-gray-100 bg-white p-5 shadow-sm sm:p-6 dark:bg-neutral-800 dark:border-neutral-700">
               {steps[currentStep].content}
             </div>
           </div>

@@ -162,10 +162,23 @@ export default function DeliveryNotes() {
 
   return (
     <div className="flex flex-col">
+      <div className="flex items-center justify-between p-1.5">
+        <div>
+          <h1 className="text-xl font-semibold text-gray-800">Delivery Notes</h1>
+          <p className="text-sm text-gray-500">
+            Create and manage delivery notes.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/dashboard/delivery-notes/create">
+            <CirclePlusIcon /> Create Delivery Note
+          </Link>
+        </Button>
+      </div>
       <div className="flex flex-col p-1.5">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
-            <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 dark:border-neutral-700 dark:divide-neutral-700">
+            <div className="border border-gray-100 rounded-[20px] divide-y divide-gray-100 dark:border-neutral-700 dark:divide-neutral-700">
               <div className="py-3 px-4 flex flex-row justify-between">
                 <div className="relative w-lg max-w-sm">
                   <label className="sr-only">Search</label>
@@ -176,7 +189,7 @@ export default function DeliveryNotes() {
                     placeholder={`Search by ${
                       sortOptions.find((o) => o.key === sortKey)?.label
                     }`}
-                    className="py-1.5 sm:py-2 px-3 ps-9 block w-full border border-gray-200 shadow-2xs rounded-lg sm:text-sm"
+                    className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 ps-9 pe-3 block text-sm shadow-2xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
                   />
                   <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3">
                     <Search className="h-4 w-4 text-gray-400" />
@@ -194,7 +207,7 @@ export default function DeliveryNotes() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="secondary"
-                        className="hover:bg-black hover:text-white"
+                        className="hover:bg-emerald-50 hover:text-emerald-700"
                       >
                         <ArrowDownUp className="w-4" />
                       </Button>
@@ -213,12 +226,6 @@ export default function DeliveryNotes() {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-
-                  <Button variant="secondary" asChild>
-                    <Link href="/dashboard/delivery-notes/create">
-                      <CirclePlusIcon /> Create Delivery Note
-                    </Link>
-                  </Button>
                 </div>
               </div>
               <div className="overflow-hidden min-h-[550px]">
@@ -345,7 +352,7 @@ export default function DeliveryNotes() {
                         disabled:pointer-events-none
                         cursor-pointer ${
                           currentPage === i + 1
-                            ? "bg-black text-white hover:bg-black"
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
                             : "text-gray-800 hover:bg-gray-100"
                         }`}
                     >

@@ -40,6 +40,102 @@
       "destination": "/pages/dashboard/confirmationvouchers/:id/view"
     },
     {
+      "source": "/dashboard/confirmation-vouchers/hotels",
+      "destination": "/pages/dashboard/confirmationvouchers/hotels"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/airlines",
+      "destination": "/pages/dashboard/confirmationvouchers/airlines"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/airports",
+      "destination": "/pages/dashboard/confirmationvouchers/airports"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/general-details",
+      "destination": "/pages/dashboard/confirmationvouchers/general-details"
+    },
+    {
+      "source": "/dashboard/confirmation-vouchers/settings",
+      "destination": "/pages/dashboard/confirmationvouchers/settings"
+    },
+    {
+      "source": "/dashboard/travel/dashboard",
+      "destination": "/pages/dashboard/travel/dashboard"
+    },
+    {
+      "source": "/dashboard/travel/customers",
+      "destination": "/pages/dashboard/travel/customers"
+    },
+    {
+      "source": "/dashboard/travel/enquiries",
+      "destination": "/pages/dashboard/travel/enquiries"
+    },
+    {
+      "source": "/dashboard/travel/itineraries",
+      "destination": "/pages/dashboard/travel/itineraries"
+    },
+    {
+      "source": "/dashboard/travel/bookings",
+      "destination": "/pages/dashboard/travel/bookings"
+    },
+    {
+      "source": "/dashboard/travel/suppliers/hotels",
+      "destination": "/pages/dashboard/travel/suppliers/hotels"
+    },
+    {
+      "source": "/dashboard/travel/suppliers/airlines",
+      "destination": "/pages/dashboard/travel/suppliers/airlines"
+    },
+    {
+      "source": "/dashboard/travel/suppliers/transport",
+      "destination": "/pages/dashboard/travel/suppliers/transport"
+    },
+    {
+      "source": "/dashboard/travel/suppliers/activities",
+      "destination": "/pages/dashboard/travel/suppliers/activities"
+    },
+    {
+      "source": "/dashboard/travel/documents",
+      "destination": "/pages/dashboard/travel/documents"
+    },
+    {
+      "source": "/dashboard/travel/settings/general-details",
+      "destination": "/pages/dashboard/travel/settings/general-details"
+    },
+    {
+      "source": "/dashboard/travel/settings/voucher-settings",
+      "destination": "/pages/dashboard/travel/settings/voucher-settings"
+    },
+    {
+      "source": "/dashboard/estimates",
+      "destination": "/pages/dashboard/accounting/estimates"
+    },
+    {
+      "source": "/dashboard/credit-notes",
+      "destination": "/pages/dashboard/accounting/credit-notes"
+    },
+    {
+      "source": "/dashboard/debit-notes",
+      "destination": "/pages/dashboard/accounting/debit-notes"
+    },
+    {
+      "source": "/dashboard/receipts",
+      "destination": "/pages/dashboard/accounting/receipts"
+    },
+    {
+      "source": "/dashboard/expenses",
+      "destination": "/pages/dashboard/accounting/expenses"
+    },
+    {
+      "source": "/dashboard/customers",
+      "destination": "/pages/dashboard/customers"
+    },
+    {
+      "source": "/dashboard/notifications",
+      "destination": "/pages/dashboard/notifications"
+    },
+    {
       "source": "/dashboard/invoices",
       "destination": "/pages/dashboard/invoices"
     },
@@ -54,6 +150,198 @@
     {
       "source": "/dashboard/invoices/:id/view",
       "destination": "/pages/dashboard/invoices/:id/view"
+    },
+    {
+      "source": "/dashboard/accounting/dashboard",
+      "destination": "/pages/dashboard/accounting/dashboard"
+    },
+    {
+      "source": "/dashboard/bills",
+      "destination": "/pages/dashboard/accounting/bills"
+    },
+    {
+      "source": "/dashboard/supplier-payments",
+      "destination": "/pages/dashboard/accounting/supplier-payments"
+    },
+    {
+      "source": "/dashboard/expense-claims",
+      "destination": "/pages/dashboard/accounting/expense-claims"
+    },
+    {
+      "source": "/dashboard/bank-accounts",
+      "destination": "/pages/dashboard/accounting/bank-accounts"
+    },
+    {
+      "source": "/dashboard/cash-accounts",
+      "destination": "/pages/dashboard/accounting/cash-accounts"
+    },
+    {
+      "source": "/dashboard/bank-transactions",
+      "destination": "/pages/dashboard/accounting/bank-transactions"
+    },
+    {
+      "source": "/dashboard/reconciliation",
+      "destination": "/pages/dashboard/accounting/reconciliation"
+    },
+    {
+      "source": "/dashboard/chart-of-accounts",
+      "destination": "/pages/dashboard/accounting/chart-of-accounts"
+    },
+    {
+      "source": "/dashboard/journal-entries",
+      "destination": "/pages/dashboard/accounting/journal-entries"
+    },
+    {
+      "source": "/dashboard/general-ledger",
+      "destination": "/pages/dashboard/accounting/general-ledger"
+    },
+    {
+      "source": "/dashboard/trial-balance",
+      "destination": "/pages/dashboard/accounting/trial-balance"
+    },
+    {
+      "source": "/dashboard/tax-rates",
+      "destination": "/pages/dashboard/accounting/tax-rates"
+    },
+    {
+      "source": "/dashboard/tax-transactions",
+      "destination": "/pages/dashboard/accounting/tax-transactions"
+    },
+    {
+      "source": "/dashboard/tax-returns",
+      "destination": "/pages/dashboard/accounting/tax-returns"
+    },
+    {
+      "source": "/dashboard/reports/profit-loss",
+      "destination": "/pages/dashboard/accounting/reports/profit-loss"
+    },
+    {
+      "source": "/dashboard/reports/balance-sheet",
+      "destination": "/pages/dashboard/accounting/reports/balance-sheet"
+    },
+    {
+      "source": "/dashboard/reports/cash-flow",
+      "destination": "/pages/dashboard/accounting/reports/cash-flow"
+    },
+    {
+      "source": "/dashboard/reports/sales",
+      "destination": "/pages/dashboard/accounting/reports/sales"
+    },
+    {
+      "source": "/dashboard/reports/purchases",
+      "destination": "/pages/dashboard/accounting/reports/purchases"
+    },
+    {
+      "source": "/dashboard/reports/expenses",
+      "destination": "/pages/dashboard/accounting/reports/expenses"
+    },
+    {
+      "source": "/dashboard/reports/accounts-receivable",
+      "destination": "/pages/dashboard/accounting/reports/accounts-receivable"
+    },
+    {
+      "source": "/dashboard/reports/accounts-payable",
+      "destination": "/pages/dashboard/accounting/reports/accounts-payable"
+    },
+    {
+      "source": "/dashboard/reports/tax",
+      "destination": "/pages/dashboard/accounting/reports/tax"
+    },
+    {
+      "source": "/dashboard/accounting/settings/general",
+      "destination": "/pages/dashboard/accounting/settings/general"
+    },
+    {
+      "source": "/dashboard/accounting/settings/invoice",
+      "destination": "/pages/dashboard/accounting/settings/invoice"
+    },
+    {
+      "source": "/dashboard/accounting/settings/numbering",
+      "destination": "/pages/dashboard/accounting/settings/numbering"
+    },
+    {
+      "source": "/dashboard/accounting/settings/payment-terms",
+      "destination": "/pages/dashboard/accounting/settings/payment-terms"
+    },
+    {
+      "source": "/dashboard/auditing/overview",
+      "destination": "/pages/dashboard/auditing/overview"
+    },
+    {
+      "source": "/dashboard/auditing/activity-log",
+      "destination": "/pages/dashboard/auditing/activity-log"
+    },
+    {
+      "source": "/dashboard/auditing/audit-trail",
+      "destination": "/pages/dashboard/auditing/audit-trail"
+    },
+    {
+      "source": "/dashboard/auditing/user-activity",
+      "destination": "/pages/dashboard/auditing/user-activity"
+    },
+    {
+      "source": "/dashboard/auditing/login-history",
+      "destination": "/pages/dashboard/auditing/login-history"
+    },
+    {
+      "source": "/dashboard/auditing/failed-logins",
+      "destination": "/pages/dashboard/auditing/failed-logins"
+    },
+    {
+      "source": "/dashboard/auditing/sessions",
+      "destination": "/pages/dashboard/auditing/sessions"
+    },
+    {
+      "source": "/dashboard/auditing/data-created",
+      "destination": "/pages/dashboard/auditing/data-created"
+    },
+    {
+      "source": "/dashboard/auditing/data-updated",
+      "destination": "/pages/dashboard/auditing/data-updated"
+    },
+    {
+      "source": "/dashboard/auditing/data-deleted",
+      "destination": "/pages/dashboard/auditing/data-deleted"
+    },
+    {
+      "source": "/dashboard/auditing/data-restored",
+      "destination": "/pages/dashboard/auditing/data-restored"
+    },
+    {
+      "source": "/dashboard/auditing/invoice-changes",
+      "destination": "/pages/dashboard/auditing/invoice-changes"
+    },
+    {
+      "source": "/dashboard/auditing/payment-changes",
+      "destination": "/pages/dashboard/auditing/payment-changes"
+    },
+    {
+      "source": "/dashboard/auditing/expense-changes",
+      "destination": "/pages/dashboard/auditing/expense-changes"
+    },
+    {
+      "source": "/dashboard/auditing/accounting-changes",
+      "destination": "/pages/dashboard/auditing/accounting-changes"
+    },
+    {
+      "source": "/dashboard/auditing/stock-changes",
+      "destination": "/pages/dashboard/auditing/stock-changes"
+    },
+    {
+      "source": "/dashboard/auditing/stock-adjustments",
+      "destination": "/pages/dashboard/auditing/stock-adjustments"
+    },
+    {
+      "source": "/dashboard/auditing/stock-transfers",
+      "destination": "/pages/dashboard/auditing/stock-transfers"
+    },
+    {
+      "source": "/dashboard/auditing/approval-history",
+      "destination": "/pages/dashboard/auditing/approval-history"
+    },
+    {
+      "source": "/dashboard/auditing/export-reports",
+      "destination": "/pages/dashboard/auditing/export-reports"
     },
     {
       "source": "/dashboard/pos",
@@ -78,6 +366,38 @@
     {
       "source": "/dashboard/pos/sales",
       "destination": "/pages/dashboard/pos/sales"
+    },
+    {
+      "source": "/dashboard/pos/overview",
+      "destination": "/pages/dashboard/pos/overview"
+    },
+    {
+      "source": "/dashboard/pos/settings",
+      "destination": "/pages/dashboard/pos/settings"
+    },
+    {
+      "source": "/dashboard/pos/transfers",
+      "destination": "/pages/dashboard/pos/transfers"
+    },
+    {
+      "source": "/dashboard/pos/outlets/:id",
+      "destination": "/pages/dashboard/pos/outlets/:id"
+    },
+    {
+      "source": "/dashboard/pos/outlets",
+      "destination": "/pages/dashboard/pos/outlets"
+    },
+    {
+      "source": "/dashboard/pos/stock/adjustments",
+      "destination": "/pages/dashboard/pos/stock/adjustments"
+    },
+    {
+      "source": "/dashboard/pos/stock/low-stock",
+      "destination": "/pages/dashboard/pos/stock/low-stock"
+    },
+    {
+      "source": "/dashboard/pos/stock",
+      "destination": "/pages/dashboard/pos/stock"
     },
     {
       "source": "/dashboard/delivery-notes",
@@ -114,5 +434,133 @@
     {
       "source": "/dashboard/settings",
       "destination": "/pages/dashboard/settings"
+    },
+    {
+      "source": "/dashboard/customer/overview",
+      "destination": "/pages/dashboard/customer/overview"
+    },
+    {
+      "source": "/dashboard/customer/personal",
+      "destination": "/pages/dashboard/customer/personal"
+    },
+    {
+      "source": "/dashboard/customer/contact",
+      "destination": "/pages/dashboard/customer/contact"
+    },
+    {
+      "source": "/dashboard/customer/address",
+      "destination": "/pages/dashboard/customer/address"
+    },
+    {
+      "source": "/dashboard/customer/business",
+      "destination": "/pages/dashboard/customer/business"
+    },
+    {
+      "source": "/dashboard/customer/travel-profile",
+      "destination": "/pages/dashboard/customer/travel-profile"
+    },
+    {
+      "source": "/dashboard/customer/bookings",
+      "destination": "/pages/dashboard/customer/bookings"
+    },
+    {
+      "source": "/dashboard/customer/documents",
+      "destination": "/pages/dashboard/customer/documents"
+    },
+    {
+      "source": "/dashboard/customer/orders",
+      "destination": "/pages/dashboard/customer/orders"
+    },
+    {
+      "source": "/dashboard/customer/invoices",
+      "destination": "/pages/dashboard/customer/invoices"
+    },
+    {
+      "source": "/dashboard/customer/payments",
+      "destination": "/pages/dashboard/customer/payments"
+    },
+    {
+      "source": "/dashboard/customer/credit-notes",
+      "destination": "/pages/dashboard/customer/credit-notes"
+    },
+    {
+      "source": "/dashboard/customer/refunds",
+      "destination": "/pages/dashboard/customer/refunds"
+    },
+    {
+      "source": "/dashboard/customer/communication",
+      "destination": "/pages/dashboard/customer/communication"
+    },
+    {
+      "source": "/dashboard/customer/notes",
+      "destination": "/pages/dashboard/customer/notes"
+    },
+    {
+      "source": "/dashboard/customer/activity",
+      "destination": "/pages/dashboard/customer/activity"
+    },
+    {
+      "source": "/dashboard/delivery/overview",
+      "destination": "/pages/dashboard/delivery/overview"
+    },
+    {
+      "source": "/dashboard/delivery/deliveries",
+      "destination": "/pages/dashboard/delivery/deliveries"
+    },
+    {
+      "source": "/dashboard/delivery/dispatch",
+      "destination": "/pages/dashboard/delivery/dispatch"
+    },
+    {
+      "source": "/dashboard/delivery/partners",
+      "destination": "/pages/dashboard/delivery/partners"
+    },
+    {
+      "source": "/dashboard/delivery/zones",
+      "destination": "/pages/dashboard/delivery/zones"
+    },
+    {
+      "source": "/dashboard/delivery/charges",
+      "destination": "/pages/dashboard/delivery/charges"
+    },
+    {
+      "source": "/dashboard/delivery/settings",
+      "destination": "/pages/dashboard/delivery/settings"
+    },
+    {
+      "source": "/dashboard/requests/overview",
+      "destination": "/pages/dashboard/requests/overview"
+    },
+    {
+      "source": "/dashboard/requests/all",
+      "destination": "/pages/dashboard/requests/all"
+    },
+    {
+      "source": "/dashboard/requests/support",
+      "destination": "/pages/dashboard/requests/support"
+    },
+    {
+      "source": "/dashboard/requests/features",
+      "destination": "/pages/dashboard/requests/features"
+    },
+    {
+      "source": "/dashboard/requests/feedback",
+      "destination": "/pages/dashboard/requests/feedback"
+    },
+    {
+      "source": "/dashboard/requests/bugs",
+      "destination": "/pages/dashboard/requests/bugs"
+    },
+    {
+      "source": "/dashboard/requests/complaints",
+      "destination": "/pages/dashboard/requests/complaints"
+    },
+    {
+      "source": "/dashboard/requests/announcements",
+      "destination": "/pages/dashboard/requests/announcements"
+    },
+    {
+      "source": "/dashboard/guides",
+      "destination": "/pages/dashboard/guides"
     }
   ]

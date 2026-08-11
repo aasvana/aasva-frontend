@@ -2,7 +2,10 @@
 
 import { ReactNode, useEffect } from "react";
 import { useFieldArray, useFormContext, Controller } from "react-hook-form";
+import Link from "next/link";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
+import { useCustomerStore } from "@/stores/customerStore";
 import {
   INVOICE_STATUS_LABELS,
   CURRENCIES,
@@ -42,12 +45,12 @@ function SectionCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
-        <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+    <section className="rounded-[20px] border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-gray-900">{title}</h3>
         {actions}
       </div>
-      <div className="p-4">{children}</div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -221,17 +224,64 @@ export function PartiesSection() {
     control,
   } = useFormContext<InvoiceFormData>();
   const sameAsBilling = watch("sameAsBilling");
+  const billTo = watch("billTo");
+
+  const customers = useCustomerStore((s) => s.customers);
+
+  const customerOptions = customers.map((c) => ({
+    value: c.name,
+    label: `${c.name}${c.company ? ` (${c.company})` : ""}`,
+  }));
+
+  const handleCustomerSelect = (name: string) => {
+    const customer = customers.find((c) => c.name === name);
+    if (!customer) return;
+    const address = [customer.address, customer.place, customer.country]
+      .filter(Boolean)
+      .join(", ");
+    const selected: typeof billTo = {
+      name: customer.name,
+      company: customer.company ?? "",
+      email: customer.email ?? "",
+      phone: customer.phone ?? "",
+      address,
+    };
+    setValue("billTo", selected);
+    if (sameAsBilling) setValue("shipTo", selected);
+  };
 
   useEffect(() => {
     if (!sameAsBilling) return;
-    const billTo = watch("billTo");
-    setValue("shipTo", billTo);
+    const billToWatch = watch("billTo");
+    setValue("shipTo", billToWatch);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sameAsBilling, watch("billTo")]);
 
   return (
     <SectionCard title="Bill To & Ship To">
       <div className="grid gap-8">
+        <div className="grid gap-4">
+          <h3 className="text-sm font-semibold text-gray-700">
+            Select a saved customer
+          </h3>
+          <Combobox
+            options={customerOptions}
+            value={
+              customerOptions.some((o) => o.value === billTo.name)
+                ? billTo.name
+                : ""
+            }
+            onChange={handleCustomerSelect}
+            placeholder="Select a saved customer to prefill"
+            searchPlaceholder="Search customers..."
+          />
+          <Link
+            href="/dashboard/customers"
+            className="text-sm font-medium text-emerald-600 hover:underline"
+          >
+            Manage customers
+          </Link>
+        </div>
         <PartyBlock prefix="billTo" title="Bill To" />
         <div className="flex items-center gap-2">
           <Controller
@@ -303,14 +353,14 @@ export function LineItemsSection() {
                   <TableRow key={field.id}>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         placeholder="Description"
                         {...register(`items.${index}.description`)}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         type="number"
                         min={0}
                         {...register(`items.${index}.qty`, { valueAsNumber: true })}
@@ -318,7 +368,7 @@ export function LineItemsSection() {
                     </TableCell>
                     <TableCell>
                       <Input
-                        className="bg-white"
+                        className="bg-gray-50"
                         type="number"
                         min={0}
                         step="0.01"
@@ -336,7 +386,7 @@ export function LineItemsSection() {
                             value={String(taxField.value ?? 0)}
                             onValueChange={(v) => taxField.onChange(Number(v))}
                           >
-                            <SelectTrigger className="bg-white w-full">
+                            <SelectTrigger className="w-full">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -402,7 +452,7 @@ export function LineItemsSection() {
                   type="number"
                   min={0}
                   step="0.01"
-                  className="bg-white"
+                  className="bg-gray-50"
                   {...register("discountValue", { valueAsNumber: true })}
                 />
               </div>
@@ -469,13 +519,13 @@ export function PaymentSection() {
               type="number"
               min={0}
               step="0.01"
-              className="bg-white"
+              className="bg-gray-50"
               {...register("paidAmount", { valueAsNumber: true })}
             />
           </div>
           <div className="grid gap-1.5">
             <Label>Total amount</Label>
-            <div className="flex h-9 items-center rounded-md border border-gray-200 bg-gray-50 px-3 text-sm font-medium">
+            <div className="flex h-12 items-center rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium">
               {formatMoney(totals.total, formValues.currency)}
             </div>
           </div>
@@ -528,7 +578,7 @@ export function PaymentSection() {
           <textarea
             id="notes"
             rows={3}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-xs"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-[15px] shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
             placeholder="Thank you for your business!"
             {...register("notes")}
           />
@@ -541,7 +591,7 @@ export function PaymentSection() {
           <textarea
             id="terms"
             rows={3}
-            className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-xs"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-[15px] shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
             placeholder="Payment due within 30 days..."
             {...register("terms")}
           />

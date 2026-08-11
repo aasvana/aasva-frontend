@@ -13,8 +13,9 @@ import { format } from "date-fns";
 import { JSX } from "react";
 import { useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
-import airlines from "@/constants/json/airlines.json";
-import airports from "@/constants/json/airports.json";
+import { useCvConfigStore } from "@/stores/cvConfigStore";
+import { useCustomerStore } from "@/stores/customerStore";
+import Link from "next/link";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import TravellersDetails from "./travellers-details";
@@ -28,6 +29,23 @@ export type Step = {
   title: string;
   content: JSX.Element;
 };
+
+function useTravelOptions() {
+  const airlines = useCvConfigStore((s) => s.airlines);
+  const airports = useCvConfigStore((s) => s.airports);
+
+  const airlineOptions: ComboboxOption[] = airlines.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name}`,
+  }));
+
+  const airportOptions: ComboboxOption[] = airports.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name} (${a.city})`,
+  }));
+
+  return { airlineOptions, airportOptions };
+}
 
 export function getSteps(): Step[] {
   return [
@@ -51,16 +69,53 @@ function Step1CustomerDetails() {
     setValue,
   } = useFormContext<ConfirmationVoucherFormData>();
   const journeyDate = watch("journeyDate");
+  const customerName = watch("customerName");
+
+  const customers = useCustomerStore((s) => s.customers);
+
+  const customerOptions: ComboboxOption[] = customers.map((c) => ({
+    value: c.name,
+    label: `${c.name}${c.company ? ` (${c.company})` : ""}`,
+  }));
+
+  const handleCustomerSelect = (name: string) => {
+    const customer = customers.find((c) => c.name === name);
+    if (!customer) return;
+    setValue("customerName", customer.name, { shouldValidate: true });
+    setValue("companyName", customer.company ?? "");
+    setValue("emailAddress", customer.email ?? "");
+    setValue("mobileNo", customer.phone ?? "");
+  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid gap-1.5 md:col-span-2">
+        <Label>Saved customer</Label>
+        <Combobox
+          options={customerOptions}
+          value={customerOptions.some((o) => o.value === customerName)
+            ? customerName
+            : ""}
+          onChange={handleCustomerSelect}
+          placeholder="Select a saved customer to prefill"
+          searchPlaceholder="Search customers..."
+        />
+        <p className="text-sm text-gray-500">
+          <Link
+            href="/dashboard/customers"
+            className="font-medium text-emerald-600 hover:underline"
+          >
+            Manage customers
+          </Link>
+        </p>
+      </div>
       <div className="grid gap-1.5">
         <Label htmlFor="customerName">Customer name</Label>
         <Input
           type="text"
           id="customerName"
           placeholder="John Doe"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.customerName}
           {...register("customerName")}
         />
@@ -74,7 +129,7 @@ function Step1CustomerDetails() {
           type="text"
           id="mobileNo"
           placeholder="9876543210"
-          className="bg-white"
+          className="bg-gray-50"
           maxLength={10}
           aria-invalid={!!errors.mobileNo}
           {...register("mobileNo")}
@@ -89,7 +144,7 @@ function Step1CustomerDetails() {
           type="email"
           id="emailAddress"
           placeholder="name@domain.com"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.emailAddress}
           {...register("emailAddress")}
         />
@@ -103,7 +158,7 @@ function Step1CustomerDetails() {
           type="text"
           id="companyName"
           placeholder="SpaceX"
-          className="bg-white"
+          className="bg-gray-50"
           {...register("companyName")}
         />
       </div>
@@ -113,8 +168,8 @@ function Step1CustomerDetails() {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                errors.journeyDate ? "border-red-500" : ""
+              className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                errors.journeyDate ? "border-red-500" : "border-gray-200"
               }`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -152,15 +207,7 @@ function Step2Boarding() {
   const boardingFrom = watch("boardingFrom");
   const boardingTo = watch("boardingTo");
 
-  const airlineOptions: ComboboxOption[] = airlines.map((a) => ({
-    value: a.code,
-    label: `${a.code} - ${a.name}`,
-  }));
-
-  const airportOptions: ComboboxOption[] = airports.map((a) => ({
-    value: a.code,
-    label: `${a.code} - ${a.name} (${a.city})`,
-  }));
+  const { airlineOptions, airportOptions } = useTravelOptions();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -186,8 +233,8 @@ function Step2Boarding() {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                errors.boardingDate ? "border-red-500" : ""
+              className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                errors.boardingDate ? "border-red-500" : "border-gray-200"
               }`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -246,7 +293,7 @@ function Step2Boarding() {
         <Input
           type="time"
           id="boardingDepartureTime"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.boardingDepartureTime}
           {...register("boardingDepartureTime")}
         />
@@ -259,7 +306,7 @@ function Step2Boarding() {
         <Input
           type="time"
           id="boardingArrivalTime"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.boardingArrivalTime}
           {...register("boardingArrivalTime")}
         />
@@ -283,15 +330,7 @@ function Step3Returning() {
   const returnFrom = watch("returnFrom");
   const returnTo = watch("returnTo");
 
-  const airlineOptions: ComboboxOption[] = airlines.map((a) => ({
-    value: a.code,
-    label: `${a.code} - ${a.name}`,
-  }));
-
-  const airportOptions: ComboboxOption[] = airports.map((a) => ({
-    value: a.code,
-    label: `${a.code} - ${a.name} (${a.city})`,
-  }));
+  const { airlineOptions, airportOptions } = useTravelOptions();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -317,8 +356,8 @@ function Step3Returning() {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                errors.returnDate ? "border-red-500" : ""
+              className={`h-12 w-full justify-start rounded-xl border bg-gray-50 px-4 text-left text-[15px] font-normal focus-visible:border-emerald-400 focus-visible:ring-emerald-100 ${
+                errors.returnDate ? "border-red-500" : "border-gray-200"
               }`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
@@ -377,7 +416,7 @@ function Step3Returning() {
         <Input
           type="time"
           id="returnDepartureTime"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.returnDepartureTime}
           {...register("returnDepartureTime")}
         />
@@ -390,7 +429,7 @@ function Step3Returning() {
         <Input
           type="time"
           id="returnArrivalTime"
-          className="bg-white"
+          className="bg-gray-50"
           aria-invalid={!!errors.returnArrivalTime}
           {...register("returnArrivalTime")}
         />

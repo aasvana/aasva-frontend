@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import { Combobox } from "@/components/ui/combobox";
+import { useOutletStore } from "@/stores/outletStore";
 import { PosProduct, formatMoney, usePosStore } from "./index";
 
 export function PosProductPicker({
@@ -13,13 +15,22 @@ export function PosProductPicker({
   placeholder?: string;
 }) {
   const products = usePosStore((s) => s.products);
+  const activeOutletId = useOutletStore((s) => s.activeOutletId);
 
-  const options = products
-    .filter((product) => !excludeIds.includes(product.id))
-    .map((product) => ({
-      value: product.id,
-      label: `${product.name} · ${formatMoney(product.price, "USD")}`,
-    }));
+  const options = useMemo(
+    () =>
+      products
+        .filter(
+          (product) =>
+            product.outletId === activeOutletId &&
+            !excludeIds.includes(product.id)
+        )
+        .map((product) => ({
+          value: product.id,
+          label: `${product.name} · ${formatMoney(product.price, "USD")}`,
+        })),
+    [products, activeOutletId, excludeIds]
+  );
 
   return (
     <Combobox

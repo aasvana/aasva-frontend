@@ -74,6 +74,7 @@ export function buildPosSale(params: {
   customerName: string;
   paymentMode: PaymentMode;
   currency: string;
+  outletId: string;
 }): PosSale {
   const totals = computeTotals({
     items: params.cart.map((item) => ({
@@ -89,6 +90,7 @@ export function buildPosSale(params: {
 
   return {
     id: newId(),
+    outletId: params.outletId,
     invoiceId: params.invoiceId,
     customerName: params.customerName || "Walk-in Customer",
     items: params.cart.map((item) => ({

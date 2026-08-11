@@ -8,6 +8,7 @@ import {
   CirclePlusIcon,
   EllipsisVertical,
   Pencil,
+  Printer,
   RefreshCw,
   Search,
   Trash2,
@@ -21,9 +22,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useHydrate } from "@/hooks/useHydrate";
 import {
+  LabelPrintDialog,
+  OutletSwitcher,
+  PosProduct,
   formatMoney,
   usePosStore,
 } from "@/modules/pos";
+import { useOutletStore } from "@/stores/outletStore";
 import { toast } from "sonner";
 
 const sortOptions = [
@@ -42,15 +47,22 @@ export default function PosProductsPage() {
 
   const products = usePosStore((s) => s.products);
   const deleteProductById = usePosStore((s) => s.deleteProductById);
+  const activeOutletId = useOutletStore((s) => s.activeOutletId);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [printProduct, setPrintProduct] = useState<PosProduct | null>(null);
   const itemsPerPage = 10;
 
+  const outletProducts = useMemo(
+    () => products.filter((p) => p.outletId === activeOutletId),
+    [products, activeOutletId]
+  );
+
   const sorted = useMemo(() => {
-    const filtered = products.filter((product) =>
+    const filtered = outletProducts.filter((product) =>
       `${product.name} ${product.sku} ${product.category}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
@@ -66,7 +78,7 @@ export default function PosProductsPage() {
       if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
-  }, [products, searchTerm, sortKey, sortOrder]);
+  }, [outletProducts, searchTerm, sortKey, sortOrder]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / itemsPerPage));
   const paginated = sorted.slice(
@@ -93,20 +105,23 @@ export default function PosProductsPage() {
         <div>
           <h1 className="text-xl font-semibold text-gray-800">Products</h1>
           <p className="text-sm text-gray-500">
-            Manage the products available at your store.
+            Manage the products available at this outlet.
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/pos/products/create">
-            <CirclePlusIcon /> Add Product
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <OutletSwitcher />
+          <Button asChild>
+            <Link href="/dashboard/pos/products/create">
+              <CirclePlusIcon /> Add Product
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-col p-1.5">
         <div className="-m-1.5 overflow-x-auto">
           <div className="p-1.5 min-w-full inline-block align-middle">
-            <div className="border border-gray-200 rounded-lg divide-y divide-gray-200 dark:border-neutral-700 dark:divide-neutral-700">
+            <div className="border border-gray-100 rounded-[20px] divide-y divide-gray-100 dark:border-neutral-700 dark:divide-neutral-700">
               <div className="py-3 px-4 flex flex-row justify-between">
                 <div className="relative w-lg max-w-sm">
                   <label className="sr-only">Search</label>
@@ -118,7 +133,7 @@ export default function PosProductsPage() {
                       setCurrentPage(1);
                     }}
                     placeholder="Search products..."
-                    className="py-1.5 sm:py-2 px-3 ps-9 block w-full border border-gray-200 shadow-2xs rounded-lg sm:text-sm"
+                    className="h-11 w-full rounded-xl border border-gray-200 bg-gray-50 ps-9 pe-3 block text-sm shadow-2xs outline-none transition-[color,box-shadow] focus-visible:border-emerald-400 focus-visible:ring-emerald-100 focus-visible:ring-[3px]"
                   />
                   <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none ps-3">
                     <Search className="h-4 w-4 text-gray-400" />
@@ -141,7 +156,7 @@ export default function PosProductsPage() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="secondary"
-                        className="hover:bg-black hover:text-white"
+                        className="hover:bg-emerald-50 hover:text-emerald-700"
                       >
                         <ArrowDownUp className="w-4" />
                       </Button>
@@ -163,13 +178,13 @@ export default function PosProductsPage() {
                 </div>
               </div>
               <div className="overflow-hidden min-h-[550px]">
-                {products.length === 0 ? (
+                {outletProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-4 h-[550px] text-center">
                     <p className="text-lg font-medium text-gray-800">
                       No products yet
                     </p>
                     <p className="text-sm text-gray-500">
-                      Add your first product to start taking orders.
+                      Add your first product to start taking orders at this outlet.
                     </p>
                     <Button asChild>
                       <Link href="/dashboard/pos/products/create">
@@ -238,6 +253,11 @@ export default function PosProductsPage() {
                                 >
                                   <Pencil /> Edit
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => setPrintProduct(product)}
+                                >
+                                  <Printer /> Print Label
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => handleDelete(product.id)}>
                                   <Trash2 /> Delete
                                 </DropdownMenuItem>
@@ -263,7 +283,7 @@ export default function PosProductsPage() {
                         disabled:pointer-events-none
                         cursor-pointer ${
                           currentPage === i + 1
-                            ? "bg-black text-white hover:bg-black"
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
                             : "text-gray-800 hover:bg-gray-100"
                         }`}
                     >
@@ -276,6 +296,13 @@ export default function PosProductsPage() {
           </div>
         </div>
       </div>
+      <LabelPrintDialog
+        product={printProduct}
+        open={Boolean(printProduct)}
+        onOpenChange={(open) => {
+          if (!open) setPrintProduct(null);
+        }}
+      />
     </div>
   );
 }
