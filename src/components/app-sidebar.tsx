@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   IconAddressBook,
   IconBell,
-  IconBook2,
   IconCamera,
   IconChartScatter,
   IconDashboard,
@@ -13,6 +12,7 @@ import {
   IconFileDescription,
   IconFileWord,
   // IconFolder,
+  IconHelp,
   IconInnerShadowTop,
   IconPlaneTilt,
   // IconListDetails,
@@ -534,8 +534,50 @@ const data = {
     },
     {
       title: "Analytics",
-      url: "#",
+      url: "/dashboard/analytics/overview",
       icon: IconChartScatter,
+      items: [
+        {
+          title: "Overview",
+          url: "/dashboard/analytics/overview",
+        },
+        {
+          title: "Sales",
+          url: "/dashboard/analytics/sales",
+        },
+        {
+          title: "Customers",
+          url: "/dashboard/analytics/customers",
+        },
+        {
+          title: "Products",
+          url: "/dashboard/analytics/products",
+        },
+        {
+          title: "Inventory",
+          url: "/dashboard/analytics/inventory",
+        },
+        {
+          title: "Accounting",
+          url: "/dashboard/analytics/accounting",
+        },
+        {
+          title: "Expenses",
+          url: "/dashboard/analytics/expenses",
+        },
+        {
+          title: "Travel",
+          url: "/dashboard/analytics/travel",
+        },
+        {
+          title: "Delivery",
+          url: "/dashboard/analytics/delivery",
+        },
+        {
+          title: "Team",
+          url: "/dashboard/analytics/team",
+        },
+      ],
     },
     {
       title: "Customers",
@@ -666,9 +708,218 @@ const data = {
       ],
     },
     {
-      title: "Team",
-      url: "#",
+      title: "Help Center",
+      url: "/dashboard/help-center",
+      icon: IconHelp,
+      items: [
+        {
+          title: "Overview",
+          url: "/dashboard/help-center",
+        },
+        {
+          title: "Knowledge Base",
+          url: "/dashboard/knowledge-base",
+        },
+        {
+          title: "FAQs",
+          url: "/dashboard/faqs",
+        },
+        {
+          title: "Guides",
+          url: "/dashboard/guides",
+        },
+        {
+          title: "Troubleshooting",
+          url: "/dashboard/troubleshooting",
+        },
+        {
+          title: "What's New",
+          url: "/dashboard/whats-new",
+        },
+      ],
+    },
+    {
+      title: "Teams Meet",
+      url: "/dashboard/teams-meet/overview",
       icon: IconUsers,
+      items: [
+        {
+          title: "Overview",
+          url: "/dashboard/teams-meet/overview",
+        },
+        {
+          title: "Team",
+          url: "/dashboard/teams-meet/team/members",
+          items: [
+            {
+              title: "All Members",
+              url: "/dashboard/teams-meet/team/members",
+            },
+            {
+              title: "Departments",
+              url: "/dashboard/teams-meet/team/departments",
+            },
+            {
+              title: "Roles & Permissions",
+              url: "/dashboard/teams-meet/team/roles",
+            },
+            {
+              title: "Organization Chart",
+              url: "/dashboard/teams-meet/team/org-chart",
+            },
+          ],
+        },
+        {
+          title: "Chat",
+          url: "/dashboard/teams-meet/chat/direct-messages",
+          items: [
+            {
+              title: "Direct Messages",
+              url: "/dashboard/teams-meet/chat/direct-messages",
+            },
+            {
+              title: "Group Chats",
+              url: "/dashboard/teams-meet/chat/group-chats",
+            },
+            {
+              title: "Channels",
+              url: "/dashboard/teams-meet/chat/channels",
+            },
+          ],
+        },
+        {
+          title: "Meetings",
+          url: "/dashboard/teams-meet/meetings/upcoming",
+          items: [
+            {
+              title: "Upcoming",
+              url: "/dashboard/teams-meet/meetings/upcoming",
+            },
+            {
+              title: "Calendar",
+              url: "/dashboard/teams-meet/meetings/calendar",
+            },
+            {
+              title: "Meeting Rooms",
+              url: "/dashboard/teams-meet/meetings/rooms",
+            },
+            {
+              title: "Meeting History",
+              url: "/dashboard/teams-meet/meetings/history",
+            },
+          ],
+        },
+        {
+          title: "Work",
+          url: "/dashboard/teams-meet/work/my-tasks",
+          items: [
+            {
+              title: "My Tasks",
+              url: "/dashboard/teams-meet/work/my-tasks",
+            },
+            {
+              title: "Team Tasks",
+              url: "/dashboard/teams-meet/work/team-tasks",
+            },
+            {
+              title: "Projects",
+              url: "/dashboard/teams-meet/work/projects",
+            },
+            {
+              title: "My Work",
+              url: "/dashboard/teams-meet/work/my-work",
+            },
+            {
+              title: "Approvals",
+              url: "/dashboard/teams-meet/work/approvals",
+            },
+          ],
+        },
+        {
+          title: "Onboarding",
+          url: "/dashboard/teams-meet/onboarding/new-joiners",
+          items: [
+            {
+              title: "New Joiners",
+              url: "/dashboard/teams-meet/onboarding/new-joiners",
+            },
+            {
+              title: "Onboarding Plans",
+              url: "/dashboard/teams-meet/onboarding/plans",
+            },
+            {
+              title: "Checklists",
+              url: "/dashboard/teams-meet/onboarding/checklists",
+            },
+            {
+              title: "Progress",
+              url: "/dashboard/teams-meet/onboarding/progress",
+            },
+          ],
+        },
+        {
+          title: "Time & Attendance",
+          url: "/dashboard/teams-meet/time/attendance",
+          items: [
+            {
+              title: "Attendance",
+              url: "/dashboard/teams-meet/time/attendance",
+            },
+            {
+              title: "Leave",
+              url: "/dashboard/teams-meet/time/leave",
+            },
+            {
+              title: "Work Hours",
+              url: "/dashboard/teams-meet/time/work-hours",
+            },
+          ],
+        },
+        {
+          title: "Performance",
+          url: "/dashboard/teams-meet/performance/goals",
+          items: [
+            {
+              title: "Goals",
+              url: "/dashboard/teams-meet/performance/goals",
+            },
+            {
+              title: "Reviews",
+              url: "/dashboard/teams-meet/performance/reviews",
+            },
+            {
+              title: "Progress",
+              url: "/dashboard/teams-meet/performance/progress",
+            },
+            {
+              title: "Recognition",
+              url: "/dashboard/teams-meet/performance/recognition",
+            },
+          ],
+        },
+        {
+          title: "Documents",
+          url: "/dashboard/teams-meet/documents/team-documents",
+          items: [
+            {
+              title: "Team Documents",
+              url: "/dashboard/teams-meet/documents/team-documents",
+            },
+            {
+              title: "Policies",
+              url: "/dashboard/teams-meet/documents/policies",
+            },
+            {
+              title: "Employee Documents",
+              url: "/dashboard/teams-meet/documents/employee-documents",
+            },
+          ],
+        },
+        {
+          title: "Announcements",
+          url: "/dashboard/teams-meet/announcements",
+        },
+      ],
     },
   ],
   navClouds: [
@@ -731,13 +982,8 @@ const data = {
       icon: IconSettings,
     },
     {
-      title: "Guides",
-      url: "/dashboard/guides",
-      icon: IconBook2,
-    },
-    {
       title: "Search",
-      url: "#",
+      url: "/dashboard/search",
       icon: IconSearch,
     },
   ],

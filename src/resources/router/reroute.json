@@ -400,6 +400,182 @@
       "destination": "/pages/dashboard/pos/stock"
     },
     {
+      "source": "/dashboard/analytics",
+      "destination": "/pages/dashboard/analytics/overview"
+    },
+    {
+      "source": "/dashboard/analytics/overview",
+      "destination": "/pages/dashboard/analytics/overview"
+    },
+    {
+      "source": "/dashboard/analytics/sales",
+      "destination": "/pages/dashboard/analytics/sales"
+    },
+    {
+      "source": "/dashboard/analytics/customers",
+      "destination": "/pages/dashboard/analytics/customers"
+    },
+    {
+      "source": "/dashboard/analytics/products",
+      "destination": "/pages/dashboard/analytics/products"
+    },
+    {
+      "source": "/dashboard/analytics/inventory",
+      "destination": "/pages/dashboard/analytics/inventory"
+    },
+    {
+      "source": "/dashboard/analytics/accounting",
+      "destination": "/pages/dashboard/analytics/accounting"
+    },
+    {
+      "source": "/dashboard/analytics/expenses",
+      "destination": "/pages/dashboard/analytics/expenses"
+    },
+    {
+      "source": "/dashboard/analytics/travel",
+      "destination": "/pages/dashboard/analytics/travel"
+    },
+    {
+      "source": "/dashboard/analytics/delivery",
+      "destination": "/pages/dashboard/analytics/delivery"
+    },
+    {
+      "source": "/dashboard/analytics/team",
+      "destination": "/pages/dashboard/analytics/team"
+    },
+    {
+      "source": "/dashboard/teams-meet",
+      "destination": "/pages/dashboard/teams-meet/overview"
+    },
+    {
+      "source": "/dashboard/teams-meet/overview",
+      "destination": "/pages/dashboard/teams-meet/overview"
+    },
+    {
+      "source": "/dashboard/teams-meet/team/members",
+      "destination": "/pages/dashboard/teams-meet/team/members"
+    },
+    {
+      "source": "/dashboard/teams-meet/team/departments",
+      "destination": "/pages/dashboard/teams-meet/team/departments"
+    },
+    {
+      "source": "/dashboard/teams-meet/team/roles",
+      "destination": "/pages/dashboard/teams-meet/team/roles"
+    },
+    {
+      "source": "/dashboard/teams-meet/team/org-chart",
+      "destination": "/pages/dashboard/teams-meet/team/org-chart"
+    },
+    {
+      "source": "/dashboard/teams-meet/chat/direct-messages",
+      "destination": "/pages/dashboard/teams-meet/chat/direct-messages"
+    },
+    {
+      "source": "/dashboard/teams-meet/chat/group-chats",
+      "destination": "/pages/dashboard/teams-meet/chat/group-chats"
+    },
+    {
+      "source": "/dashboard/teams-meet/chat/channels",
+      "destination": "/pages/dashboard/teams-meet/chat/channels"
+    },
+    {
+      "source": "/dashboard/teams-meet/meetings/upcoming",
+      "destination": "/pages/dashboard/teams-meet/meetings/upcoming"
+    },
+    {
+      "source": "/dashboard/teams-meet/meetings/calendar",
+      "destination": "/pages/dashboard/teams-meet/meetings/calendar"
+    },
+    {
+      "source": "/dashboard/teams-meet/meetings/rooms",
+      "destination": "/pages/dashboard/teams-meet/meetings/rooms"
+    },
+    {
+      "source": "/dashboard/teams-meet/meetings/history",
+      "destination": "/pages/dashboard/teams-meet/meetings/history"
+    },
+    {
+      "source": "/dashboard/teams-meet/work/my-tasks",
+      "destination": "/pages/dashboard/teams-meet/work/my-tasks"
+    },
+    {
+      "source": "/dashboard/teams-meet/work/team-tasks",
+      "destination": "/pages/dashboard/teams-meet/work/team-tasks"
+    },
+    {
+      "source": "/dashboard/teams-meet/work/projects",
+      "destination": "/pages/dashboard/teams-meet/work/projects"
+    },
+    {
+      "source": "/dashboard/teams-meet/work/my-work",
+      "destination": "/pages/dashboard/teams-meet/work/my-work"
+    },
+    {
+      "source": "/dashboard/teams-meet/work/approvals",
+      "destination": "/pages/dashboard/teams-meet/work/approvals"
+    },
+    {
+      "source": "/dashboard/teams-meet/onboarding/new-joiners",
+      "destination": "/pages/dashboard/teams-meet/onboarding/new-joiners"
+    },
+    {
+      "source": "/dashboard/teams-meet/onboarding/plans",
+      "destination": "/pages/dashboard/teams-meet/onboarding/plans"
+    },
+    {
+      "source": "/dashboard/teams-meet/onboarding/checklists",
+      "destination": "/pages/dashboard/teams-meet/onboarding/checklists"
+    },
+    {
+      "source": "/dashboard/teams-meet/onboarding/progress",
+      "destination": "/pages/dashboard/teams-meet/onboarding/progress"
+    },
+    {
+      "source": "/dashboard/teams-meet/time/attendance",
+      "destination": "/pages/dashboard/teams-meet/time/attendance"
+    },
+    {
+      "source": "/dashboard/teams-meet/time/leave",
+      "destination": "/pages/dashboard/teams-meet/time/leave"
+    },
+    {
+      "source": "/dashboard/teams-meet/time/work-hours",
+      "destination": "/pages/dashboard/teams-meet/time/work-hours"
+    },
+    {
+      "source": "/dashboard/teams-meet/performance/goals",
+      "destination": "/pages/dashboard/teams-meet/performance/goals"
+    },
+    {
+      "source": "/dashboard/teams-meet/performance/reviews",
+      "destination": "/pages/dashboard/teams-meet/performance/reviews"
+    },
+    {
+      "source": "/dashboard/teams-meet/performance/progress",
+      "destination": "/pages/dashboard/teams-meet/performance/progress"
+    },
+    {
+      "source": "/dashboard/teams-meet/performance/recognition",
+      "destination": "/pages/dashboard/teams-meet/performance/recognition"
+    },
+    {
+      "source": "/dashboard/teams-meet/documents/team-documents",
+      "destination": "/pages/dashboard/teams-meet/documents/team-documents"
+    },
+    {
+      "source": "/dashboard/teams-meet/documents/policies",
+      "destination": "/pages/dashboard/teams-meet/documents/policies"
+    },
+    {
+      "source": "/dashboard/teams-meet/documents/employee-documents",
+      "destination": "/pages/dashboard/teams-meet/documents/employee-documents"
+    },
+    {
+      "source": "/dashboard/teams-meet/announcements",
+      "destination": "/pages/dashboard/teams-meet/announcements"
+    },
+    {
       "source": "/dashboard/delivery-notes",
       "destination": "/pages/dashboard/delivery-notes"
     },
@@ -562,5 +738,29 @@
     {
       "source": "/dashboard/guides",
       "destination": "/pages/dashboard/guides"
+    },
+    {
+      "source": "/dashboard/search",
+      "destination": "/pages/dashboard/search"
+    },
+    {
+      "source": "/dashboard/help-center",
+      "destination": "/pages/dashboard/help-center"
+    },
+    {
+      "source": "/dashboard/knowledge-base",
+      "destination": "/pages/dashboard/knowledge-base"
+    },
+    {
+      "source": "/dashboard/faqs",
+      "destination": "/pages/dashboard/faqs"
+    },
+    {
+      "source": "/dashboard/troubleshooting",
+      "destination": "/pages/dashboard/troubleshooting"
+    },
+    {
+      "source": "/dashboard/whats-new",
+      "destination": "/pages/dashboard/whats-new"
     }
   ]
