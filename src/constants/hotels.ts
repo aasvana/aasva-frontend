@@ -1,0 +1,17 @@
+export const hotels = [
+  { name: "Taj Mahal Palace", destination: "Mumbai", rating: "5" },
+  { name: "The Taj Lake Palace", destination: "Udaipur", rating: "5" },
+  { name: "Umaid Bhawan Palace", destination: "Jodhpur", rating: "5" },
+  { name: "The Leela Palace", destination: "Bengaluru", rating: "5" },
+  { name: "The Oberoi Udaivilas", destination: "Udaipur", rating: "5" },
+  { name: "JW Marriott", destination: "New Delhi", rating: "5" },
+  { name: "ITC Grand Bharat", destination: "Gurgaon", rating: "5" },
+  { name: "Radisson Blu Resort", destination: "Goa", rating: "4" },
+  { name: "The Fern Residency", destination: "Goa", rating: "4" },
+  { name: "Holiday Inn Resort", destination: "Port Blair", rating: "4" },
+  { name: "The Ritz-Carlton", destination: "Maldives", rating: "5" },
+  { name: "Atlantis The Palm", destination: "Dubai", rating: "5" },
+  { name: "Marina Bay Sands", destination: "Singapore", rating: "5" },
+  { name: "Hilton Singapore Orchard", destination: "Singapore", rating: "5" },
+  { name: "Grand Hyatt Bangkok", destination: "Bangkok", rating: "5" },
+];

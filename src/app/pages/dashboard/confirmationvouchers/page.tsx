@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,20 +23,19 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import cvInfosJson from "../../../../resources/test-json/cvList.json";
+import {
+  useConfirmationVouchers,
+  useDeleteConfirmationVoucher,
+} from "@/lib/cv-query";
+import { SavedConfirmationVoucher } from "@/lib/cv-storage";
 
-type CvInfo = {
+type CvRow = {
+  id: string;
   cvId: string;
-  reservationId: string;
   customerName: string;
   agent: string;
   paymentType: string;
   date: string;
-};
-
-type CvData = {
-  title: string;
-  content: CvInfo[];
 };
 
 const sortOptions = [
@@ -46,17 +48,30 @@ const sortOptions = [
 type SortKey = (typeof sortOptions)[number]["key"];
 type SortOrder = "asc" | "desc";
 
+const toRow = (record: SavedConfirmationVoucher): CvRow => ({
+  id: record.id,
+  cvId: record.data.voucherNo || record.id.slice(0, 8),
+  customerName: record.data.customerName || "-",
+  agent: record.data.companyName || "-",
+  paymentType: record.data.paymentType || "-",
+  date: format(new Date(record.savedAt), "dd-MM-yyyy"),
+});
+
 export default function ConfirmationVouchers() {
-  const cvInfos: CvData = cvInfosJson as CvData;
+  const router = useRouter();
+  const { data: vouchers = [], isLoading } = useConfirmationVouchers();
+  const deleteMutation = useDeleteConfirmationVoucher();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("date");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const sortByKey = (data: CvInfo[], key: SortKey, order: SortOrder) => {
+  const rows: CvRow[] = vouchers.map(toRow);
+
+  const sortByKey = (data: CvRow[], key: SortKey, order: SortOrder) => {
     return [...data].sort((a, b) => {
       let aVal: any = a[key];
       let bVal: any = b[key];
@@ -76,7 +91,7 @@ export default function ConfirmationVouchers() {
   };
 
   const filterAndSortData = () => {
-    const filtered = cvInfos.content.filter((item) =>
+    const filtered = rows.filter((item) =>
       String(item[sortKey]).toLowerCase().includes(searchTerm.toLowerCase())
     );
     return sortByKey(filtered, sortKey, sortOrder);
@@ -106,12 +121,17 @@ export default function ConfirmationVouchers() {
   const handleReset = () => {
     setSearchTerm("");
     setSortKey("date");
-    setSortOrder("desc");
+    setSortOrder("asc");
     setCurrentPage(1);
   };
-  useEffect(() => {
-    handleSort("date");
-  }, []);
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Delete this confirmation voucher?")) return;
+    deleteMutation.mutate(id, {
+      onSuccess: () => toast.success("Confirmation voucher deleted."),
+      onError: () => toast.error("Failed to delete the confirmation voucher."),
+    });
+  };
 
   return (
     <div className="flex flex-col">
@@ -175,79 +195,114 @@ export default function ConfirmationVouchers() {
                 </div>
               </div>
               <div className="overflow-hidden min-h-[550px]">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50 dark:bg-neutral-700">
-                    <tr>
-                      {[
-                        "cvId",
-                        "customerName",
-                        "agent",
-                        "payment",
-                        "date",
-                        "Action",
-                      ].map((header, idx) => (
-                        <th
-                          key={idx}
-                          scope="col"
-                          className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500"
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-                    {paginatedData().map((data, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                          {data.cvId}
-                        </td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                          {data.customerName}
-                        </td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                          {data.agent}
-                        </td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                          {data.paymentType}
-                        </td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                          {data.date}
-                        </td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-end text-sm font-medium">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger>
-                              <EllipsisVertical />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side="left" align="start">
-                              <DropdownMenuItem>
-                                <Pencil /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Eye /> View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Trash2 /> Delete
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Download /> Download
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-[550px] text-sm text-gray-500">
+                    Loading confirmation vouchers...
+                  </div>
+                ) : rows.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-4 h-[550px] text-center">
+                    <p className="text-lg font-medium text-gray-800">
+                      No confirmation vouchers yet
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Create your first confirmation voucher to see it here.
+                    </p>
+                    <Button asChild>
+                      <Link href="/dashboard/confirmation-vouchers/create">
+                        <CirclePlusIcon /> Create Voucher
+                      </Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50 dark:bg-neutral-700">
+                      <tr>
+                        {[
+                          "cvId",
+                          "customerName",
+                          "agent",
+                          "payment",
+                          "date",
+                          "Action",
+                        ].map((header, idx) => (
+                          <th
+                            key={idx}
+                            scope="col"
+                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500"
+                          >
+                            {header}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+                      {paginatedData().map((data) => (
+                        <tr key={data.id}>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {data.cvId}
+                          </td>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {data.customerName}
+                          </td>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {data.agent}
+                          </td>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {data.paymentType}
+                          </td>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {data.date}
+                          </td>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-end text-sm font-medium">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger>
+                                <EllipsisVertical />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent side="left" align="start">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(
+                                      `/dashboard/confirmation-vouchers/${data.id}/edit`
+                                    )
+                                  }
+                                >
+                                  <Pencil /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(
+                                      `/dashboard/confirmation-vouchers/${data.id}/view`
+                                    )
+                                  }
+                                >
+                                  <Eye /> View
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleDelete(data.id)}
+                                >
+                                  <Trash2 /> Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Download /> Download
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
 
-              <div className="py-4 px-4 flex justify-center space-x-2">
-                {[...Array(totalPages)].map((_, i) => (
-                  <Button
-                    variant="secondary"
-                    key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`min-w-10 flex justify-center items-center
+              {totalPages > 1 && (
+                <div className="py-4 px-4 flex justify-center space-x-2">
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      variant="secondary"
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`min-w-10 flex justify-center items-center
                     focus:outline-hidden py-2.5 text-sm rounded-full disabled:opacity-50 
                     disabled:pointer-events-none
                     cursor-pointer ${
@@ -255,11 +310,12 @@ export default function ConfirmationVouchers() {
                         ? "bg-black text-white hover:bg-black"
                         : "text-gray-800 hover:bg-gray-100"
                     }`}
-                  >
-                    {i + 1}
-                  </Button>
-                ))}
-              </div>
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

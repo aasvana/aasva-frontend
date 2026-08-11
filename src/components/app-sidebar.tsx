@@ -17,6 +17,7 @@ import {
   IconReport,
   IconSearch,
   IconSettings,
+  IconShoppingCart,
   IconUserQuestion,
   IconUsers,
 } from "@tabler/icons-react"
@@ -56,8 +57,35 @@ const data = {
     },
     {
       title: "Invoices",
-      url: "#",
+      url: "/dashboard/invoices",
       icon: IconReceipt,
+    },
+    {
+      title: "Store",
+      url: "/dashboard/pos/store",
+      icon: IconShoppingCart,
+      items: [
+        {
+          title: "Store",
+          url: "/dashboard/pos/store",
+        },
+        {
+          title: "Sales Orders",
+          url: "/dashboard/pos/sales",
+        },
+        {
+          title: "Delivery Notes",
+          url: "/dashboard/delivery-notes",
+        },
+        {
+          title: "Purchase Orders",
+          url: "/dashboard/purchase-orders",
+        },
+        {
+          title: "Products",
+          url: "/dashboard/pos/products",
+        },
+      ],
     },
     {
       title: "Analytics",
@@ -126,7 +154,7 @@ const data = {
   navSecondary: [
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/settings",
       icon: IconSettings,
     },
     {

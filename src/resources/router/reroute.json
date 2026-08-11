@@ -33,10 +33,86 @@
     },
     {
       "source": "/dashboard/confirmation-vouchers/:id/edit",
-      "destination": "/pages/dashboard/confirmationvouchers/[id]/edit"
+      "destination": "/pages/dashboard/confirmationvouchers/:id/edit"
     },
     {
       "source": "/dashboard/confirmation-vouchers/:id/view",
-      "destination": "/pages/dashboard/confirmationvouchers/[id]/view"
+      "destination": "/pages/dashboard/confirmationvouchers/:id/view"
+    },
+    {
+      "source": "/dashboard/invoices",
+      "destination": "/pages/dashboard/invoices"
+    },
+    {
+      "source": "/dashboard/invoices/create",
+      "destination": "/pages/dashboard/invoices/create"
+    },
+    {
+      "source": "/dashboard/invoices/:id/edit",
+      "destination": "/pages/dashboard/invoices/:id/edit"
+    },
+    {
+      "source": "/dashboard/invoices/:id/view",
+      "destination": "/pages/dashboard/invoices/:id/view"
+    },
+    {
+      "source": "/dashboard/pos",
+      "destination": "/pages/dashboard/pos/store"
+    },
+    {
+      "source": "/dashboard/pos/store",
+      "destination": "/pages/dashboard/pos/store"
+    },
+    {
+      "source": "/dashboard/pos/products",
+      "destination": "/pages/dashboard/pos/products"
+    },
+    {
+      "source": "/dashboard/pos/products/create",
+      "destination": "/pages/dashboard/pos/products/create"
+    },
+    {
+      "source": "/dashboard/pos/products/:id/edit",
+      "destination": "/pages/dashboard/pos/products/:id/edit"
+    },
+    {
+      "source": "/dashboard/pos/sales",
+      "destination": "/pages/dashboard/pos/sales"
+    },
+    {
+      "source": "/dashboard/delivery-notes",
+      "destination": "/pages/dashboard/delivery-notes"
+    },
+    {
+      "source": "/dashboard/delivery-notes/create",
+      "destination": "/pages/dashboard/delivery-notes/create"
+    },
+    {
+      "source": "/dashboard/delivery-notes/:id/edit",
+      "destination": "/pages/dashboard/delivery-notes/:id/edit"
+    },
+    {
+      "source": "/dashboard/delivery-notes/:id/view",
+      "destination": "/pages/dashboard/delivery-notes/:id/view"
+    },
+    {
+      "source": "/dashboard/purchase-orders",
+      "destination": "/pages/dashboard/purchase-orders"
+    },
+    {
+      "source": "/dashboard/purchase-orders/create",
+      "destination": "/pages/dashboard/purchase-orders/create"
+    },
+    {
+      "source": "/dashboard/purchase-orders/:id/edit",
+      "destination": "/pages/dashboard/purchase-orders/:id/edit"
+    },
+    {
+      "source": "/dashboard/purchase-orders/:id/view",
+      "destination": "/pages/dashboard/purchase-orders/:id/view"
+    },
+    {
+      "source": "/dashboard/settings",
+      "destination": "/pages/dashboard/settings"
     }
   ]

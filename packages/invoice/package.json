@@ -1,0 +1,66 @@
+{
+  "name": "@xmerge/invoice",
+  "version": "0.1.0",
+  "description": "Self-contained invoice module for Next.js + shadcn/ui apps: zod schema, react-query hooks, localStorage persistence, multi-step form, preview, and PDF export.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "invoice",
+    "billing",
+    "react",
+    "nextjs",
+    "shadcn",
+    "tailwind",
+    "pdf",
+    "react-hook-form",
+    "zod"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "next": ">=14",
+    "react-hook-form": ">=7",
+    "@hookform/resolvers": ">=3",
+    "zod": ">=3",
+    "@tanstack/react-query": ">=5",
+    "zustand": ">=4",
+    "sonner": ">=1",
+    "date-fns": ">=3",
+    "lucide-react": ">=0.400",
+    "@react-pdf/renderer": ">=3"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "^15.3.0",
+    "react-hook-form": "^7.55.0",
+    "@hookform/resolvers": "^3.10.0",
+    "zod": "^3.24.2",
+    "@tanstack/react-query": "^5.74.7",
+    "zustand": "^5.0.3",
+    "sonner": "^2.0.3",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.488.0",
+    "@react-pdf/renderer": "^4.6.0"
+  }
+}

@@ -3,30 +3,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Mars, Venus, X } from "lucide-react";
-import React, { useState } from "react";
-const uuidv4 = () => crypto.randomUUID();
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { ConfirmationVoucherFormData } from "../schema";
 
 const TravellersDetails = () => {
-  const [travellers, setTravellers] = useState([
-    { id: uuidv4(), name: "", age: "", gender: "male" },
-    { id: uuidv4(), name: "", age: "", gender: "female" },
-  ]);
+  const {
+    control,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<ConfirmationVoucherFormData>();
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "travellers",
+  });
+
+  const travellers = watch("travellers");
 
   const handleAddTraveller = () => {
-    setTravellers((prev) => [
-      ...prev,
-      { id: uuidv4(), name: "", age: "", gender: "male" },
-    ]);
-  };
-
-  const handleRemoveTraveller = (id: string) => {
-    setTravellers((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const handleChange = (id: string, key: string, value: string) => {
-    setTravellers((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, [key]: value } : t))
-    );
+    append({ name: "", age: "", gender: "male" });
   };
 
   return (
@@ -37,15 +34,24 @@ const TravellersDetails = () => {
         </Button>
       </div>
 
-      {travellers.map((traveller, index) => (
+      {errors.travellers?.root && (
+        <p className="text-sm text-red-500 mb-2">
+          {errors.travellers.root.message}
+        </p>
+      )}
+
+      {fields.map((field, index) => {
+        const gender = travellers?.[index]?.gender;
+
+        return (
         <div
-          key={traveller.id}
+          key={field.id}
           className="relative grid grid-cols-1 md:grid-cols-3 gap-6 border rounded-md p-4 mb-4"
         >
           {index !== 0 && (
             <button
               type="button"
-              onClick={() => handleRemoveTraveller(traveller.id)}
+              onClick={() => remove(index)}
               className="absolute top-2 right-2 text-gray-500 hover:text-red-600"
             >
               <X className="w-4 h-4" />
@@ -53,49 +59,58 @@ const TravellersDetails = () => {
           )}
 
           <div className="grid gap-1.5">
-            <Label htmlFor={`name-${traveller.id}`}>Traveller Name</Label>
+            <Label htmlFor={`travellers.${index}.name`}>Traveller Name</Label>
             <Input
               type="text"
-              id={`name-${traveller.id}`}
+              id={`travellers.${index}.name`}
               placeholder="John Doe"
               className="bg-white"
-              value={traveller.name}
-              onChange={(e) =>
-                handleChange(traveller.id, "name", e.target.value)
-              }
+              aria-invalid={!!errors.travellers?.[index]?.name}
+              {...control.register(`travellers.${index}.name`)}
             />
+            {errors.travellers?.[index]?.name && (
+              <p className="text-sm text-red-500">
+                {errors.travellers[index]?.name?.message}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-1.5">
-            <Label htmlFor={`age-${traveller.id}`}>Traveller Age</Label>
+            <Label htmlFor={`travellers.${index}.age`}>Traveller Age</Label>
             <Input
               type="number"
-              id={`age-${traveller.id}`}
+              id={`travellers.${index}.age`}
               placeholder="30"
               className="bg-white"
-              value={traveller.age}
-              onChange={(e) => handleChange(traveller.id, "age", e.target.value)}
+              aria-invalid={!!errors.travellers?.[index]?.age}
+              {...control.register(`travellers.${index}.age`)}
             />
+            {errors.travellers?.[index]?.age && (
+              <p className="text-sm text-red-500">
+                {errors.travellers[index]?.age?.message}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-row items-end gap-4">
             <div className="w-full">
               <label
-                htmlFor={`male-${traveller.id}`}
+                htmlFor={`travellers.${index}.gender.male`}
                 className={cn(
                   "flex cursor-pointer items-center gap-2 border rounded-md p-2",
-                  traveller.gender === "male"
+                  gender === "male"
                     ? "bg-blue-100 border-blue-600 text-blue-700"
                     : "bg-white border-gray-300 text-gray-700"
                 )}
               >
                 <input
                   type="radio"
-                  id={`male-${traveller.id}`}
-                  name={`gender-${traveller.id}`}
+                  id={`travellers.${index}.gender.male`}
                   value="male"
-                  checked={traveller.gender === "male"}
-                  onChange={() => handleChange(traveller.id, "gender", "male")}
+                  checked={gender === "male"}
+                  onChange={() =>
+                    setValue(`travellers.${index}.gender`, "male")
+                  }
                   className="sr-only"
                 />
                 <Mars className="w-5 h-5" />
@@ -104,21 +119,22 @@ const TravellersDetails = () => {
             </div>
             <div className="w-full">
               <label
-                htmlFor={`female-${traveller.id}`}
+                htmlFor={`travellers.${index}.gender.female`}
                 className={cn(
                   "flex cursor-pointer items-center gap-2 border rounded-md p-2",
-                  traveller.gender === "female"
+                  gender === "female"
                     ? "bg-pink-100 border-pink-600 text-pink-700"
                     : "bg-white border-gray-300 text-gray-700"
                 )}
               >
                 <input
                   type="radio"
-                  id={`female-${traveller.id}`}
-                  name={`gender-${traveller.id}`}
+                  id={`travellers.${index}.gender.female`}
                   value="female"
-                  checked={traveller.gender === "female"}
-                  onChange={() => handleChange(traveller.id, "gender", "female")}
+                  checked={gender === "female"}
+                  onChange={() =>
+                    setValue(`travellers.${index}.gender`, "female")
+                  }
                   className="sr-only"
                 />
                 <Venus className="w-5 h-5" />
@@ -126,8 +142,15 @@ const TravellersDetails = () => {
               </label>
             </div>
           </div>
+
+          {errors.travellers?.[index]?.gender && (
+            <p className="text-sm text-red-500 col-span-3">
+              {errors.travellers[index]?.gender?.message}
+            </p>
+          )}
         </div>
-      ))}
+        );
+      })}
     </>
   );
 };

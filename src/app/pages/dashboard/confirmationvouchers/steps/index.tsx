@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Hotel } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -10,9 +10,14 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Dispatch, JSX, SetStateAction, useState } from "react";
+import { JSX } from "react";
+import { useFormContext } from "react-hook-form";
+import { ConfirmationVoucherFormData } from "../schema";
+import airlines from "@/constants/json/airlines.json";
+import airports from "@/constants/json/airports.json";
+import { Combobox, ComboboxOption } from "@/components/ui/combobox";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import TravellersDetails from "./travellers-details";
-import { Textarea } from "@/components/ui/textarea";
 import HotelsDetails from "./hotels-details";
 import GeneralDetails from "./general-details";
 import ItineraryDetails from "./itinerary-details";
@@ -24,267 +29,421 @@ export type Step = {
   content: JSX.Element;
 };
 
-export function getSteps(
-  date: Date | undefined,
-  setDate: Dispatch<SetStateAction<Date | undefined>>
-): Step[] {
+export function getSteps(): Step[] {
   return [
-    {
-      id: 1,
-      title: "Customer Details",
-      content: (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="grid gap-1.5">
-            <Label htmlFor="customerName">Customer name</Label>
-            <Input
-              type="text"
-              id="customerName"
-              placeholder="John Doe"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="mobileNo">Mobile no.</Label>
-            <Input
-              type="number"
-              id="mobileNo"
-              placeholder="9876543210"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="emailAddress">Email address</Label>
-            <Input
-              type="email"
-              id="emailAddress"
-              placeholder="name@domain.com"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="companyName">Company name (optional)</Label>
-            <Input
-              type="text"
-              id="companyName"
-              placeholder="SpaceX"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="journeyDate">Journey date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 2,
-      title: "Travel Details - Boarding",
-      content: (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="grid gap-1.5">
-            <Label htmlFor="airline">Airline</Label>
-            <Input
-              type="text"
-              id="airline"
-              placeholder="Air India"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingDate">Boarding date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingFrom">Boarding from</Label>
-            <Input
-              type="text"
-              id="boardingFrom"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingTo">Boarding to</Label>
-            <Input
-              type="text"
-              id="boardingTo"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="departureTime">Departure time</Label>
-            <Input
-              type="time"
-              id="boardingTime"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="arrivalTime">Arrival time</Label>
-            <Input
-              type="time"
-              id="arrivalTime"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 3,
-      title: "Travel Details - Returning",
-      content: (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="grid gap-1.5">
-            <Label htmlFor="airline">Airline</Label>
-            <Input
-              type="text"
-              id="airline"
-              placeholder="Air India"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingDate">Boarding date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingFrom">Boarding from</Label>
-            <Input
-              type="text"
-              id="boardingFrom"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="boardingTo">Boarding to</Label>
-            <Input
-              type="text"
-              id="boardingTo"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="departureTime">Departure time</Label>
-            <Input
-              type="time"
-              id="boardingTime"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-          <div className="grid gap-1.5">
-            <Label htmlFor="arrivalTime">Arrival time</Label>
-            <Input
-              type="time"
-              id="arrivalTime"
-              placeholder="Airport/Station"
-              className="bg-white"
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 4,
-      title: "Traveller Details",
-      content: <TravellersDetails />,
-    },
-    {
-      id: 5,
-      title: "Hotel Details",
-      content: <HotelsDetails />,
-    },
-    {
-      id: 6,
-      title: "Packege Details",
-      content: (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="grid w-full gap-1.5">
-            <Label htmlFor="included">Package Included</Label>
-            <Textarea placeholder="Type here..." id="included" className="min-h-[320px] bg-white" spellCheck="true" />
-          </div>
-          <div className="grid w-full gap-1.5">
-            <Label htmlFor="excluded">Package Exclueded</Label>
-            <Textarea placeholder="Type here..." id="excluded" className="min-h-[320px] bg-white" spellCheck="true" />
-          </div>
-        </div>
-      ),
-    },
-    {
-      id: 7,
-      title: "Tour Itinerary",
-      content: <ItineraryDetails />,
-    },
-    {
-      id: 8,
-      title: "General Details",
-      content: <GeneralDetails />,
-    },
-    {
-      id: 9,
-      title: "Official Details",
-      content: <OfficialDetails />,
-    }
+    { id: 1, title: "Customer Details", content: <Step1CustomerDetails /> },
+    { id: 2, title: "Travel Details - Boarding", content: <Step2Boarding /> },
+    { id: 3, title: "Travel Details - Returning", content: <Step3Returning /> },
+    { id: 4, title: "Traveller Details", content: <TravellersDetails /> },
+    { id: 5, title: "Hotels Details", content: <HotelsDetails /> },
+    { id: 6, title: "Package Details", content: <Step6Package /> },
+    { id: 7, title: "Tour Itinerary", content: <ItineraryDetails /> },
+    { id: 8, title: "General Details", content: <GeneralDetails /> },
+    { id: 9, title: "Official Details", content: <OfficialDetails /> },
   ];
+}
+
+function Step1CustomerDetails() {
+  const {
+    register,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useFormContext<ConfirmationVoucherFormData>();
+  const journeyDate = watch("journeyDate");
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid gap-1.5">
+        <Label htmlFor="customerName">Customer name</Label>
+        <Input
+          type="text"
+          id="customerName"
+          placeholder="John Doe"
+          className="bg-white"
+          aria-invalid={!!errors.customerName}
+          {...register("customerName")}
+        />
+        {errors.customerName && (
+          <p className="text-sm text-red-500">{errors.customerName.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="mobileNo">Mobile no.</Label>
+        <Input
+          type="text"
+          id="mobileNo"
+          placeholder="9876543210"
+          className="bg-white"
+          maxLength={10}
+          aria-invalid={!!errors.mobileNo}
+          {...register("mobileNo")}
+        />
+        {errors.mobileNo && (
+          <p className="text-sm text-red-500">{errors.mobileNo.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="emailAddress">Email address</Label>
+        <Input
+          type="email"
+          id="emailAddress"
+          placeholder="name@domain.com"
+          className="bg-white"
+          aria-invalid={!!errors.emailAddress}
+          {...register("emailAddress")}
+        />
+        {errors.emailAddress && (
+          <p className="text-sm text-red-500">{errors.emailAddress.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="companyName">Company name (optional)</Label>
+        <Input
+          type="text"
+          id="companyName"
+          placeholder="SpaceX"
+          className="bg-white"
+          {...register("companyName")}
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Journey date</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                errors.journeyDate ? "border-red-500" : ""
+              }`}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+                  {journeyDate ? format(new Date(journeyDate), "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={journeyDate}
+              onSelect={(day) =>
+                day && setValue("journeyDate", day, { shouldValidate: true })
+              }
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        {errors.journeyDate && (
+          <p className="text-sm text-red-500">{errors.journeyDate.message as string}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Step2Boarding() {
+  const {
+    register,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useFormContext<ConfirmationVoucherFormData>();
+  const boardingDate = watch("boardingDate");
+  const boardingAirline = watch("boardingAirline");
+  const boardingFrom = watch("boardingFrom");
+  const boardingTo = watch("boardingTo");
+
+  const airlineOptions: ComboboxOption[] = airlines.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name}`,
+  }));
+
+  const airportOptions: ComboboxOption[] = airports.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name} (${a.city})`,
+  }));
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid gap-1.5">
+        <Label>Airline</Label>
+        <Combobox
+          options={airlineOptions}
+          value={boardingAirline}
+          onChange={(val) =>
+            setValue("boardingAirline", val, { shouldValidate: true })
+          }
+          placeholder="Select airline"
+          searchPlaceholder="Search airlines..."
+          invalid={!!errors.boardingAirline}
+        />
+        {errors.boardingAirline && (
+          <p className="text-sm text-red-500">{errors.boardingAirline.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Boarding date</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                errors.boardingDate ? "border-red-500" : ""
+              }`}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {boardingDate ? format(new Date(boardingDate), "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={boardingDate}
+              onSelect={(day) =>
+                day && setValue("boardingDate", day, { shouldValidate: true })
+              }
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        {errors.boardingDate && (
+          <p className="text-sm text-red-500">{errors.boardingDate.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Boarding from</Label>
+        <Combobox
+          options={airportOptions}
+          value={boardingFrom}
+          onChange={(val) =>
+            setValue("boardingFrom", val, { shouldValidate: true })
+          }
+          placeholder="Select airport"
+          searchPlaceholder="Search airports..."
+          invalid={!!errors.boardingFrom}
+        />
+        {errors.boardingFrom && (
+          <p className="text-sm text-red-500">{errors.boardingFrom.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Boarding to</Label>
+        <Combobox
+          options={airportOptions}
+          value={boardingTo}
+          onChange={(val) =>
+            setValue("boardingTo", val, { shouldValidate: true })
+          }
+          placeholder="Select airport"
+          searchPlaceholder="Search airports..."
+          invalid={!!errors.boardingTo}
+        />
+        {errors.boardingTo && (
+          <p className="text-sm text-red-500">{errors.boardingTo.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="boardingDepartureTime">Departure time</Label>
+        <Input
+          type="time"
+          id="boardingDepartureTime"
+          className="bg-white"
+          aria-invalid={!!errors.boardingDepartureTime}
+          {...register("boardingDepartureTime")}
+        />
+        {errors.boardingDepartureTime && (
+          <p className="text-sm text-red-500">{errors.boardingDepartureTime.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="boardingArrivalTime">Arrival time</Label>
+        <Input
+          type="time"
+          id="boardingArrivalTime"
+          className="bg-white"
+          aria-invalid={!!errors.boardingArrivalTime}
+          {...register("boardingArrivalTime")}
+        />
+        {errors.boardingArrivalTime && (
+          <p className="text-sm text-red-500">{errors.boardingArrivalTime.message as string}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Step3Returning() {
+  const {
+    register,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useFormContext<ConfirmationVoucherFormData>();
+  const returnDate = watch("returnDate");
+  const returnAirline = watch("returnAirline");
+  const returnFrom = watch("returnFrom");
+  const returnTo = watch("returnTo");
+
+  const airlineOptions: ComboboxOption[] = airlines.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name}`,
+  }));
+
+  const airportOptions: ComboboxOption[] = airports.map((a) => ({
+    value: a.code,
+    label: `${a.code} - ${a.name} (${a.city})`,
+  }));
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid gap-1.5">
+        <Label>Airline</Label>
+        <Combobox
+          options={airlineOptions}
+          value={returnAirline}
+          onChange={(val) =>
+            setValue("returnAirline", val, { shouldValidate: true })
+          }
+          placeholder="Select airline"
+          searchPlaceholder="Search airlines..."
+          invalid={!!errors.returnAirline}
+        />
+        {errors.returnAirline && (
+          <p className="text-sm text-red-500">{errors.returnAirline.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Return date</Label>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={`w-full justify-start text-left font-normal ${
+                errors.returnDate ? "border-red-500" : ""
+              }`}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {returnDate ? format(new Date(returnDate), "PPP") : <span>Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={returnDate}
+              onSelect={(day) =>
+                day && setValue("returnDate", day, { shouldValidate: true })
+              }
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+        {errors.returnDate && (
+          <p className="text-sm text-red-500">{errors.returnDate.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Boarding from</Label>
+        <Combobox
+          options={airportOptions}
+          value={returnFrom}
+          onChange={(val) =>
+            setValue("returnFrom", val, { shouldValidate: true })
+          }
+          placeholder="Select airport"
+          searchPlaceholder="Search airports..."
+          invalid={!!errors.returnFrom}
+        />
+        {errors.returnFrom && (
+          <p className="text-sm text-red-500">{errors.returnFrom.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label>Boarding to</Label>
+        <Combobox
+          options={airportOptions}
+          value={returnTo}
+          onChange={(val) =>
+            setValue("returnTo", val, { shouldValidate: true })
+          }
+          placeholder="Select airport"
+          searchPlaceholder="Search airports..."
+          invalid={!!errors.returnTo}
+        />
+        {errors.returnTo && (
+          <p className="text-sm text-red-500">{errors.returnTo.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="returnDepartureTime">Departure time</Label>
+        <Input
+          type="time"
+          id="returnDepartureTime"
+          className="bg-white"
+          aria-invalid={!!errors.returnDepartureTime}
+          {...register("returnDepartureTime")}
+        />
+        {errors.returnDepartureTime && (
+          <p className="text-sm text-red-500">{errors.returnDepartureTime.message as string}</p>
+        )}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="returnArrivalTime">Arrival time</Label>
+        <Input
+          type="time"
+          id="returnArrivalTime"
+          className="bg-white"
+          aria-invalid={!!errors.returnArrivalTime}
+          {...register("returnArrivalTime")}
+        />
+        {errors.returnArrivalTime && (
+          <p className="text-sm text-red-500">{errors.returnArrivalTime.message as string}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Step6Package() {
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<ConfirmationVoucherFormData>();
+
+  const packageIncluded = watch("packageIncluded");
+  const packageExcluded = watch("packageExcluded");
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid w-full gap-1.5">
+        <Label htmlFor="packageIncluded">Package Included</Label>
+        <RichTextEditor
+          id="packageIncluded"
+          value={packageIncluded}
+          onChange={(html) =>
+            setValue("packageIncluded", html, { shouldValidate: true })
+          }
+          placeholder="Type here..."
+          invalid={!!errors.packageIncluded}
+        />
+        {errors.packageIncluded && (
+          <p className="text-sm text-red-500">{errors.packageIncluded.message as string}</p>
+        )}
+      </div>
+      <div className="grid w-full gap-1.5">
+        <Label htmlFor="packageExcluded">Package Excluded</Label>
+        <RichTextEditor
+          id="packageExcluded"
+          value={packageExcluded}
+          onChange={(html) =>
+            setValue("packageExcluded", html, { shouldValidate: true })
+          }
+          placeholder="Type here..."
+          invalid={!!errors.packageExcluded}
+        />
+        {errors.packageExcluded && (
+          <p className="text-sm text-red-500">{errors.packageExcluded.message as string}</p>
+        )}
+      </div>
+    </div>
+  );
 }

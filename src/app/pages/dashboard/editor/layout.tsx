@@ -152,17 +152,10 @@ const layout = () => {
                                         </div>
                                     </div>
                                     <div className="pl-3 w-full">
-                                        <div
-                                            className="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"
-                                        >
-                                            New message from
-                                            <span className="font-semibold text-gray-900 dark:text-white"
-                                            >Bonnie Green</span
-                                            >: "Hey, what's up? All set for the presentation?"
+                                        <div className="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
+                                            New message from <span className="font-semibold text-gray-900 dark:text-white">Bonnie Green</span>: &quot;Hey, what&apos;s up? All set for the presentation?&quot;
                                         </div>
-                                        <div
-                                            className="text-xs font-medium text-primary-600 dark:text-primary-500"
-                                        >
+                                        <div className="text-xs font-medium text-primary-600 dark:text-primary-500">
                                             a few moments ago
                                         </div>
                                     </div>
@@ -194,21 +187,10 @@ const layout = () => {
                                         </div>
                                     </div>
                                     <div className="pl-3 w-full">
-                                        <div
-                                            className="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"
-                                        >
-                                            <span className="font-semibold text-gray-900 dark:text-white"
-                                            >Jese leos</span
-                                            >
-                                            and
-                                            <span className="font-medium text-gray-900 dark:text-white"
-                                            >5 others</span
-                                            >
-                                            started following you.
+                                        <div className="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">
+                                            <span className="font-semibold text-gray-900 dark:text-white">Jese leos</span> and <span className="font-medium text-gray-900 dark:text-white">5 others</span> started following you.
                                         </div>
-                                        <div
-                                            className="text-xs font-medium text-primary-600 dark:text-primary-500"
-                                        >
+                                        <div className="text-xs font-medium text-primary-600 dark:text-primary-500">
                                             10 minutes ago
                                         </div>
                                     </div>

@@ -1,6 +1,13 @@
 "use client"
 
-import { IconCirclePlusFilled, IconMail, type Icon } from "@tabler/icons-react"
+import { useState } from "react"
+import {
+  IconChevronRight,
+  IconCirclePlusFilled,
+  IconMail,
+  type Icon,
+} from "@tabler/icons-react"
+import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -9,18 +16,32 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
   SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+
+export type NavMainItem = {
+  title: string
+  url: string
+  icon?: Icon
+  items?: {
+    title: string
+    url: string
+  }[]
+}
 
 export function NavMain({
   items,
 }: {
-  items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
+  items: NavMainItem[]
 }) {
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
+
+  const toggleGroup = (title: string) => {
+    setOpenGroups((prev) => ({ ...prev, [title]: !prev[title] }))
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -44,16 +65,46 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton className="cursor-pointer" tooltip={item.title}>
-                <SidebarMenuSubButton href={item.url} className="flex items-center gap-2 text-sm">
+          {items.map((item) =>
+            item.items && item.items.length > 0 ? (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  className="cursor-pointer"
+                  tooltip={item.title}
+                  onClick={() => toggleGroup(item.title)}
+                >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
-                </SidebarMenuSubButton>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+                  <IconChevronRight
+                    className={cn(
+                      "ml-auto transition-transform duration-200",
+                      openGroups[item.title] && "rotate-90"
+                    )}
+                  />
+                </SidebarMenuButton>
+                {openGroups[item.title] && (
+                  <SidebarMenuSub>
+                    {item.items.map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton href={subItem.url}>
+                          <span>{subItem.title}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                )}
+              </SidebarMenuItem>
+            ) : (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton className="cursor-pointer" tooltip={item.title}>
+                  <SidebarMenuSubButton href={item.url} className="flex items-center gap-2 text-sm">
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </SidebarMenuSubButton>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

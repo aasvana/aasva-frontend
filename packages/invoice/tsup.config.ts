@@ -1,0 +1,43 @@
+import { defineConfig } from "tsup";
+
+export default defineConfig({
+  entry: ["src/index.ts"],
+  format: ["esm", "cjs"],
+  dts: true,
+  sourcemap: true,
+  clean: true,
+  // These stay as imports in the published output — consumers provide them.
+  external: [
+    "react",
+    "react-dom",
+    "react/jsx-runtime",
+    "next",
+    "next/navigation",
+    "next/link",
+    "react-hook-form",
+    "@hookform/resolvers",
+    "@hookform/resolvers/zod",
+    "zod",
+    "@tanstack/react-query",
+    "zustand",
+    "zustand/middleware",
+    "sonner",
+    "date-fns",
+    "lucide-react",
+    "@react-pdf/renderer",
+    // shadcn/ui primitives + the `cn` helper are provided by the consumer.
+    "@/lib/utils",
+    "@/components/ui/button",
+    "@/components/ui/input",
+    "@/components/ui/label",
+    "@/components/ui/textarea",
+    "@/components/ui/checkbox",
+    "@/components/ui/badge",
+    "@/components/ui/calendar",
+    "@/components/ui/popover",
+    "@/components/ui/select",
+    "@/components/ui/table",
+    "@/components/ui/drawer",
+    "@/components/ui/tooltip",
+  ],
+});
