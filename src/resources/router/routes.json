@@ -33,5 +33,85 @@
     "source": "/dashboard/confirmation-vouchers",
     "destination": "/pages/dashboard/confirmationvouchers",
     "label": "Confirmation Vouchers"
+  },
+  {
+    "source": "/dashboard/healthcare",
+    "destination": "/pages/dashboard/healthcare/overview",
+    "label": "Healthcare Overview"
+  },
+  {
+    "source": "/dashboard/healthcare/overview",
+    "destination": "/pages/dashboard/healthcare/overview",
+    "label": "Healthcare Overview"
+  },
+  {
+    "source": "/dashboard/healthcare/patients",
+    "destination": "/pages/dashboard/healthcare/patients",
+    "label": "Patients"
+  },
+  {
+    "source": "/dashboard/healthcare/appointments",
+    "destination": "/pages/dashboard/healthcare/appointments",
+    "label": "Appointments"
+  },
+  {
+    "source": "/dashboard/healthcare/queue",
+    "destination": "/pages/dashboard/healthcare/queue",
+    "label": "Queue"
+  },
+  {
+    "source": "/dashboard/healthcare/consultations",
+    "destination": "/pages/dashboard/healthcare/consultations",
+    "label": "Consultations"
+  },
+  {
+    "source": "/dashboard/healthcare/medical-records",
+    "destination": "/pages/dashboard/healthcare/medical-records",
+    "label": "Medical Records"
+  },
+  {
+    "source": "/dashboard/healthcare/prescriptions",
+    "destination": "/pages/dashboard/healthcare/prescriptions",
+    "label": "Prescriptions"
+  },
+  {
+    "source": "/dashboard/healthcare/investigations",
+    "destination": "/pages/dashboard/healthcare/investigations",
+    "label": "Investigations"
+  },
+  {
+    "source": "/dashboard/healthcare/treatments",
+    "destination": "/pages/dashboard/healthcare/treatments",
+    "label": "Treatments"
+  },
+  {
+    "source": "/dashboard/healthcare/follow-ups",
+    "destination": "/pages/dashboard/healthcare/follow-ups",
+    "label": "Follow-ups"
+  },
+  {
+    "source": "/dashboard/healthcare/billing",
+    "destination": "/pages/dashboard/healthcare/billing",
+    "label": "Billing"
+  },
+  {
+    "source": "/dashboard/healthcare/pharmacy",
+    "destination": "/pages/dashboard/healthcare/pharmacy",
+    "label": "Pharmacy"
+  },
+  {
+    "source": "/dashboard/healthcare/staff",
+    "destination": "/pages/dashboard/healthcare/staff",
+    "label": "Staff"
+  },
+  {
+    "source": "/dashboard/healthcare/reports",
+    "destination": "/pages/dashboard/healthcare/reports",
+    "label": "Reports"
+  },
+  {
+    "source": "/dashboard/healthcare/settings",
+    "destination": "/pages/dashboard/healthcare/settings",
+    "label": "Settings"
   }
 ]

@@ -828,6 +828,81 @@ const PAGE_ROUTES: {
     label: "Settings",
   },
   {
+    prefix: "/dashboard/healthcare/overview",
+    group: "Healthcare",
+    label: "Overview",
+  },
+  {
+    prefix: "/dashboard/healthcare/patients",
+    group: "Healthcare",
+    label: "Patients",
+  },
+  {
+    prefix: "/dashboard/healthcare/appointments",
+    group: "Healthcare",
+    label: "Appointments",
+  },
+  {
+    prefix: "/dashboard/healthcare/queue",
+    group: "Healthcare",
+    label: "Queue",
+  },
+  {
+    prefix: "/dashboard/healthcare/consultations",
+    group: "Healthcare",
+    label: "Consultations",
+  },
+  {
+    prefix: "/dashboard/healthcare/medical-records",
+    group: "Healthcare",
+    label: "Medical Records",
+  },
+  {
+    prefix: "/dashboard/healthcare/prescriptions",
+    group: "Healthcare",
+    label: "Prescriptions",
+  },
+  {
+    prefix: "/dashboard/healthcare/investigations",
+    group: "Healthcare",
+    label: "Investigations",
+  },
+  {
+    prefix: "/dashboard/healthcare/treatments",
+    group: "Healthcare",
+    label: "Treatments",
+  },
+  {
+    prefix: "/dashboard/healthcare/follow-ups",
+    group: "Healthcare",
+    label: "Follow-ups",
+  },
+  {
+    prefix: "/dashboard/healthcare/billing",
+    group: "Healthcare",
+    label: "Billing",
+  },
+  {
+    prefix: "/dashboard/healthcare/pharmacy",
+    group: "Healthcare",
+    label: "Pharmacy",
+  },
+  {
+    prefix: "/dashboard/healthcare/staff",
+    group: "Healthcare",
+    label: "Staff",
+  },
+  {
+    prefix: "/dashboard/healthcare/reports",
+    group: "Healthcare",
+    label: "Reports",
+  },
+  {
+    prefix: "/dashboard/healthcare/settings",
+    group: "Healthcare",
+    label: "Settings",
+  },
+  {
     prefix: "/dashboard/requests/overview",
     group: "User Requests",
     label: "Overview",

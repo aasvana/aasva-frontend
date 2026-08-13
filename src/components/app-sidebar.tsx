@@ -22,6 +22,7 @@ import {
   IconSettings,
   IconShieldLock,
   IconShoppingCart,
+  IconStethoscope,
   IconTruckDelivery,
   IconUserQuestion,
   IconUsers,
@@ -474,6 +475,73 @@ const data = {
         {
           title: "Settings",
           url: "/dashboard/delivery/settings",
+        },
+      ],
+    },
+    {
+      title: "Healthcare",
+      url: "/dashboard/healthcare/overview",
+      icon: IconStethoscope,
+      items: [
+        {
+          title: "Overview",
+          url: "/dashboard/healthcare/overview",
+        },
+        {
+          title: "Patients",
+          url: "/dashboard/healthcare/patients",
+        },
+        {
+          title: "Appointments",
+          url: "/dashboard/healthcare/appointments",
+        },
+        {
+          title: "Queue",
+          url: "/dashboard/healthcare/queue",
+        },
+        {
+          title: "Consultations",
+          url: "/dashboard/healthcare/consultations",
+        },
+        {
+          title: "Medical Records",
+          url: "/dashboard/healthcare/medical-records",
+        },
+        {
+          title: "Prescriptions",
+          url: "/dashboard/healthcare/prescriptions",
+        },
+        {
+          title: "Investigations",
+          url: "/dashboard/healthcare/investigations",
+        },
+        {
+          title: "Treatments",
+          url: "/dashboard/healthcare/treatments",
+        },
+        {
+          title: "Follow-ups",
+          url: "/dashboard/healthcare/follow-ups",
+        },
+        {
+          title: "Billing",
+          url: "/dashboard/healthcare/billing",
+        },
+        {
+          title: "Pharmacy",
+          url: "/dashboard/healthcare/pharmacy",
+        },
+        {
+          title: "Staff",
+          url: "/dashboard/healthcare/staff",
+        },
+        {
+          title: "Reports",
+          url: "/dashboard/healthcare/reports",
+        },
+        {
+          title: "Settings",
+          url: "/dashboard/healthcare/settings",
         },
       ],
     },

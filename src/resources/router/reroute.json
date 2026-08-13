@@ -762,5 +762,69 @@
     {
       "source": "/dashboard/whats-new",
       "destination": "/pages/dashboard/whats-new"
+    },
+    {
+      "source": "/dashboard/healthcare",
+      "destination": "/pages/dashboard/healthcare/overview"
+    },
+    {
+      "source": "/dashboard/healthcare/overview",
+      "destination": "/pages/dashboard/healthcare/overview"
+    },
+    {
+      "source": "/dashboard/healthcare/patients",
+      "destination": "/pages/dashboard/healthcare/patients"
+    },
+    {
+      "source": "/dashboard/healthcare/appointments",
+      "destination": "/pages/dashboard/healthcare/appointments"
+    },
+    {
+      "source": "/dashboard/healthcare/queue",
+      "destination": "/pages/dashboard/healthcare/queue"
+    },
+    {
+      "source": "/dashboard/healthcare/consultations",
+      "destination": "/pages/dashboard/healthcare/consultations"
+    },
+    {
+      "source": "/dashboard/healthcare/medical-records",
+      "destination": "/pages/dashboard/healthcare/medical-records"
+    },
+    {
+      "source": "/dashboard/healthcare/prescriptions",
+      "destination": "/pages/dashboard/healthcare/prescriptions"
+    },
+    {
+      "source": "/dashboard/healthcare/investigations",
+      "destination": "/pages/dashboard/healthcare/investigations"
+    },
+    {
+      "source": "/dashboard/healthcare/treatments",
+      "destination": "/pages/dashboard/healthcare/treatments"
+    },
+    {
+      "source": "/dashboard/healthcare/follow-ups",
+      "destination": "/pages/dashboard/healthcare/follow-ups"
+    },
+    {
+      "source": "/dashboard/healthcare/billing",
+      "destination": "/pages/dashboard/healthcare/billing"
+    },
+    {
+      "source": "/dashboard/healthcare/pharmacy",
+      "destination": "/pages/dashboard/healthcare/pharmacy"
+    },
+    {
+      "source": "/dashboard/healthcare/staff",
+      "destination": "/pages/dashboard/healthcare/staff"
+    },
+    {
+      "source": "/dashboard/healthcare/reports",
+      "destination": "/pages/dashboard/healthcare/reports"
+    },
+    {
+      "source": "/dashboard/healthcare/settings",
+      "destination": "/pages/dashboard/healthcare/settings"
     }
   ]
