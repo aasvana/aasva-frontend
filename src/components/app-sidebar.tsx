@@ -42,7 +42,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { brand } from "@/constants/brand"
+import { MODULE_ACCESS } from "@/constants/roles"
+import { useHydrated } from "@/hooks/useHydrated"
 import { useOutletStore } from "@/stores/outletStore"
+import { useAuthStore } from "@/stores/AuthStore"
 import type { NavMainItem } from "@/components/nav-main"
 import Link from "next/link"
 
@@ -1076,10 +1079,20 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const activeOutletId = useOutletStore((s) => s.activeOutletId)
+  const role = useAuthStore((s) => s.role)
+  const hydrated = useHydrated()
+
+  const visibleItems = React.useMemo(() => {
+    if (!hydrated || !role) return data.navMain
+    return data.navMain.filter((item) => {
+      const allowedRoles = MODULE_ACCESS[item.title]
+      return allowedRoles ? allowedRoles.includes(role) : true
+    })
+  }, [hydrated, role])
 
   const navMain: NavMainItem[] = React.useMemo(
     () =>
-      data.navMain.map((item) => {
+      visibleItems.map((item) => {
         if (item.title !== "Store") return item
         return {
           ...item,
@@ -1097,7 +1110,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ),
         }
       }),
-    [activeOutletId]
+    [visibleItems, activeOutletId]
   )
 
   return (

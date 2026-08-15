@@ -28,6 +28,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { ROLE_LABELS } from "@/constants/roles"
+import { useAuthStore } from "@/stores/AuthStore"
 import { useLogout } from "@/hooks/useLogout"
 
 export function NavUser({
@@ -41,6 +43,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const logout = useLogout();
+  const role = useAuthStore((state) => state.role);
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -59,6 +62,11 @@ export function NavUser({
                 <span className="text-muted-foreground truncate text-xs">
                   {user.email}
                 </span>
+                {role && (
+                  <span className="mt-0.5 w-fit rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-emerald-700">
+                    {ROLE_LABELS[role]}
+                  </span>
+                )}
               </div>
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>

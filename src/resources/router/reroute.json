@@ -16,6 +16,14 @@
       "destination": "/pages/auth/signup"
     },
     {
+      "source": "/forgot-password",
+      "destination": "/pages/auth/forgot-password"
+    },
+    {
+      "source": "/onboarding/role",
+      "destination": "/pages/onboarding/role"
+    },
+    {
       "source": "/profile",
       "destination": "/user/profile"
     },
