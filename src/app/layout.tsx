@@ -4,6 +4,7 @@ import "./globals.css";
 import { brand } from "@/constants/brand";
 import PrelineScriptWrapper from "@/components/PrelineScriptWrapper";
 import { Toaster } from "@/components/ui/sonner"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Providers } from "@/middleware/QueryClientProvider";
 
 const geistSans = Geist({
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon/favicon.ico" />
         <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
@@ -41,11 +42,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <main>{children}</main>
-        </Providers>
-        <Toaster />
-        <PrelineScriptWrapper />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Providers>
+            <main>{children}</main>
+          </Providers>
+          <Toaster />
+          <PrelineScriptWrapper />
+        </ThemeProvider>
       </body>
     </html>
   );

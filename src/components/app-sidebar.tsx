@@ -43,18 +43,15 @@ import {
 } from "@/components/ui/sidebar"
 import { brand } from "@/constants/brand"
 import { MODULE_ACCESS } from "@/constants/roles"
+import { MODULE_PAGE_KEY } from "@/constants/pages"
 import { useHydrated } from "@/hooks/useHydrated"
 import { useOutletStore } from "@/stores/outletStore"
 import { useAuthStore } from "@/stores/AuthStore"
+import { usePageAccessStore } from "@/stores/pageAccessStore"
 import type { NavMainItem } from "@/components/nav-main"
 import Link from "next/link"
 
 const data = {
-  user: {
-    name: "Admin",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -1080,15 +1077,21 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const activeOutletId = useOutletStore((s) => s.activeOutletId)
   const role = useAuthStore((s) => s.role)
+  const modules = useAuthStore((s) => s.modules)
+  const access = usePageAccessStore((s) => s.access)
   const hydrated = useHydrated()
 
   const visibleItems = React.useMemo(() => {
     if (!hydrated || !role) return data.navMain
     return data.navMain.filter((item) => {
       const allowedRoles = MODULE_ACCESS[item.title]
-      return allowedRoles ? allowedRoles.includes(role) : true
+      if (allowedRoles && !allowedRoles.includes(role)) return false
+      const pageKey = MODULE_PAGE_KEY[item.title]
+      if (pageKey && access[pageKey] === false) return false
+      if (modules.length > 0 && !modules.includes(item.title)) return false
+      return true
     })
-  }, [hydrated, role])
+  }, [hydrated, role, modules, access])
 
   const navMain: NavMainItem[] = React.useMemo(
     () =>
@@ -1136,7 +1139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

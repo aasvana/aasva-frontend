@@ -1,12 +1,18 @@
 import { useAuthStore } from '@/stores/AuthStore';
 import { useRouter } from 'next/navigation';
+import api from '@/lib/api.utils';
 
 export const useLogout = () => {
-  const clearToken = useAuthStore((state) => state.clearToken);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
   const router = useRouter();
 
-  const logout = () => {
-    clearToken();
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Ignore errors - clear local state regardless
+    }
+    clearAuth();
     router.push('/login');
   };
 

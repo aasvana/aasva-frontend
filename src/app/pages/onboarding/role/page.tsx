@@ -2,23 +2,32 @@
 import { brand } from "@/constants/brand";
 import { ROLE_OPTIONS, type UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
+import { usePageAccessStore } from "@/stores/pageAccessStore";
+import { getNextOnboardingRoute } from "@/helpers/pageAccess";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const RoleSelectionPage = () => {
   const router = useRouter();
   const setRole = useAuthStore((state) => state.setRole);
+  const access = usePageAccessStore((state) => state.access);
   const [selected, setSelected] = useState<UserRole | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!(access["role-onboarding"] ?? true)) {
+      router.replace(getNextOnboardingRoute());
+    }
+  }, [access, router]);
 
   const handleSelect = (value: UserRole) => {
     if (submitting) return;
     setSelected(value);
     setSubmitting(true);
     setRole(value);
-    router.push('/dashboard');
+    router.push(getNextOnboardingRoute());
   };
 
   return (

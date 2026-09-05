@@ -8,6 +8,10 @@
       "destination": "/pages/auth"
     },
     {
+      "source": "/auth/callback",
+      "destination": "/pages/auth/callback"
+    },
+    {
       "source": "/login",
       "destination": "/pages/auth/login"
     },
@@ -20,12 +24,20 @@
       "destination": "/pages/auth/forgot-password"
     },
     {
+      "source": "/reset-password",
+      "destination": "/pages/auth/reset-password"
+    },
+    {
       "source": "/onboarding/role",
       "destination": "/pages/onboarding/role"
     },
     {
+      "source": "/onboarding/module",
+      "destination": "/pages/onboarding/module"
+    },
+    {
       "source": "/profile",
-      "destination": "/user/profile"
+      "destination": "/pages/dashboard/profile"
     },
     {
       "source": "/dashboard",

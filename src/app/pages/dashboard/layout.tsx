@@ -3,29 +3,53 @@ import { AppSidebar } from '@/components/app-sidebar';
 import AuthFooter from '@/components/generic/auth/footer';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-// import { useHydrated } from '@/hooks/useHydrated';
-// import { useAuthStore } from '@/stores/AuthStore';
-// import { useRouter } from 'next/navigation';
+import { getNextOnboardingRoute, getPageKeyFromPath } from '@/helpers/pageAccess';
+import { useAuthStore } from '@/stores/AuthStore';
+import { usePageAccessStore } from '@/stores/pageAccessStore';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { ReactNode } from 'react';
+import api from '@/lib/api.utils';
 
 interface AuthLayoutProps {
   children: ReactNode;
 }
 
 const DashboardLayout = ({ children }: AuthLayoutProps) => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const access = usePageAccessStore((state) => state.access);
+  const role = useAuthStore((state) => state.role);
+  const modules = useAuthStore((state) => state.modules);
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
 
-  // const router = useRouter();
-  // const hydrated = useHydrated();
-  // const token = useAuthStore((state) => state.token);
+  useEffect(() => {
+    if (token && !user) {
+      api
+        .get('/auth/me')
+        .then((res) => useAuthStore.getState().setUser(res.data))
+        .catch(() => {});
+    }
+  }, [token, user]);
 
-  // useEffect(() => {
-  //   if (hydrated && !token) {
-  //     router.replace('/login');
-  //   }
-  // }, [hydrated, token, router]);
+  useEffect(() => {
+    if (!role || modules.length === 0) {
+      router.replace(getNextOnboardingRoute());
+      return;
+    }
 
-  // if (!hydrated) return null;
-  
+    if (pathname === '/dashboard' || pathname === '/dashboard/settings') return;
+
+    const key = getPageKeyFromPath(pathname);
+    if (key && access[key] === false) {
+      router.replace('/dashboard');
+    }
+  }, [pathname, access, router, role, modules]);
+
+  if (!role || modules.length === 0) {
+    return null;
+  }
 
   return (
     <SidebarProvider

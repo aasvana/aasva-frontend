@@ -28,7 +28,7 @@ window.VanillaCalendarPro = VanillaCalendarPro;
 
 // Preline UI
 async function loadPreline() {
-  return import('preline/dist/index.js');
+  return import('preline/dist');
 }
 
 export default function PrelineScript() {

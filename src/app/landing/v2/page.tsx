@@ -749,7 +749,7 @@ const FinalCta = () => (
   </section>
 );
 
-export default function Home() {
+export default function LandingV2() {
   return (
     <div className="bg-white dark:bg-brand-night min-h-screen">
       <Nav />

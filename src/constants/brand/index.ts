@@ -1,12 +1,14 @@
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Xmerge";
+
 export const brand = {
-    name: "Xmerge",
+    name: APP_NAME,
     shortName: "Xm",
     author: 'Aquib Shahbaz',
     authorUrl: "https://www.justaquib.com",
-    description: "Xmerge is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications. It provides a clean and intuitive interface, along with a wide range of components and features to help developers create stunning applications quickly and efficiently.",
-    shortDescription: "Xmerge is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.",
-    tagline: "Xmerge is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.",
-    taglineDescription: "Xmerge is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.",
+    description: `${APP_NAME} is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications. It provides a clean and intuitive interface, along with a wide range of components and features to help developers create stunning applications quickly and efficiently.`,
+    shortDescription: `${APP_NAME} is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.`,
+    tagline: `${APP_NAME} is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.`,
+    taglineDescription: `${APP_NAME} is a powerful and flexible web application template designed for building modern, responsive, and user-friendly applications.`,
     keywords: [
         "web application template",
         "responsive design",

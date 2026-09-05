@@ -19,6 +19,7 @@ import {
   TeamSection,
   UserProfileSection,
 } from "@/components/settings/settings-sections";
+import { PageAccessSection } from "@/components/settings/page-access-section";
 
 const sectionContent = (id: SettingsSectionId) => {
   switch (id) {
@@ -44,6 +45,8 @@ const sectionContent = (id: SettingsSectionId) => {
       return <NotificationsSection />;
     case "security":
       return <SecuritySection />;
+    case "page-access":
+      return <PageAccessSection />;
     default:
       return null;
   }

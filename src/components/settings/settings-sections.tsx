@@ -27,6 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CURRENCIES } from "@/modules/invoice";
 import { useCompanyStore } from "@/stores/companyStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 function Switch({
   checked,
@@ -140,10 +141,33 @@ function fileToDataUrl(file: File, maxDim = 512, quality = 0.9): Promise<string>
 }
 
 export function UserProfileSection() {
-  const [name, setName] = useState("Admin");
-  const [email, setEmail] = useState("m@example.com");
+  const authUser = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
+
+  const [name, setName] = useState(
+    authUser
+      ? [authUser.firstName, authUser.lastName].filter(Boolean).join(" ") ||
+        "User"
+      : "User"
+  );
+  const [firstName, lastName] = [
+    name.split(" ")[0] ?? "",
+    name.split(" ").slice(1).join(" "),
+  ];
+  const [email, setEmail] = useState(authUser?.email ?? "");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState(authUser?.roles?.[0]?.name ?? "member");
+
+  const handleSave = () => {
+    if (!authUser) return;
+    setUser({
+      ...authUser,
+      firstName,
+      lastName,
+      email,
+    });
+    notifySaved("Profile");
+  };
 
   return (
     <Card>
@@ -196,7 +220,7 @@ export function UserProfileSection() {
           </Field>
         </div>
       </CardContent>
-      <CardActions onSave={() => notifySaved("Profile")} />
+      <CardActions onSave={handleSave} />
     </Card>
   );
 }

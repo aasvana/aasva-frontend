@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { brand } from "@/constants/brand";
 import { paymentTypes } from "@/constants/paymentTypes";
 import { useCvConfigStore } from "@/stores/cvConfigStore";
 import { format } from "date-fns";
@@ -66,7 +67,7 @@ const OfficialDetails = () => {
         <Input
           type="text"
           id="voucherNo"
-          placeholder="Xmerge/Kol/A/001"
+          placeholder={`${brand.name}/Kol/A/001`}
           className="bg-gray-50"
           aria-invalid={!!errors.voucherNo}
           {...register("voucherNo")}

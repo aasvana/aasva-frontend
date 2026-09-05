@@ -11,11 +11,13 @@ import {
   ReceiptText,
   ScrollText,
   Shield,
+  ShieldCheck,
   User,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/AuthStore";
 
 export type SettingsSectionId =
   | "user-profile"
@@ -28,7 +30,8 @@ export type SettingsSectionId =
   | "billing"
   | "integrations"
   | "notifications"
-  | "security";
+  | "security"
+  | "page-access";
 
 export type SettingsSection = {
   id: SettingsSectionId;
@@ -124,6 +127,17 @@ export const settingsGroups: SettingsGroup[] = [
       },
     ],
   },
+  {
+    label: "Admin",
+    sections: [
+      {
+        id: "page-access",
+        label: "Page Access",
+        description: "Control which pages users can see",
+        icon: ShieldCheck,
+      },
+    ],
+  },
 ];
 
 export function SettingsNav({
@@ -133,9 +147,19 @@ export function SettingsNav({
   active: SettingsSectionId;
   onChange: (id: SettingsSectionId) => void;
 }) {
+  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin);
+
+  const groups = React.useMemo(
+    () =>
+      isSuperAdmin
+        ? settingsGroups
+        : settingsGroups.filter((group) => group.label !== "Admin"),
+    [isSuperAdmin]
+  );
+
   return (
     <nav className="flex flex-col gap-6" aria-label="Settings">
-      {settingsGroups.map((group) => (
+      {groups.map((group) => (
         <div key={group.label} className="flex flex-col gap-1">
           <p className="px-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {group.label}

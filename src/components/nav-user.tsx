@@ -5,8 +5,12 @@ import {
   IconDotsVertical,
   IconLogout,
   IconNotification,
+  IconShield,
+  IconStack2,
+  IconSwitchHorizontal,
   IconUserCircle,
 } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
 
 import {
   Avatar,
@@ -31,19 +35,71 @@ import {
 import { ROLE_LABELS } from "@/constants/roles"
 import { useAuthStore } from "@/stores/AuthStore"
 import { useLogout } from "@/hooks/useLogout"
+import { cn } from "@/lib/utils"
 
-export function NavUser({
-  user,
+function Switch({
+  checked,
+  onCheckedChange,
 }: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
+  checked: boolean
+  onCheckedChange: (value: boolean) => void
 }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onCheckedChange(!checked)}
+      className={cn(
+        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors",
+        checked ? "bg-emerald-500" : "bg-muted"
+      )}
+    >
+      <span
+        className={cn(
+          "block size-4 rounded-full bg-background shadow-sm transition-transform",
+          checked ? "translate-x-[18px]" : "translate-x-0.5"
+        )}
+      />
+    </button>
+  )
+}
+
+type NavUserProps = {
+  user?: {
+    name?: string
+    email?: string
+    avatar?: string
+  } | null
+}
+
+export function NavUser({ user: userProp }: NavUserProps) {
   const { isMobile } = useSidebar()
   const logout = useLogout();
   const role = useAuthStore((state) => state.role);
+  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin);
+  const setSuperAdmin = useAuthStore((state) => state.setSuperAdmin);
+  const authUser = useAuthStore((state) => state.user);
+  const router = useRouter();
+
+  const user = {
+    name:
+      userProp?.name ||
+      (authUser
+        ? [authUser.firstName, authUser.lastName].filter(Boolean).join(" ") ||
+          "User"
+        : "User"),
+    email: userProp?.email || authUser?.email || "",
+    avatar: userProp?.avatar || "",
+  };
+
+  const initials = user.name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("") || "U";
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -55,7 +111,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -81,7 +137,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -93,9 +149,17 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
                 <IconUserCircle />
                 Account
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/onboarding/role")}>
+                <IconSwitchHorizontal />
+                Switch Role
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/onboarding/module")}>
+                <IconStack2 />
+                Customize Modules
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconCreditCard />
@@ -106,6 +170,20 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={(event) => event.preventDefault()}
+              className="flex items-center justify-between"
+            >
+              <span className="flex items-center gap-2">
+                <IconShield />
+                Super Admin
+              </span>
+              <Switch
+                checked={isSuperAdmin}
+                onCheckedChange={setSuperAdmin}
+              />
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
               <IconLogout />

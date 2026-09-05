@@ -28,18 +28,13 @@ const ForgotPasswordPage = () => {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async (data: ForgotPasswordFormData) => {
-      const pushData = {
-        email: data.email,
-        provider: 'email',
-        passport: 'forgot-password',
-      };
       return await request(
         {
           method: 'POST',
-          url: '/auth',
+          url: '/auth/forgot-password',
           showToast: false,
         },
-        pushData
+        { email: data.email }
       );
     },
     retry: 0,

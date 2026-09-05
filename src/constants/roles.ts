@@ -70,6 +70,49 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   ecommerce: "E-commerce Store",
 };
 
+export const ROLE_MODULES: Record<UserRole, string[]> = {
+  doctor: [
+    "Healthcare",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  travel: [
+    "Travel",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  delivery: [
+    "Delivery",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  ecommerce: [
+    "Store",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+};
+
 export const MODULE_ACCESS: Record<string, UserRole[]> = {
   Dashboard: ALL_ROLES,
   Healthcare: ["doctor"],

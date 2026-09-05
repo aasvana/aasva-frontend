@@ -1,4 +1,5 @@
 import { Logo } from "@/resources/assets/imgs";
+import { brand } from "@/constants/brand";
 import Image from "next/image";
 import React from "react";
 import { format } from 'date-fns';
@@ -13,8 +14,8 @@ const Footer = () => {
                     <div className="text-center md:text-start">
                         {/* <!-- Logo --> */}
                         <a className="flex flex-row justify-center items-center rounded-xl text-xl font-semibold focus:outline-hidden focus:opacity-80" href="#" aria-label="Preline">
-                            <Image src={Logo} alt="Xmerge" height='100' width='100' className="w-6 h-6 rounded-sm" />
-                            <span className=" text-black dark:text-white ms-2 text-xl font-bold">merge</span>
+                            <Image src={Logo} alt={brand.name} height='100' width='100' className="w-6 h-6 rounded-sm" />
+                            <span className=" text-black dark:text-white ms-2 text-xl font-bold">asvana</span>
                         </a>
                         {/* <!-- End Logo --> */}
                     </div>
@@ -67,7 +68,7 @@ const Footer = () => {
                 {/* <!-- End Grid --> */}
             </div>
             <div className='p-4 text-primary-700 text-center'>
-                © {year} {process.env.NEXT_PUBLIC_BRAND_NAME} All rights reserved.
+                © {year} {brand.name} All rights reserved.
             </div>
         </footer>
     );

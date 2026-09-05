@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { brand } from "@/constants/brand";
 import { paymentTypes } from "@/constants/paymentTypes";
 import { CURRENCIES } from "@/modules/invoice";
 import { useCvConfigStore } from "@/stores/cvConfigStore";
@@ -112,7 +113,7 @@ export default function CvSettingsPage() {
                 <Input
                   value={voucherPrefix}
                   onChange={(e) => setVoucherPrefix(e.target.value)}
-                  placeholder="e.g. Xmerge/Kol/A/"
+                  placeholder={`e.g. ${brand.name}/Kol/A/`}
                 />
               </Field>
               <Field label="Voucher No Suffix">
