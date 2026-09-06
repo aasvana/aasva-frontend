@@ -5,6 +5,7 @@ import { ROLE_LABELS, ROLE_MODULES } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
 import { getNextOnboardingRoute } from "@/helpers/pageAccess";
+import { getSessionState, useSessionRestore } from "@/hooks/useSessionRestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,12 +22,26 @@ const isModuleAllowed = (
 const ModuleSelectionPage = () => {
   const router = useRouter();
   const role = useAuthStore((state) => state.role);
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const lastUserId = useAuthStore((state) => state.lastUserId);
+  const modules = useAuthStore((state) => state.modules);
   const setModules = useAuthStore((state) => state.setModules);
   const access = usePageAccessStore((state) => state.access);
+  const { restoring } = useSessionRestore();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (getSessionState() === 'restoring') return;
+
+    if (!token) {
+      router.replace(
+        user || lastUserId || role || modules.length > 0 ? '/login' : '/'
+      );
+      return;
+    }
+
     if (!role) {
       router.replace(getNextOnboardingRoute());
       return;
@@ -35,7 +50,7 @@ const ModuleSelectionPage = () => {
       isModuleAllowed(title, access)
     );
     setSelected(new Set(available));
-  }, [role, access, router]);
+  }, [role, access, router, token, user, lastUserId, modules]);
 
   const availableModules = useMemo(() => {
     if (!role) return [];
@@ -44,7 +59,7 @@ const ModuleSelectionPage = () => {
     );
   }, [role, access]);
 
-  if (!role) return null;
+  if (restoring || !token || !role) return null;
 
   const toggleModule = (title: string) => {
     setSelected((prev) => {

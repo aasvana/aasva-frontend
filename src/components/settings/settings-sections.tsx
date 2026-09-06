@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { CURRENCIES } from "@/modules/invoice";
 import { useCompanyStore } from "@/stores/companyStore";
 import { useAuthStore } from "@/stores/AuthStore";
+import { currentUserName } from "@/utils/user";
 
 function Switch({
   checked,
@@ -144,22 +145,17 @@ export function UserProfileSection() {
   const authUser = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
 
-  const [name, setName] = useState(
-    authUser
-      ? [authUser.firstName, authUser.lastName].filter(Boolean).join(" ") ||
-        "User"
-      : "User"
-  );
-  const [firstName, lastName] = [
-    name.split(" ")[0] ?? "",
-    name.split(" ").slice(1).join(" "),
-  ];
+  const [name, setName] = useState(currentUserName("fullname", authUser));
   const [email, setEmail] = useState(authUser?.email ?? "");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState(authUser?.roles?.[0]?.name ?? "member");
 
   const handleSave = () => {
     if (!authUser) return;
+    const [firstName, lastName] = [
+      name.split(" ")[0] ?? "",
+      name.split(" ").slice(1).join(" "),
+    ];
     setUser({
       ...authUser,
       firstName,

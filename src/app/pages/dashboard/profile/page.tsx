@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Mail, IdCard } from "lucide-react";
 import { useAuthStore } from "@/stores/AuthStore";
 import { ROLE_LABELS } from "@/constants/roles";
+import { currentUserName } from "@/utils/user";
 import type { UserRole } from "@/constants/roles";
 
 export default function ProfilePage() {
@@ -11,17 +12,8 @@ export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
   const role = useAuthStore((state) => state.role);
 
-  const name = user
-    ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "User"
-    : "User";
-
-  const initials =
-    name
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
-      .join("") || "U";
+  const name = currentUserName("fullname", user);
+  const initials = currentUserName("initial", user);
 
   const roleLabels = new Set(
     (user?.roles ?? []).map((r) => r.name).filter(Boolean)

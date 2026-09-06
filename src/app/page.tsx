@@ -6,6 +6,7 @@ import Footer from "@/components/generic/footer";
 import { Reveal } from "@/components/generic/landing/motion-primitives";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { brand } from "@/constants/brand";
+import { useAuthStore } from "@/stores/AuthStore";
 import { Logo } from "@/resources/assets/imgs";
 import { motion } from "motion/react";
 import {
@@ -204,7 +205,10 @@ const GridPattern = () => (
   <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(9,92,234,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(9,92,234,0.06)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,#000_60%,transparent_100%)]" />
 );
 
-const Nav = () => (
+const Nav = () => {
+  const token = useAuthStore((state) => state.token);
+
+  return (
   <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-brand-night/70 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/10">
     <nav className="max-w-7xl w-full flex items-center px-4 md:px-6 lg:px-8 h-16 mx-auto">
       <Link href="/" className="flex items-center shrink-0">
@@ -228,20 +232,23 @@ const Nav = () => (
         ))}
       </div>
       <div className="flex items-center gap-x-1.5 ms-auto">
-        <Link href="/login" className="hidden sm:inline-flex py-2 px-3 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-neutral-300 dark:hover:text-white transition-colors">
-          Sign in
+        <Link href={token ? "/dashboard" : "/login"} className="hidden sm:inline-flex py-2 px-3 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-neutral-300 dark:hover:text-white transition-colors">
+          {token ? "Dashboard" : "Sign in"}
         </Link>
         <ThemeToggle />
-        <Button asChild size="sm" className="rounded-lg bg-brand-orange hover:bg-brand-orange/90 text-white shadow-lg shadow-brand-orange/25 border-0">
-          <Link href="/signup">
-            Get started
-            <ArrowRight />
-          </Link>
-        </Button>
+        {!token && (
+          <Button asChild size="sm" className="rounded-lg bg-brand-orange hover:bg-brand-orange/90 text-white shadow-lg shadow-brand-orange/25 border-0">
+            <Link href="/signup">
+              Get started
+              <ArrowRight />
+            </Link>
+          </Button>
+        )}
       </div>
     </nav>
   </header>
-);
+  );
+};
 
 const Hero = () => (
   <section className="relative overflow-hidden pt-20 pb-16 lg:pt-28">

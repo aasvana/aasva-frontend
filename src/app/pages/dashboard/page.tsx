@@ -57,8 +57,8 @@ import {
   useTeamMeetStore,
 } from "@/stores/teamMeetStore";
 import { memberName } from "@/helpers/teams-meet/team-ui";
-
-const CURRENT_USER_NAME = "Aquib";
+import { useAuthStore } from "@/stores/AuthStore";
+import { currentUserName } from "@/utils/user";
 
 const RANGE_OPTIONS = [
   { key: "today", label: "Today" },
@@ -344,6 +344,9 @@ export default function DashboardPage() {
   const [activityFilter, setActivityFilter] = useState<ActivityModule | "All">("All");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
+
+  const authUser = useAuthStore((state) => state.user);
+  const currentUserNameDisplay = currentUserName("fullname", authUser);
 
   const outlets = useOutletStore((s) => s.outlets);
   const auditEntries = useAuditLogStore((s) => s.entries);
@@ -782,7 +785,7 @@ export default function DashboardPage() {
               Dashboard
             </h1>
             <p className="mt-1 text-sm font-medium text-gray-700">
-              {greeting}, {CURRENT_USER_NAME} 👋
+              {greeting}, {currentUserNameDisplay || "there"} 👋
             </p>
             <p className="mt-0.5 text-xs text-gray-500">
               Here&apos;s what&apos;s happening across your business today.

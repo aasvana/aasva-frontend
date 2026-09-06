@@ -4,6 +4,7 @@ import { ROLE_OPTIONS, type UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
 import { getNextOnboardingRoute } from "@/helpers/pageAccess";
+import { getSessionState, useSessionRestore } from "@/hooks/useSessionRestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,15 +13,32 @@ import React, { useEffect, useState } from "react";
 const RoleSelectionPage = () => {
   const router = useRouter();
   const setRole = useAuthStore((state) => state.setRole);
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const lastUserId = useAuthStore((state) => state.lastUserId);
+  const role = useAuthStore((state) => state.role);
+  const modules = useAuthStore((state) => state.modules);
   const access = usePageAccessStore((state) => state.access);
+  const { restoring } = useSessionRestore();
   const [selected, setSelected] = useState<UserRole | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (getSessionState() === 'restoring') return;
+
+    if (!token) {
+      router.replace(
+        user || lastUserId || role || modules.length > 0 ? '/login' : '/'
+      );
+      return;
+    }
+
     if (!(access["role-onboarding"] ?? true)) {
       router.replace(getNextOnboardingRoute());
     }
-  }, [access, router]);
+  }, [access, router, token, user, lastUserId, role, modules]);
+
+  if (restoring || !token) return null;
 
   const handleSelect = (value: UserRole) => {
     if (submitting) return;

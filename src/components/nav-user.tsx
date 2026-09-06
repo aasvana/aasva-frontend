@@ -35,6 +35,7 @@ import {
 import { ROLE_LABELS } from "@/constants/roles"
 import { useAuthStore } from "@/stores/AuthStore"
 import { useLogout } from "@/hooks/useLogout"
+import { currentUserName } from "@/utils/user"
 import { cn } from "@/lib/utils"
 
 function Switch({
@@ -84,21 +85,12 @@ export function NavUser({ user: userProp }: NavUserProps) {
 
   const user = {
     name:
-      userProp?.name ||
-      (authUser
-        ? [authUser.firstName, authUser.lastName].filter(Boolean).join(" ") ||
-          "User"
-        : "User"),
+      userProp?.name || currentUserName("fullname", authUser) || "User",
     email: userProp?.email || authUser?.email || "",
     avatar: userProp?.avatar || "",
   };
 
-  const initials = user.name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("") || "U";
+  const initials = currentUserName("initial", { firstName: user.name });
 
   return (
     <SidebarMenu>

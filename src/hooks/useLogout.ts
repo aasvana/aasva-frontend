@@ -13,7 +13,7 @@ export const useLogout = () => {
       // Ignore errors - clear local state regardless
     }
     clearAuth();
-    router.push('/login');
+    router.replace('/');
   };
 
   return logout;
