@@ -978,3 +978,5 @@ export function SecuritySection() {
     </Card>
   );
 }
+
+export { UsersSection } from "./users-section";

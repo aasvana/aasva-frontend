@@ -18,6 +18,7 @@ import {
   TaxGstSection,
   TeamSection,
   UserProfileSection,
+  UsersSection,
 } from "@/components/settings/settings-sections";
 import { PageAccessSection } from "@/components/settings/page-access-section";
 
@@ -43,10 +44,12 @@ const sectionContent = (id: SettingsSectionId) => {
       return <IntegrationsSection />;
     case "notifications":
       return <NotificationsSection />;
-    case "security":
-      return <SecuritySection />;
-    case "page-access":
-      return <PageAccessSection />;
+  case "security":
+    return <SecuritySection />;
+  case "users":
+    return <UsersSection />;
+  case "page-access":
+    return <PageAccessSection />;
     default:
       return null;
   }

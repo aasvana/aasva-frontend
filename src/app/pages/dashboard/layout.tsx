@@ -4,7 +4,7 @@ import AuthFooter from '@/components/generic/auth/footer';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getNextOnboardingRoute, getPageKeyFromPath } from '@/helpers/pageAccess';
-import { getSessionState, useSessionRestore } from '@/hooks/useSessionRestore';
+import { useSessionRestore } from '@/hooks/useSessionRestore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { usePageAccessStore } from '@/stores/pageAccessStore';
 import { usePathname, useRouter } from 'next/navigation';
@@ -37,7 +37,7 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
   }, [token, user]);
 
   useEffect(() => {
-    if (getSessionState() === 'restoring') return;
+    if (restoring) return;
 
     if (!token) {
       router.replace(
@@ -57,7 +57,7 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
     if (key && access[key] === false) {
       router.replace('/dashboard');
     }
-  }, [pathname, access, router, role, modules, token, user, lastUserId]);
+  }, [pathname, access, router, role, modules, token, user, lastUserId, restoring]);
 
   if (restoring) {
     return null;

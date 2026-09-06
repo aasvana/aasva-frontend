@@ -31,7 +31,8 @@ export type SettingsSectionId =
   | "integrations"
   | "notifications"
   | "security"
-  | "page-access";
+  | "page-access"
+  | "users";
 
 export type SettingsSection = {
   id: SettingsSectionId;
@@ -131,6 +132,12 @@ export const settingsGroups: SettingsGroup[] = [
     label: "Admin",
     sections: [
       {
+        id: "users",
+        label: "Users",
+        description: "View and manage onboarded users",
+        icon: Users,
+      },
+      {
         id: "page-access",
         label: "Page Access",
         description: "Control which pages users can see",
@@ -147,14 +154,17 @@ export function SettingsNav({
   active: SettingsSectionId;
   onChange: (id: SettingsSectionId) => void;
 }) {
-  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin);
+  const authUser = useAuthStore((state) => state.user);
+  const isSystemAdmin = authUser?.roles?.some(
+    (r) => r.name === 'systemadmin' || r.name === 'superadmin'
+  ) ?? false;
 
   const groups = React.useMemo(
     () =>
-      isSuperAdmin
+      isSystemAdmin
         ? settingsGroups
         : settingsGroups.filter((group) => group.label !== "Admin"),
-    [isSuperAdmin]
+    [isSystemAdmin]
   );
 
   return (

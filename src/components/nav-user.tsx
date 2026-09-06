@@ -5,7 +5,6 @@ import {
   IconDotsVertical,
   IconLogout,
   IconNotification,
-  IconShield,
   IconStack2,
   IconSwitchHorizontal,
   IconUserCircle,
@@ -36,35 +35,6 @@ import { ROLE_LABELS } from "@/constants/roles"
 import { useAuthStore } from "@/stores/AuthStore"
 import { useLogout } from "@/hooks/useLogout"
 import { currentUserName } from "@/utils/user"
-import { cn } from "@/lib/utils"
-
-function Switch({
-  checked,
-  onCheckedChange,
-}: {
-  checked: boolean
-  onCheckedChange: (value: boolean) => void
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      onClick={() => onCheckedChange(!checked)}
-      className={cn(
-        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-        checked ? "bg-emerald-500" : "bg-muted"
-      )}
-    >
-      <span
-        className={cn(
-          "block size-4 rounded-full bg-background shadow-sm transition-transform",
-          checked ? "translate-x-[18px]" : "translate-x-0.5"
-        )}
-      />
-    </button>
-  )
-}
 
 type NavUserProps = {
   user?: {
@@ -78,8 +48,6 @@ export function NavUser({ user: userProp }: NavUserProps) {
   const { isMobile } = useSidebar()
   const logout = useLogout();
   const role = useAuthStore((state) => state.role);
-  const isSuperAdmin = useAuthStore((state) => state.isSuperAdmin);
-  const setSuperAdmin = useAuthStore((state) => state.setSuperAdmin);
   const authUser = useAuthStore((state) => state.user);
   const router = useRouter();
 
@@ -162,20 +130,6 @@ export function NavUser({ user: userProp }: NavUserProps) {
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={(event) => event.preventDefault()}
-              className="flex items-center justify-between"
-            >
-              <span className="flex items-center gap-2">
-                <IconShield />
-                Super Admin
-              </span>
-              <Switch
-                checked={isSuperAdmin}
-                onCheckedChange={setSuperAdmin}
-              />
-            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
               <IconLogout />

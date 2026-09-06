@@ -3,7 +3,7 @@ import { brand } from "@/constants/brand";
 import { ROLE_OPTIONS, type UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
-import { getNextOnboardingRoute } from "@/helpers/pageAccess";
+import { getNextOnboardingRoute, isSystemAdmin } from "@/helpers/pageAccess";
 import { getSessionState, useSessionRestore } from "@/hooks/useSessionRestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -25,6 +25,11 @@ const RoleSelectionPage = () => {
 
   useEffect(() => {
     if (getSessionState() === 'restoring') return;
+
+    if (isSystemAdmin()) {
+      router.replace('/dashboard');
+      return;
+    }
 
     if (!token) {
       router.replace(

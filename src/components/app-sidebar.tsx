@@ -48,6 +48,7 @@ import { useHydrated } from "@/hooks/useHydrated"
 import { useOutletStore } from "@/stores/outletStore"
 import { useAuthStore } from "@/stores/AuthStore"
 import { usePageAccessStore } from "@/stores/pageAccessStore"
+import { isSystemAdmin } from "@/helpers/pageAccess"
 import type { NavMainItem } from "@/components/nav-main"
 import Link from "next/link"
 
@@ -1083,7 +1084,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const visibleItems = React.useMemo(() => {
     if (!hydrated || !role) return data.navMain
+    const systemAdmin = isSystemAdmin()
     return data.navMain.filter((item) => {
+      if (systemAdmin) return true
       const allowedRoles = MODULE_ACCESS[item.title]
       if (allowedRoles && !allowedRoles.includes(role)) return false
       const pageKey = MODULE_PAGE_KEY[item.title]

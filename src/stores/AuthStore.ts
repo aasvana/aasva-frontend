@@ -2,25 +2,30 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserRole } from '@/constants/roles';
 
+let storeHydrated = false;
+
+export { storeHydrated };
+
 interface AuthState {
   token: string | null;
   refreshToken: string | null;
   role: UserRole | null;
   modules: string[];
-  isSuperAdmin: boolean;
   lastUserId: string | null;
+  profileType: string | null;
   user: {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
     roles: { name: string }[];
+    profileType?: { id: string; name: string; key: string } | null;
   } | null;
   setToken: (token: string | null) => void;
   setRefreshToken: (refreshToken: string | null) => void;
   setRole: (role: UserRole | null) => void;
   setModules: (modules: string[]) => void;
-  setSuperAdmin: (isSuperAdmin: boolean) => void;
+  setProfileType: (profileType: string | null) => void;
   setUser: (user: AuthState['user']) => void;
   setAuth: (token: string, refreshToken: string, user: AuthState['user']) => void;
   restoreAuth: (
@@ -39,14 +44,14 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       role: null,
       modules: [],
-      isSuperAdmin: false,
       lastUserId: null,
+      profileType: null,
       user: null,
       setToken: (token) => set({ token }),
       setRefreshToken: (refreshToken) => set({ refreshToken }),
       setRole: (role) => set({ role }),
       setModules: (modules) => set({ modules }),
-      setSuperAdmin: (isSuperAdmin) => set({ isSuperAdmin }),
+      setProfileType: (profileType) => set({ profileType }),
       setUser: (user) =>
         set((state) => ({
           user,
@@ -63,7 +68,7 @@ export const useAuthStore = create<AuthState>()(
             lastUserId: userId,
             role: sameUser ? state.role : null,
             modules: sameUser ? state.modules : [],
-            isSuperAdmin: sameUser ? state.isSuperAdmin : false,
+            profileType: sameUser ? state.profileType : null,
           };
         }),
       clearToken: () => set({ token: null }),
@@ -75,7 +80,7 @@ export const useAuthStore = create<AuthState>()(
           lastUserId: user?.id ?? state.lastUserId,
           role: state.role,
           modules: state.modules,
-          isSuperAdmin: state.isSuperAdmin,
+          profileType: state.profileType,
         })),
       clearAuth: () =>
         set((state) => ({
@@ -87,6 +92,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-token',
+      onRehydrateStorage: () => {
+        storeHydrated = true;
+      },
     }
   )
 );

@@ -1,18 +1,40 @@
 import type { Icon } from "@tabler/icons-react";
 import {
+  IconBriefcase,
+  IconCalculator,
   IconPlaneTilt,
+  IconReceipt,
   IconShoppingCart,
   IconStethoscope,
   IconTruckDelivery,
+  IconUserCheck,
+  IconUserShield,
+  IconUsers,
 } from "@tabler/icons-react";
 
-export type UserRole = "doctor" | "travel" | "delivery" | "ecommerce";
+export type UserRole = 
+  | "doctor"
+  | "manager"
+  | "accountant"
+  | "receptionist"
+  | "travel-agent"
+  | "delivery-partner"
+  | "store-manager"
+  | "ecommerce-user"
+  | "healthcare-admin"
+  | "systemadmin";
 
 export const ALL_ROLES: UserRole[] = [
   "doctor",
-  "travel",
-  "delivery",
-  "ecommerce",
+  "manager",
+  "accountant",
+  "receptionist",
+  "travel-agent",
+  "delivery-partner",
+  "store-manager",
+  "ecommerce-user",
+  "healthcare-admin",
+  "systemadmin",
 ];
 
 export type RoleOption = {
@@ -35,7 +57,34 @@ export const ROLE_OPTIONS: RoleOption[] = [
     accent: "bg-sky-50 text-sky-600 border-sky-200 group-hover:bg-sky-100",
   },
   {
-    value: "travel",
+    value: "manager",
+    label: "Manager",
+    title: "I'm a Manager",
+    description:
+      "Oversee operations, teams, and cross-functional workflows.",
+    icon: IconBriefcase,
+    accent: "bg-indigo-50 text-indigo-600 border-indigo-200 group-hover:bg-indigo-100",
+  },
+  {
+    value: "accountant",
+    label: "Accountant",
+    title: "I'm an Accountant",
+    description:
+      "Manage invoices, bills, expenses, banking and financial reports.",
+    icon: IconCalculator,
+    accent: "bg-emerald-50 text-emerald-600 border-emerald-200 group-hover:bg-emerald-100",
+  },
+  {
+    value: "receptionist",
+    label: "Receptionist",
+    title: "I'm a Receptionist",
+    description:
+      "Handle front desk operations, appointments and customer check-ins.",
+    icon: IconUserCheck,
+    accent: "bg-pink-50 text-pink-600 border-pink-200 group-hover:bg-pink-100",
+  },
+  {
+    value: "travel-agent",
     label: "Travel Agent",
     title: "I'm a Travel Agent",
     description:
@@ -44,7 +93,7 @@ export const ROLE_OPTIONS: RoleOption[] = [
     accent: "bg-amber-50 text-amber-600 border-amber-200 group-hover:bg-amber-100",
   },
   {
-    value: "delivery",
+    value: "delivery-partner",
     label: "Delivery Partner",
     title: "I'm a Delivery Partner",
     description:
@@ -53,21 +102,54 @@ export const ROLE_OPTIONS: RoleOption[] = [
     accent: "bg-violet-50 text-violet-600 border-violet-200 group-hover:bg-violet-100",
   },
   {
-    value: "ecommerce",
+    value: "store-manager",
+    label: "Store Manager",
+    title: "I'm a Store Manager",
+    description:
+      "Manage outlets, products, inventory, POS and sales operations.",
+    icon: IconShoppingCart,
+    accent: "bg-teal-50 text-teal-600 border-teal-200 group-hover:bg-teal-100",
+  },
+  {
+    value: "ecommerce-user",
     label: "E-commerce Store Owner",
     title: "I run an E-commerce Store",
     description:
-      "Manage outlets, products, inventory, sales and stock transfers.",
-    icon: IconShoppingCart,
-    accent: "bg-emerald-50 text-emerald-600 border-emerald-200 group-hover:bg-emerald-100",
+      "Manage online store, products, inventory, sales and stock transfers.",
+    icon: IconReceipt,
+    accent: "bg-cyan-50 text-cyan-600 border-cyan-200 group-hover:bg-cyan-100",
+  },
+  {
+    value: "healthcare-admin",
+    label: "Healthcare Admin",
+    title: "I'm a Healthcare Admin",
+    description:
+      "Administer healthcare operations, patients, appointments and pharmacy.",
+    icon: IconUsers,
+    accent: "bg-rose-50 text-rose-600 border-rose-200 group-hover:bg-rose-100",
+  },
+  {
+    value: "systemadmin",
+    label: "System Admin",
+    title: "I'm a System Admin",
+    description:
+      "Full access to all modules, user management and system configuration.",
+    icon: IconUserShield,
+    accent: "bg-red-50 text-red-600 border-red-200 group-hover:bg-red-100",
   },
 ];
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   doctor: "Doctor",
-  travel: "Travel Agent",
-  delivery: "Delivery Partner",
-  ecommerce: "E-commerce Store",
+  manager: "Manager",
+  accountant: "Accountant",
+  receptionist: "Receptionist",
+  "travel-agent": "Travel Agent",
+  "delivery-partner": "Delivery Partner",
+  "store-manager": "Store Manager",
+  "ecommerce-user": "E-commerce Store Owner",
+  "healthcare-admin": "Healthcare Admin",
+  systemadmin: "System Admin",
 };
 
 export const ROLE_MODULES: Record<UserRole, string[]> = {
@@ -81,7 +163,33 @@ export const ROLE_MODULES: Record<UserRole, string[]> = {
     "Help Center",
     "Teams Meet",
   ],
-  travel: [
+  manager: [
+    "Dashboard",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  accountant: [
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  receptionist: [
+    "Dashboard",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  "travel-agent": [
     "Travel",
     "Accounting",
     "Auditing",
@@ -91,7 +199,7 @@ export const ROLE_MODULES: Record<UserRole, string[]> = {
     "Help Center",
     "Teams Meet",
   ],
-  delivery: [
+  "delivery-partner": [
     "Delivery",
     "Accounting",
     "Auditing",
@@ -101,10 +209,44 @@ export const ROLE_MODULES: Record<UserRole, string[]> = {
     "Help Center",
     "Teams Meet",
   ],
-  ecommerce: [
+  "store-manager": [
     "Store",
     "Accounting",
     "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  "ecommerce-user": [
+    "Store",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  "healthcare-admin": [
+    "Healthcare",
+    "Accounting",
+    "Auditing",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ],
+  systemadmin: [
+    "Dashboard",
+    "Accounting",
+    "Auditing",
+    "Travel",
+    "Delivery",
+    "Healthcare",
+    "Store",
     "Analytics",
     "Customers",
     "User Requests",
@@ -115,10 +257,10 @@ export const ROLE_MODULES: Record<UserRole, string[]> = {
 
 export const MODULE_ACCESS: Record<string, UserRole[]> = {
   Dashboard: ALL_ROLES,
-  Healthcare: ["doctor"],
-  Travel: ["travel"],
-  Delivery: ["delivery"],
-  Store: ["ecommerce"],
+  Healthcare: ["doctor", "healthcare-admin"],
+  Travel: ["travel-agent"],
+  Delivery: ["delivery-partner"],
+  Store: ["store-manager", "ecommerce-user"],
   Accounting: ALL_ROLES,
   Auditing: ALL_ROLES,
   Analytics: ALL_ROLES,

@@ -1,7 +1,7 @@
 'use client';
 
 import { API_BASE_URL, API_KEY } from '@/constants';
-import { useAuthStore } from '@/stores/AuthStore';
+import { useAuthStore, storeHydrated } from '@/stores/AuthStore';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
@@ -20,6 +20,10 @@ export const getSessionState = (): SessionState => sessionState;
 
 const beginRestore = (): void => {
   if (attempted) return;
+  if (!storeHydrated) {
+    requestAnimationFrame(beginRestore);
+    return;
+  }
   attempted = true;
 
   const { token, refreshToken } = useAuthStore.getState();
@@ -57,17 +61,28 @@ export const useSessionRestore = (): { restoring: boolean } => {
   const [localSessionState, setLocalSessionState] =
     useState<SessionState>(sessionState);
 
+  const [restoring, setRestoring] = useState(() => {
+    const hasRefreshToken =
+      typeof window !== 'undefined' &&
+      !!useAuthStore.getState().refreshToken;
+    return !storeHydrated || hasRefreshToken;
+  });
+
   useEffect(() => {
     beginRestore();
 
-    const listener = (state: SessionState) => setLocalSessionState(state);
+    const listener = (state: SessionState) => {
+      setLocalSessionState(state);
+      setRestoring(state === 'restoring');
+    };
     listeners.add(listener);
     setLocalSessionState(sessionState);
+    setRestoring(sessionState === 'restoring');
 
     return () => {
       listeners.delete(listener);
     };
   }, []);
 
-  return { restoring: localSessionState === 'restoring' };
+  return { restoring: localSessionState === 'restoring' || restoring };
 };
