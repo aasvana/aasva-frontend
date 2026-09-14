@@ -20,6 +20,14 @@ interface AuthState {
     email: string;
     roles: { name: string }[];
     profileType?: { id: string; name: string; key: string } | null;
+    detail?: {
+      id: string;
+      userId: string;
+      dateOfBirth: string | null;
+      phone: string | null;
+      address: string | null;
+      details: Record<string, unknown> | null;
+    } | null;
   } | null;
   setToken: (token: string | null) => void;
   setRefreshToken: (refreshToken: string | null) => void;

@@ -22,6 +22,7 @@ import { currentUserName } from "@/utils/user";
 import api from "@/lib/api.utils";
 import { useAuthStore } from "@/stores/AuthStore";
 import { ROLE_LABELS } from "@/constants/roles";
+import type { UserRole } from "@/constants/roles";
 import { MODULE_PAGE_KEY } from "@/constants/pages";
 
 type BackendRole = {
@@ -289,14 +290,14 @@ export function UsersSection() {
                         variant="outline"
                         className={roleBadgeClass(role.name)}
                       >
-                        {ROLE_LABELS[role.name] || role.name}
+                        {ROLE_LABELS[role.name as UserRole] || role.name}
                       </Badge>
                     ))}
-                    {u.detail?.details?.profileTypeId && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 border border-blue-200">
-                        {profileTypes.find((pt) => pt.id === u.detail!.details!.profileTypeId)?.name || u.detail!.details!.profileTypeId}
-                      </Badge>
-                    )}
+{(u.detail?.details?.profileTypeId as string) && (
+                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border border-blue-200">
+                         {profileTypes.find((pt) => pt.id === (u.detail!.details!.profileTypeId as string))?.name || (u.detail!.details!.profileTypeId as string)}
+                       </Badge>
+                     )}
                     {canEdit && !isUserSystemAdmin && (
                       <Select
                         onValueChange={(selectedProfileTypeId) => {
@@ -373,7 +374,7 @@ export function UsersSection() {
                         <SelectContent>
                           {roles.map((r) => (
                             <SelectItem key={r.id} value={r.id}>
-                              {ROLE_LABELS[r.name] || r.name}
+                              {ROLE_LABELS[r.name as UserRole] || r.name}
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -1,6 +1,7 @@
 import { MODULE_PAGE_KEY, PATH_ACCESS_PREFIXES } from "@/constants/pages";
 import type { PageAccessKey } from "@/constants/pages";
 import { ROLE_MODULES } from "@/constants/roles";
+import type { UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
 
@@ -41,12 +42,12 @@ export const getNextOnboardingRoute = (): string => {
   const systemAdmin = user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
 
   if (systemAdmin) {
-    const backendProfileKey = user?.detail?.details?.profileTypeId;
+    const backendProfileKey = user?.detail?.details?.profileTypeId as string | undefined;
     if (role !== 'systemadmin' || modules.length === 0) {
       useAuthStore.setState({
         role: 'systemadmin',
         modules: ALL_MODULE_TITLES,
-        profileType: backendProfileKey ?? null,
+        profileType: (backendProfileKey as string) ?? null,
       });
     }
     return '/dashboard';
@@ -56,12 +57,12 @@ export const getNextOnboardingRoute = (): string => {
   const modulePage = access["module-onboarding"] ?? true;
 
   if (!role) {
-    const backendProfileKey = user?.detail?.details?.profileTypeId;
-    if (backendProfileKey && ROLE_MODULES[backendProfileKey]) {
+    const backendProfileKey = user?.detail?.details?.profileTypeId as string | undefined;
+    if (backendProfileKey && ROLE_MODULES[backendProfileKey as UserRole]) {
       useAuthStore.setState({
-        role: backendProfileKey,
+        role: backendProfileKey as UserRole,
         profileType: backendProfileKey,
-        modules: (ROLE_MODULES[backendProfileKey] ?? []).filter((title) =>
+        modules: (ROLE_MODULES[backendProfileKey as UserRole] ?? []).filter((title: string) =>
           isModuleEnabled(title)
         ),
       });

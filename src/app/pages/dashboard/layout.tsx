@@ -51,7 +51,7 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
       useAuthStore.setState({
         role: 'systemadmin',
         modules: ALL_MODULE_TITLES,
-        profileType: user?.detail?.details?.profileTypeId ?? null,
+        profileType: (user?.detail?.details?.profileTypeId as string) ?? null,
       });
       return;
     }
