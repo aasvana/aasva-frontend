@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useRef, useState } from "react";
-import { Check, Copy, ImageIcon, Plus, Trash2, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, Copy, ImageIcon, Plus, Sparkles, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +25,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { compressImageToDataUrl } from "@/lib/image-utils";
+import api from "@/lib/api.utils";
 import { CURRENCIES } from "@/modules/invoice";
 import { useCompanyStore } from "@/stores/companyStore";
+import { useCompanySettings, useEnhanceTagline } from "@/lib/company-query";
 import { useAuthStore } from "@/stores/AuthStore";
 import { currentUserName } from "@/utils/user";
 
@@ -112,35 +115,6 @@ function CardActions({ onSave }: { onSave: () => void }) {
 const notifySaved = (what: string) =>
   toast.success(`${what} updated successfully!`);
 
-function fileToDataUrl(file: File, maxDim = 512, quality = 0.9): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-        const width = Math.max(1, Math.round(img.width * scale));
-        const height = Math.max(1, Math.round(img.height * scale));
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          resolve(reader.result as string);
-          return;
-        }
-        ctx.drawImage(img, 0, 0, width, height);
-        const mime = file.type === "image/png" ? "image/png" : "image/jpeg";
-        resolve(canvas.toDataURL(mime, quality));
-      };
-      img.onerror = () => resolve(reader.result as string);
-      img.src = reader.result as string;
-    };
-    reader.onerror = () => reject(new Error("Could not read the file"));
-    reader.readAsDataURL(file);
-  });
-}
-
 export function UserProfileSection() {
   const authUser = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
@@ -223,7 +197,7 @@ export function UserProfileSection() {
 
 export function CompanyProfileSection() {
   const company = useCompanyStore((s) => s.company);
-  const updateCompany = useCompanyStore((s) => s.updateCompany);
+  const { updateMutation } = useCompanySettings();
 
   const [name, setName] = useState(company.name);
   const [shortName, setShortName] = useState(company.shortName);
@@ -232,9 +206,23 @@ export function CompanyProfileSection() {
   const [address, setAddress] = useState(company.address);
   const [website, setWebsite] = useState(company.website);
 
+  useEffect(() => {
+    setName(company.name);
+    setShortName(company.shortName);
+    setEmail(company.email);
+    setPhone(company.phone);
+    setAddress(company.address);
+    setWebsite(company.website);
+  }, [company]);
+
   const handleSave = () => {
-    updateCompany({ name, shortName, email, phone, address, website });
-    notifySaved("Company profile");
+    updateMutation.mutate(
+      { name, shortName, email, phone, address, website },
+      {
+        onSuccess: () => notifySaved("Company profile"),
+        onError: () => toast.error("Failed to update company profile."),
+      },
+    );
   };
 
   return (
@@ -291,12 +279,28 @@ export function CompanyProfileSection() {
 
 export function BrandingSection() {
   const company = useCompanyStore((s) => s.company);
-  const updateCompany = useCompanyStore((s) => s.updateCompany);
+  const { updateMutation } = useCompanySettings();
+  const enhanceTagline = useEnhanceTagline();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [logo, setLogo] = useState<string | null>(company.logo);
   const [tagline, setTagline] = useState(company.tagline);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    setLogo(company.logo);
+    setTagline(company.tagline);
+  }, [company]);
+
+  const handleEnhanceTagline = async () => {
+    try {
+      const enhanced = await enhanceTagline.mutateAsync(tagline);
+      setTagline(enhanced);
+      toast.success("Tagline enhanced with AI!");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to enhance tagline.");
+    }
+  };
 
   const handleLogoFile = async (file: File | undefined) => {
     if (!file) return;
@@ -304,9 +308,13 @@ export function BrandingSection() {
       toast.error("Please choose an image file.");
       return;
     }
+    if (file.size > 5_000_000) {
+      toast.error("Logo must be under 5 MB.");
+      return;
+    }
     setUploading(true);
     try {
-      const url = await fileToDataUrl(file);
+      const url = await compressImageToDataUrl(file);
       setLogo(url);
     } catch {
       toast.error("Failed to process the logo image.");
@@ -316,8 +324,13 @@ export function BrandingSection() {
   };
 
   const handleSave = () => {
-    updateCompany({ logo, tagline });
-    notifySaved("Branding");
+    updateMutation.mutate(
+      { logo, tagline },
+      {
+        onSuccess: () => notifySaved("Branding"),
+        onError: () => toast.error("Failed to update branding."),
+      },
+    );
   };
 
   return (
@@ -367,7 +380,8 @@ export function BrandingSection() {
               )}
             </div>
             <p className="text-xs text-muted-foreground">
-              PNG or JPG. Shown on your invoices and documents.
+              PNG or JPG. Large images are compressed automatically, then
+              uploaded to ImageKit and shown on your invoices and documents.
             </p>
           </div>
           <input
@@ -388,6 +402,22 @@ export function BrandingSection() {
             onChange={(e) => setTagline(e.target.value)}
             placeholder="A short description of your company"
           />
+          <div className="flex items-center gap-2 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleEnhanceTagline}
+              disabled={enhanceTagline.isPending}
+            >
+              <Sparkles className="size-4" />
+              {enhanceTagline.isPending ? "Enhancing..." : "Enhance with AI"}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Powered by Gemini&rsquo;s &mdash; AI rewrites your
+              tagline.
+            </p>
+          </div>
         </Field>
       </CardContent>
       <CardActions onSave={handleSave} />
@@ -406,7 +436,7 @@ const BUSINESS_TYPES = [
 
 export function TaxGstSection() {
   const company = useCompanyStore((s) => s.company);
-  const updateCompany = useCompanyStore((s) => s.updateCompany);
+  const { updateMutation } = useCompanySettings();
 
   const [gstin, setGstin] = useState(company.gstin);
   const [pan, setPan] = useState(company.pan);
@@ -416,15 +446,28 @@ export function TaxGstSection() {
     String(company.defaultTaxRate)
   );
 
+  useEffect(() => {
+    setGstin(company.gstin);
+    setPan(company.pan);
+    setTan(company.tan);
+    setCurrency(company.currency);
+    setDefaultTaxRate(String(company.defaultTaxRate));
+  }, [company]);
+
   const handleSave = () => {
-    updateCompany({
-      gstin,
-      pan,
-      tan,
-      currency,
-      defaultTaxRate: Number(defaultTaxRate) || 0,
-    });
-    notifySaved("Tax & GST");
+    updateMutation.mutate(
+      {
+        gstin,
+        pan,
+        tan,
+        currency,
+        defaultTaxRate: Number(defaultTaxRate) || 0,
+      },
+      {
+        onSuccess: () => notifySaved("Tax & GST"),
+        onError: () => toast.error("Failed to update tax details."),
+      },
+    );
   };
 
   return (
@@ -491,7 +534,7 @@ export function TaxGstSection() {
 
 export function RegistrationSection() {
   const company = useCompanyStore((s) => s.company);
-  const updateCompany = useCompanyStore((s) => s.updateCompany);
+  const { updateMutation } = useCompanySettings();
 
   const [businessType, setBusinessType] = useState(company.businessType);
   const [cin, setCin] = useState(company.cin);
@@ -502,14 +545,21 @@ export function RegistrationSection() {
     company.authorizedSignatory
   );
 
+  useEffect(() => {
+    setBusinessType(company.businessType);
+    setCin(company.cin);
+    setIncorporationDate(company.incorporationDate);
+    setAuthorizedSignatory(company.authorizedSignatory);
+  }, [company]);
+
   const handleSave = () => {
-    updateCompany({
-      businessType,
-      cin,
-      incorporationDate,
-      authorizedSignatory,
-    });
-    notifySaved("Registration details");
+    updateMutation.mutate(
+      { businessType, cin, incorporationDate, authorizedSignatory },
+      {
+        onSuccess: () => notifySaved("Registration details"),
+        onError: () => toast.error("Failed to update registration details."),
+      },
+    );
   };
 
   return (
@@ -980,3 +1030,146 @@ export function SecuritySection() {
 }
 
 export { UsersSection } from "./users-section";
+
+export function ModuleConfigSection() {
+  const [profileTypes, setProfileTypes] = useState<
+    { id: string; name: string; key: string; config: Record<string, unknown> | null }[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await api.get("/profile-types");
+        if (!cancelled) {
+          setProfileTypes(res.data);
+        }
+      } catch (err: any) {
+        toast.error(err.message || "Failed to load profile types.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allModules = [
+    "Dashboard",
+    "Accounting",
+    "Auditing",
+    "Travel",
+    "Delivery",
+    "Healthcare",
+    "Store",
+    "Analytics",
+    "Customers",
+    "User Requests",
+    "Help Center",
+    "Teams Meet",
+  ];
+
+  const updateProfileTypeConfig = async (
+    profileTypeId: string,
+    config: Record<string, unknown>
+  ) => {
+    setSaving(profileTypeId);
+    try {
+      await api.patch(`/profile-types/${profileTypeId}`, { config });
+      setProfileTypes((prev) =>
+        prev.map((pt) =>
+          pt.id === profileTypeId ? { ...pt, config } : pt
+        )
+      );
+      toast.success("Module config updated.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update config.");
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const toggleModule = (
+    profileTypeId: string,
+    module: string,
+    currentModules: string[]
+  ) => {
+    const next = currentModules.includes(module)
+      ? currentModules.filter((m) => m !== module)
+      : [...currentModules, module];
+    updateProfileTypeConfig(profileTypeId, { modules: next });
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Module Configuration</CardTitle>
+          <CardDescription>
+            Configure which modules are available for each profile type.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Module Configuration</CardTitle>
+        <CardDescription>
+          Configure which modules are available for each profile type. Systemadmin sees all modules by default.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6">
+        {profileTypes.map((pt) => {
+          const currentModules = (pt.config?.modules as string[]) || [];
+          return (
+            <div
+              key={pt.id}
+              className="flex flex-col gap-3 rounded-lg border p-4"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold">{pt.name}</h3>
+                  <p className="text-xs text-muted-foreground">{pt.key}</p>
+                </div>
+                {saving === pt.id && (
+                  <span className="text-xs text-muted-foreground">Saving...</span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {allModules.map((module) => {
+                  const enabled = currentModules.includes(module);
+                  return (
+                    <button
+                      key={module}
+                      type="button"
+                      onClick={() => toggleModule(pt.id, module, currentModules)}
+                      className={cn(
+                        "inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                        enabled
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-muted text-muted-foreground border-border"
+                      )}
+                    >
+                      {module}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}

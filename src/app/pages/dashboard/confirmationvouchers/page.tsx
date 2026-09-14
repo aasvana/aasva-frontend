@@ -27,7 +27,7 @@ import {
   useConfirmationVouchers,
   useDeleteConfirmationVoucher,
 } from "@/lib/cv-query";
-import { SavedConfirmationVoucher } from "@/lib/cv-storage";
+import { ConfirmationVoucherRecord } from "@/lib/cv-api";
 
 type CvRow = {
   id: string;
@@ -48,18 +48,24 @@ const sortOptions = [
 type SortKey = (typeof sortOptions)[number]["key"];
 type SortOrder = "asc" | "desc";
 
-const toRow = (record: SavedConfirmationVoucher): CvRow => ({
+const toRow = (record: ConfirmationVoucherRecord): CvRow => ({
   id: record.id,
-  cvId: record.data.voucherNo || record.id.slice(0, 8),
+  cvId: record.voucherNo || record.id.slice(0, 8),
   customerName: record.data.customerName || "-",
-  agent: record.data.companyName || "-",
+  agent: record.data.agentName || "-",
   paymentType: record.data.paymentType || "-",
-  date: format(new Date(record.savedAt), "dd-MM-yyyy"),
+  date: format(new Date(record.updatedAt), "dd-MM-yyyy"),
 });
 
 export default function ConfirmationVouchers() {
   const router = useRouter();
-  const { data: vouchers = [], isLoading } = useConfirmationVouchers();
+  const { data: vouchersData, isLoading } = useConfirmationVouchers({
+    limit: 1000,
+    sortBy: "updatedAt",
+    sortOrder: "desc",
+  });
+  const vouchers = vouchersData?.items ?? [];
+
   const deleteMutation = useDeleteConfirmationVoucher();
 
   const [searchTerm, setSearchTerm] = useState("");

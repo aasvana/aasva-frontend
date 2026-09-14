@@ -19,6 +19,8 @@ import {
   useUpdateConfirmationVoucher,
 } from "@/lib/cv-query";
 import { downloadCvPdf } from "@/lib/cv-pdf";
+import { useCompanySettings } from "@/lib/company-query";
+import { useCompanyStore } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { ConfirmationVoucher } from "./confirmation-voucher";
 
@@ -41,13 +43,15 @@ export function CvPreviewDrawer({
 
   const saveMutation = useSaveConfirmationVoucher();
   const updateMutation = useUpdateConfirmationVoucher(existingId ?? "");
+  const company = useCompanyStore((s) => s.company);
+  useCompanySettings();
   const [downloading, setDownloading] = React.useState(false);
 
   const handleDownload = async () => {
     if (!draft) return;
     try {
       setDownloading(true);
-      await downloadCvPdf(draft);
+      await downloadCvPdf(draft, company);
       toast.success("PDF downloaded successfully!");
     } catch {
       toast.error("Failed to generate the PDF.");
@@ -100,7 +104,7 @@ export function CvPreviewDrawer({
           <div className="flex-1 overflow-y-auto px-6 py-6 md:px-10 md:py-8">
             {draft ? (
               <div className="rounded-lg border bg-white shadow-sm">
-                <ConfirmationVoucher data={draft} />
+                <ConfirmationVoucher data={draft} company={company} />
               </div>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-muted-foreground">

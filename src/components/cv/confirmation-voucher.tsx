@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { brand } from "@/constants/brand";
 import { hotelMealPlans } from "@/constants/hotelMealPlans";
 import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
+import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
 const mealTypeLabel = (code: string) =>
@@ -63,8 +63,10 @@ function Section({
 
 export function ConfirmationVoucher({
   data,
+  company,
 }: {
   data: ConfirmationVoucherFormData;
+  company: CompanyData;
 }) {
   const d = data;
 
@@ -73,10 +75,19 @@ export function ConfirmationVoucher({
       <div className="flex flex-wrap items-start justify-between gap-4 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="grid size-9 place-items-center rounded-md bg-gray-900 text-sm font-bold text-white">
-              {brand.shortName}
-            </span>
-            <span className="text-lg font-bold">{brand.name}</span>
+            {company.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={company.logo}
+                alt={company.name}
+                className="size-9 rounded-md border border-gray-200 bg-white object-contain"
+              />
+            ) : (
+              <span className="grid size-9 place-items-center rounded-md bg-gray-900 text-sm font-bold text-white">
+                {company.shortName}
+              </span>
+            )}
+            <span className="text-lg font-bold">{company.name}</span>
           </div>
         </div>
         <div className="text-right">
@@ -93,6 +104,7 @@ export function ConfirmationVoucher({
       <Section title="Customer Details">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <DetailRow label="Customer Name" value={d.customerName} />
+          <DetailRow label="Agent" value={d.agentName} />
           <DetailRow label="Mobile No." value={d.mobileNo} />
           <DetailRow label="Email" value={d.emailAddress} />
           <DetailRow label="Company" value={d.companyName} />

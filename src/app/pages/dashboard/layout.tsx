@@ -3,7 +3,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import AuthFooter from '@/components/generic/auth/footer';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { getNextOnboardingRoute, getPageKeyFromPath } from '@/helpers/pageAccess';
+import { getNextOnboardingRoute, getPageKeyFromPath, ALL_MODULE_TITLES } from '@/helpers/pageAccess';
 import { useSessionRestore } from '@/hooks/useSessionRestore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { usePageAccessStore } from '@/stores/pageAccessStore';
@@ -43,6 +43,16 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
       router.replace(
         user || lastUserId || role || modules.length > 0 ? '/login' : '/'
       );
+      return;
+    }
+
+    const isSystemAdmin = user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
+    if (isSystemAdmin && role !== 'systemadmin') {
+      useAuthStore.setState({
+        role: 'systemadmin',
+        modules: ALL_MODULE_TITLES,
+        profileType: user?.detail?.details?.profileTypeId ?? null,
+      });
       return;
     }
 

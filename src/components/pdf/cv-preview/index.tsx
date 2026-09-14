@@ -6,12 +6,13 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
-import { brand } from "@/constants/brand";
 import { hotelMealPlans } from "@/constants/hotelMealPlans";
 import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
+import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
 const mealTypeLabel = (code: string) =>
@@ -35,6 +36,18 @@ const stripHtml = (html: string) =>
     .replace(/<[^>]+>/g, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+
+function renderableLogo(logo?: string | null): string | null {
+  if (!logo) return null;
+  if (/^data:image\//i.test(logo)) return logo;
+  if (/\.(png|jpe?g|gif|bmp|tiff)(\?|#|$)/i.test(logo)) {
+    if (typeof window !== "undefined") {
+      return new URL(logo, window.location.origin).href;
+    }
+    return logo;
+  }
+  return null;
+}
 
 const styles = StyleSheet.create({
   page: {
@@ -67,6 +80,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     lineHeight: 24,
+  },
+  brandLogo: {
+    width: 24,
+    height: 24,
+    objectFit: "contain",
   },
   brandName: {
     fontSize: 14,
@@ -176,20 +194,28 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 
 export function CvPreviewDocument({
   data,
+  company,
 }: {
   data: ConfirmationVoucherFormData;
+  company: CompanyData;
 }) {
   const d = data;
+  const logoSource = renderableLogo(company.logo);
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.brandRow}>
-            <View style={styles.brandBadge}>
-              <Text>{brand.shortName}</Text>
-            </View>
-            <Text style={styles.brandName}>{brand.name}</Text>
+            {logoSource ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <Image src={logoSource} style={styles.brandLogo} />
+            ) : (
+              <View style={styles.brandBadge}>
+                <Text>{company.shortName}</Text>
+              </View>
+            )}
+            <Text style={styles.brandName}>{company.name}</Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.headerTitle}>Confirmation Voucher</Text>
@@ -204,6 +230,7 @@ export function CvPreviewDocument({
           <Text style={styles.sectionTitle}>Customer Details</Text>
           <View style={styles.grid}>
             <DetailRow label="Customer Name" value={d.customerName} />
+            <DetailRow label="Agent" value={d.agentName} />
             <DetailRow label="Mobile No." value={d.mobileNo} />
             <DetailRow label="Email" value={d.emailAddress} />
             <DetailRow label="Company" value={d.companyName} />

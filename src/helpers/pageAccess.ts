@@ -10,6 +10,8 @@ const ALWAYS_ENABLED_PATHS: ReadonlySet<string> = new Set([
 
 const ALL_MODULE_TITLES = Object.keys(MODULE_PAGE_KEY);
 
+export { ALL_MODULE_TITLES };
+
 export const isSystemAdmin = (): boolean => {
   const user = useAuthStore.getState().user;
   return user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
@@ -39,15 +41,12 @@ export const getNextOnboardingRoute = (): string => {
   const systemAdmin = user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
 
   if (systemAdmin) {
-    if (!role || modules.length === 0) {
-      const backendProfileKey = user?.profileType?.key;
-      const defaultRole = backendProfileKey && ROLE_MODULES[backendProfileKey]
-        ? backendProfileKey
-        : 'doctor';
+    const backendProfileKey = user?.detail?.details?.profileTypeId;
+    if (role !== 'systemadmin' || modules.length === 0) {
       useAuthStore.setState({
-        role: defaultRole,
+        role: 'systemadmin',
         modules: ALL_MODULE_TITLES,
-        profileType: user?.profileType?.key ?? null,
+        profileType: backendProfileKey ?? null,
       });
     }
     return '/dashboard';
@@ -57,12 +56,13 @@ export const getNextOnboardingRoute = (): string => {
   const modulePage = access["module-onboarding"] ?? true;
 
   if (!role) {
-    if (user?.profileType?.key && ROLE_MODULES[user.profileType.key]) {
+    const backendProfileKey = user?.detail?.details?.profileTypeId;
+    if (backendProfileKey && ROLE_MODULES[backendProfileKey]) {
       useAuthStore.setState({
-        role: user.profileType.key,
-        profileType: user.profileType.key,
-        modules: (ROLE_MODULES[user.profileType.key] ?? []).filter((title) =>
-          isModuleAllowed(title, access)
+        role: backendProfileKey,
+        profileType: backendProfileKey,
+        modules: (ROLE_MODULES[backendProfileKey] ?? []).filter((title) =>
+          isModuleEnabled(title)
         ),
       });
       if (modulePage) return "/onboarding/module";

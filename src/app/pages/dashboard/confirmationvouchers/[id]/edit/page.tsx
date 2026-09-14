@@ -1,30 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  getConfirmationVoucher,
-  SavedConfirmationVoucher,
-} from "@/lib/cv-storage";
+import { useConfirmationVoucher } from "@/lib/cv-query";
 import { ConfirmationVoucherForm } from "@/components/cv/confirmation-voucher-form";
 
 export default function EditConfirmationVoucher() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [voucher, setVoucher] = useState<SavedConfirmationVoucher | undefined>(
-    undefined
-  );
-  const [loaded, setLoaded] = useState(false);
+  const { data: voucher, isLoading } = useConfirmationVoucher(params?.id);
 
-  useEffect(() => {
-    if (params?.id) {
-      setVoucher(getConfirmationVoucher(params.id));
-      setLoaded(true);
-    }
-  }, [params?.id]);
-
-  if (!loaded) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24 text-sm text-gray-500">
         Loading...

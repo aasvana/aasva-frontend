@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, Search, SearchX, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,12 +18,22 @@ const MAX_PER_GROUP = 12;
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
+  const [index, setIndex] = useState<SearchResult[]>([]);
   const router = useRouter();
   const setSelectedCustomer = useCustomerProfileStore(
     (s) => s.setSelectedCustomer
   );
 
-  const index = useMemo(() => indexAll(), []);
+  useEffect(() => {
+    let cancelled = false;
+    indexAll().then((results) => {
+      if (!cancelled) setIndex(results);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const results = useMemo(
     () => filterIndex(index, query),
     [index, query]

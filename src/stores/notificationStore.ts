@@ -11,7 +11,8 @@ export type NotificationCategory =
   | "sales"
   | "inventory"
   | "customer"
-  | "travel";
+  | "travel"
+  | "agent";
 
 export type AppNotification = {
   id: string;

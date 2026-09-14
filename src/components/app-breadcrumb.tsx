@@ -700,6 +700,7 @@ const PAGE_ROUTES: {
     label: "Confirmation Vouchers",
   },
   { prefix: "/dashboard/customers", label: "Customers" },
+  { prefix: "/dashboard/agents", label: "Agents" },
   {
     prefix: "/dashboard/customer/overview",
     group: "Customers",

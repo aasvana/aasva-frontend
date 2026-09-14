@@ -2,12 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  deleteConfirmationVoucher,
-  getConfirmationVoucher,
-  getConfirmationVouchers,
-  saveConfirmationVoucher,
-  updateConfirmationVoucher,
-} from "@/lib/cv-storage";
+  apiDeleteVoucher,
+  apiGetVoucher,
+  apiGetVouchers,
+  apiSaveVoucher,
+  apiUpdateVoucher,
+  ConfirmationVoucherRecord,
+} from "@/lib/cv-api";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
 export const cvQueryKeys = {
@@ -15,17 +16,30 @@ export const cvQueryKeys = {
   detail: (id: string) => [...cvQueryKeys.all, id] as const,
 };
 
-export function useConfirmationVouchers() {
+export type PaginatedVouchers = {
+  items: ConfirmationVoucherRecord[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export function useConfirmationVouchers(params?: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}) {
   return useQuery({
-    queryKey: cvQueryKeys.all,
-    queryFn: () => getConfirmationVouchers(),
+    queryKey: [...cvQueryKeys.all, params],
+    queryFn: () => apiGetVouchers(params),
   });
 }
 
 export function useConfirmationVoucher(id: string | undefined) {
   return useQuery({
     queryKey: cvQueryKeys.detail(id ?? ""),
-    queryFn: () => getConfirmationVoucher(id as string),
+    queryFn: () => apiGetVoucher(id as string),
     enabled: !!id,
   });
 }
@@ -33,8 +47,7 @@ export function useConfirmationVoucher(id: string | undefined) {
 export function useSaveConfirmationVoucher() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: ConfirmationVoucherFormData) =>
-      saveConfirmationVoucher(data),
+    mutationFn: (data: ConfirmationVoucherFormData) => apiSaveVoucher(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
     },
@@ -44,8 +57,7 @@ export function useSaveConfirmationVoucher() {
 export function useUpdateConfirmationVoucher(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: ConfirmationVoucherFormData) =>
-      updateConfirmationVoucher(id, data),
+    mutationFn: (data: ConfirmationVoucherFormData) => apiUpdateVoucher(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
       queryClient.invalidateQueries({ queryKey: cvQueryKeys.detail(id) });
@@ -56,7 +68,7 @@ export function useUpdateConfirmationVoucher(id: string) {
 export function useDeleteConfirmationVoucher() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => deleteConfirmationVoucher(id),
+    mutationFn: (id: string) => apiDeleteVoucher(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
     },

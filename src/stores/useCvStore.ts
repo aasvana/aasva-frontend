@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
-import { reviveDates } from "@/lib/cv-storage";
+import { reviveDates } from "@/lib/cv-api";
 
 interface CvState {
   draft: ConfirmationVoucherFormData | null;

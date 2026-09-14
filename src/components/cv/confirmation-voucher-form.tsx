@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider, FieldErrors, DefaultValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,8 +19,8 @@ import { notify } from "@/lib/notify";
 import { CvPreviewDrawer } from "@/components/cv/cv-preview-drawer";
 import { useCvStore } from "@/stores/useCvStore";
 import { useCvConfigStore } from "@/stores/cvConfigStore";
-import { getConfirmationVouchers } from "@/lib/cv-storage";
 import {
+  useConfirmationVouchers,
   useSaveConfirmationVoucher,
   useUpdateConfirmationVoucher,
 } from "@/lib/cv-query";
@@ -41,6 +41,7 @@ const createDefaults: DefaultValues<ConfirmationVoucherFormData> = {
   mobileNo: "",
   emailAddress: "",
   companyName: "",
+  agentName: "",
   boardingAirline: "",
   boardingFrom: "",
   boardingTo: "",
@@ -108,6 +109,11 @@ export function ConfirmationVoucherForm({
   const saveMutation = useSaveConfirmationVoucher();
   const updateMutation = useUpdateConfirmationVoucher(existingId ?? "");
 
+  const { data: vouchersData, isLoading: vouchersLoading } =
+    useConfirmationVouchers({ limit: 1000, sortBy: "updatedAt", sortOrder: "desc" });
+  const existingVouchers = useMemo(() => vouchersData?.items ?? [], [vouchersData]);
+  const initializedRef = useRef(false);
+
   const methods = useForm<ConfirmationVoucherFormData>({
     resolver: zodResolver(confirmationVoucherSchema),
     mode: "onChange",
@@ -121,57 +127,61 @@ export function ConfirmationVoucherForm({
 
   useEffect(() => {
     if (mode !== "create") return;
+    if (vouchersLoading) return;
 
-    const draft = useCvStore.getState().draft;
-    if (draft) {
-      methods.reset(draft);
-    } else {
-      const config = useCvConfigStore.getState();
-      const existing = getConfirmationVouchers();
-      const { voucherPrefix, voucherSuffix, defaultPaymentType } =
-        config.settings;
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const draft = useCvStore.getState().draft;
+      if (draft) {
+        methods.reset(draft);
+      } else {
+        const config = useCvConfigStore.getState();
+        const existing = existingVouchers;
+        const { voucherPrefix, voucherSuffix, defaultPaymentType } =
+          config.settings;
 
-      let nextNumber = existing.length + 1;
-      if (voucherPrefix || voucherSuffix) {
-        const numbers = existing
-          .map((v) => v.data.voucherNo)
-          .filter((no) => {
-            const inner = no.slice(
-              voucherPrefix.length,
-              no.length - voucherSuffix.length
+        let nextNumber = existing.length + 1;
+        if (voucherPrefix || voucherSuffix) {
+          const numbers = existing
+            .map((v) => v.voucherNo)
+            .filter((no) => {
+              const inner = no.slice(
+                voucherPrefix.length,
+                no.length - voucherSuffix.length
+              );
+              return (
+                no.startsWith(voucherPrefix) &&
+                no.endsWith(voucherSuffix) &&
+                /^\d+$/.test(inner)
+              );
+            })
+            .map((no) =>
+              Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
             );
-            return (
-              no.startsWith(voucherPrefix) &&
-              no.endsWith(voucherSuffix) &&
-              /^\d+$/.test(inner)
-            );
-          })
-          .map((no) =>
-            Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
-          );
-        if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
-      }
-
-      const general: Partial<ConfirmationVoucherFormData> = {};
-      for (const detail of config.generalDetails) {
-        if (detail.value) {
-          (general as Record<string, unknown>)[detail.key] = detail.value;
+          if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
         }
-      }
 
-      methods.reset({
-        ...createDefaults,
-        ...general,
-        bookingDate: new Date(),
-        paymentType: defaultPaymentType,
-        voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
-      });
+        const general: Partial<ConfirmationVoucherFormData> = {};
+        for (const detail of config.generalDetails) {
+          if (detail.value) {
+            (general as Record<string, unknown>)[detail.key] = detail.value;
+          }
+        }
+
+        methods.reset({
+          ...createDefaults,
+          ...general,
+          bookingDate: new Date(),
+          paymentType: defaultPaymentType,
+          voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
+        });
+      }
     }
     const subscription = methods.watch((values) => {
       setDraft(values as ConfirmationVoucherFormData);
     });
     return () => subscription.unsubscribe();
-  }, [methods, setDraft, mode]);
+  }, [methods, setDraft, mode, vouchersLoading, existingVouchers]);
 
   const showValidationError = (
     errors: FieldErrors<ConfirmationVoucherFormData>

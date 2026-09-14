@@ -36,7 +36,7 @@
       "destination": "/pages/onboarding/module"
     },
     {
-      "source": "/profile",
+      "source": "/dashboard/profile",
       "destination": "/pages/dashboard/profile"
     },
     {
@@ -150,6 +150,10 @@
     {
       "source": "/dashboard/customers",
       "destination": "/pages/dashboard/customers"
+    },
+    {
+      "source": "/dashboard/agents",
+      "destination": "/pages/dashboard/agents"
     },
     {
       "source": "/dashboard/notifications",
@@ -846,5 +850,9 @@
     {
       "source": "/dashboard/healthcare/settings",
       "destination": "/pages/dashboard/healthcare/settings"
+    },
+    {
+      "source": "/dashboard/users",
+      "destination": "/pages/dashboard/users"
     }
   ]

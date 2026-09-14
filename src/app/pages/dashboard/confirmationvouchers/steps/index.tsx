@@ -15,6 +15,7 @@ import { useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
 import { useCvConfigStore } from "@/stores/cvConfigStore";
 import { useCustomerStore } from "@/stores/customerStore";
+import { useAgentStore } from "@/stores/agentStore";
 import Link from "next/link";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -70,12 +71,19 @@ function Step1CustomerDetails() {
   } = useFormContext<ConfirmationVoucherFormData>();
   const journeyDate = watch("journeyDate");
   const customerName = watch("customerName");
+  const agentName = watch("agentName");
 
   const customers = useCustomerStore((s) => s.customers);
+  const agents = useAgentStore((s) => s.agents);
 
   const customerOptions: ComboboxOption[] = customers.map((c) => ({
     value: c.name,
     label: `${c.name}${c.company ? ` (${c.company})` : ""}`,
+  }));
+
+  const agentOptions: ComboboxOption[] = agents.map((a) => ({
+    value: a.name,
+    label: `${a.name}${a.company ? ` (${a.company})` : ""}`,
   }));
 
   const handleCustomerSelect = (name: string) => {
@@ -85,6 +93,10 @@ function Step1CustomerDetails() {
     setValue("companyName", customer.company ?? "");
     setValue("emailAddress", customer.email ?? "");
     setValue("mobileNo", customer.phone ?? "");
+  };
+
+  const handleAgentSelect = (name: string) => {
+    setValue("agentName", name, { shouldValidate: true });
   };
 
   return (
@@ -106,6 +118,26 @@ function Step1CustomerDetails() {
             className="font-medium text-emerald-600 hover:underline"
           >
             Manage customers
+          </Link>
+        </p>
+      </div>
+      <div className="grid gap-1.5 md:col-span-2">
+        <Label>Saved agent</Label>
+        <Combobox
+          options={agentOptions}
+          value={agentOptions.some((o) => o.value === agentName)
+            ? agentName
+            : ""}
+          onChange={handleAgentSelect}
+          placeholder="Select a saved agent (optional)"
+          searchPlaceholder="Search agents..."
+        />
+        <p className="text-sm text-gray-500">
+          <Link
+            href="/dashboard/agents"
+            className="font-medium text-emerald-600 hover:underline"
+          >
+            Manage agents
           </Link>
         </p>
       </div>

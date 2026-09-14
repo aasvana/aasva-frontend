@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import BackButton from "@/components/generic/back-button";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
-import {
-  getConfirmationVoucher,
-  SavedConfirmationVoucher,
-} from "@/lib/cv-storage";
+import { useConfirmationVoucher } from "@/lib/cv-query";
+import { useCompanySettings } from "@/lib/company-query";
+import { useCompanyStore } from "@/stores/companyStore";
 import { downloadCvPdf } from "@/lib/cv-pdf";
 import { ConfirmationVoucher } from "@/components/cv/confirmation-voucher";
 
@@ -32,22 +31,16 @@ const EmptyState = () => {
 
 export default function ViewConfirmationVoucher() {
   const params = useParams<{ id: string }>();
-  const [voucher, setVoucher] = useState<SavedConfirmationVoucher | undefined>(
-    undefined
-  );
+  const { data: voucher, isLoading } = useConfirmationVoucher(params?.id);
+  const company = useCompanyStore((s) => s.company);
+  useCompanySettings();
   const [downloading, setDownloading] = useState(false);
-
-  useEffect(() => {
-    if (params?.id) {
-      setVoucher(getConfirmationVoucher(params.id));
-    }
-  }, [params?.id]);
 
   const handleDownload = async () => {
     if (!voucher) return;
     try {
       setDownloading(true);
-      await downloadCvPdf(voucher.data);
+      await downloadCvPdf(voucher.data, company);
       toast.success("PDF downloaded successfully!");
     } catch {
       toast.error("Failed to generate the PDF.");
@@ -58,7 +51,11 @@ export default function ViewConfirmationVoucher() {
 
   return (
     <>
-      {!voucher ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-24 text-sm text-gray-500">
+          Loading...
+        </div>
+      ) : !voucher ? (
         <EmptyState />
       ) : (
         <>
@@ -79,7 +76,7 @@ export default function ViewConfirmationVoucher() {
       </div>
 
       <div className="print-area bg-white border rounded-lg overflow-hidden">
-        <ConfirmationVoucher data={voucher.data} />
+        <ConfirmationVoucher data={voucher.data} company={company} />
       </div>
     </div>
         </>

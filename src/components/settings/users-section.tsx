@@ -22,6 +22,7 @@ import { currentUserName } from "@/utils/user";
 import api from "@/lib/api.utils";
 import { useAuthStore } from "@/stores/AuthStore";
 import { ROLE_LABELS } from "@/constants/roles";
+import { MODULE_PAGE_KEY } from "@/constants/pages";
 
 type BackendRole = {
   id: string;
@@ -34,6 +35,16 @@ type BackendProfileType = {
   name: string;
   key: string;
   description: string | null;
+  config?: Record<string, unknown>;
+};
+
+type BackendUserDetail = {
+  id: string;
+  userId: string;
+  dateOfBirth: string | null;
+  phone: string | null;
+  address: string | null;
+  details: Record<string, unknown> | null;
 };
 
 type BackendUser = {
@@ -44,7 +55,7 @@ type BackendUser = {
   isActive: boolean;
   isEmailVerified: boolean;
   roles: BackendRole[];
-  profileType: BackendProfileType | null;
+  detail: BackendUserDetail | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -84,7 +95,7 @@ export function UsersSection() {
         ]);
 
         if (!cancelled) {
-          setUsers(usersRes.data);
+          setUsers(usersRes.data.items);
           setRoles(rolesRes.data);
           setProfileTypes(profileTypesRes.data);
         }
@@ -131,13 +142,25 @@ export function UsersSection() {
   const handleProfileTypeChange = async (userId: string, profileTypeId: string) => {
     setUpdatingId(userId);
     try {
-      await api.patch(`/users/${userId}`, { profileTypeId });
+      await api.patch(`/user-details/${userId}`, {
+        details: { profileTypeId: profileTypeId || undefined },
+      });
       setUsers((prev) =>
         prev.map((u) =>
           u.id === userId
             ? {
                 ...u,
-                profileType: profileTypes.find((pt) => pt.id === profileTypeId) || null,
+                detail: u.detail
+                  ? {
+                      ...u.detail,
+                      details: {
+                        ...u.detail.details,
+                        ...(profileTypeId
+                          ? { profileTypeId }
+                          : {}),
+                      },
+                    }
+                  : u.detail,
               }
             : u
         )
@@ -163,6 +186,63 @@ export function UsersSection() {
     }
   };
 
+  const handleModuleOverride = async (
+    userId: string,
+    action: "add" | "remove",
+    moduleTitle: string
+  ) => {
+    setUpdatingId(userId);
+    try {
+      const user = users.find((u) => u.id === userId);
+      const currentDetails = user?.detail?.details as
+        | { moduleOverrides?: { add: string[]; remove: string[] } }
+        | undefined;
+      const currentOverrides = currentDetails?.moduleOverrides || {
+        add: [],
+        remove: [],
+      };
+
+      const nextOverrides = { ...currentOverrides };
+      if (action === "add") {
+        nextOverrides.add = [...(nextOverrides.add || []), moduleTitle];
+        nextOverrides.remove = (nextOverrides.remove || []).filter(
+          (m) => m !== moduleTitle
+        );
+      } else {
+        nextOverrides.remove = [...(nextOverrides.remove || []), moduleTitle];
+        nextOverrides.add = (nextOverrides.add || []).filter(
+          (m) => m !== moduleTitle
+        );
+      }
+
+      await api.patch(`/users/${userId}/modules`, {
+        add: nextOverrides.add,
+        remove: nextOverrides.remove,
+      });
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId
+            ? {
+                ...u,
+                detail: u.detail
+                  ? {
+                      ...u.detail,
+                      details: { moduleOverrides: nextOverrides },
+                    }
+                  : u.detail,
+              }
+            : u
+        )
+      );
+      toast.success("Module overrides updated.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update module overrides.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -182,6 +262,9 @@ export function UsersSection() {
               const fullName = currentUserName("fullname", u);
               const initial = fullName.trim().charAt(0).toUpperCase() || "U";
               const canEdit = isSystemAdmin || u.id !== user?.id;
+              const isUserSystemAdmin = u.roles.some(
+                (role) => role.name === "systemadmin"
+              );
 
               return (
                 <div
@@ -209,21 +292,16 @@ export function UsersSection() {
                         {ROLE_LABELS[role.name] || role.name}
                       </Badge>
                     ))}
-                    {u.profileType && (
+                    {u.detail?.details?.profileTypeId && (
                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border border-blue-200">
-                        {u.profileType.name}
+                        {profileTypes.find((pt) => pt.id === u.detail!.details!.profileTypeId)?.name || u.detail!.details!.profileTypeId}
                       </Badge>
                     )}
-                    {canEdit && (
+                    {canEdit && !isUserSystemAdmin && (
                       <Select
                         onValueChange={(selectedProfileTypeId) => {
-                          const currentId = u.profileType?.id;
-                          const next = selectedProfileTypeId === currentId ? "" : selectedProfileTypeId;
-                          if (!next) {
-                            handleProfileTypeChange(u.id, "");
-                          } else {
-                            handleProfileTypeChange(u.id, next);
-                          }
+                          const next = selectedProfileTypeId === "none" ? "" : selectedProfileTypeId;
+                          handleProfileTypeChange(u.id, next || "");
                         }}
                         disabled={updatingId === u.id}
                       >
@@ -231,7 +309,7 @@ export function UsersSection() {
                           <SelectValue placeholder="Change profile" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {profileTypes.map((pt) => (
                             <SelectItem key={pt.id} value={pt.id}>
                               {pt.name}
@@ -240,7 +318,45 @@ export function UsersSection() {
                         </SelectContent>
                       </Select>
                     )}
-                    {canEdit && (
+                    {canEdit && !isUserSystemAdmin && (
+                      <div className="flex items-center gap-1">
+                        <Select
+                          onValueChange={(moduleTitle) => {
+                            handleModuleOverride(u.id, "add", moduleTitle);
+                          }}
+                          disabled={updatingId === u.id}
+                        >
+                          <SelectTrigger className="w-auto h-8 text-xs">
+                            <SelectValue placeholder="+ Module" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.keys(MODULE_PAGE_KEY).map((module) => (
+                              <SelectItem key={module} value={module}>
+                                {module}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select
+                          onValueChange={(moduleTitle) => {
+                            handleModuleOverride(u.id, "remove", moduleTitle);
+                          }}
+                          disabled={updatingId === u.id}
+                        >
+                          <SelectTrigger className="w-auto h-8 text-xs">
+                            <SelectValue placeholder="- Module" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.keys(MODULE_PAGE_KEY).map((module) => (
+                              <SelectItem key={module} value={module}>
+                                {module}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {canEdit && !isUserSystemAdmin && (
                       <Select
                         onValueChange={(selectedRoleId) => {
                           const currentIds = u.roles.map((r) => r.id);
@@ -263,7 +379,7 @@ export function UsersSection() {
                         </SelectContent>
                       </Select>
                     )}
-                    {canEdit && (
+                    {canEdit && !isUserSystemAdmin && (
                       <Button
                         variant="ghost"
                         size="icon"

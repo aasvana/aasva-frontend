@@ -1,5 +1,5 @@
 import { GUIDES } from "@/components/guides/guides-data";
-import { getConfirmationVouchers } from "@/lib/cv-storage";
+import { apiGetVouchers } from "@/lib/cv-api";
 import { getDeliveryNotes } from "@/modules/delivery-note/storage";
 import { getInvoices } from "@/modules/invoice/storage";
 import { getProducts, getSales } from "@/modules/pos/storage";
@@ -258,7 +258,7 @@ const SUPPLIER_HREF: Record<string, string> = {
   activity: "/dashboard/travel/suppliers/activities",
 };
 
-export function indexAll(): SearchResult[] {
+export async function indexAll(): Promise<SearchResult[]> {
   const out: SearchResult[] = [];
 
   for (const [label, subtitle, href] of MODULE_LINKS) {
@@ -479,7 +479,7 @@ export function indexAll(): SearchResult[] {
     );
   }
 
-  for (const record of getConfirmationVouchers()) {
+  for (const record of (await apiGetVouchers({ limit: 1000 })).items) {
     const d = record.data;
     const travellers = (d.travellers ?? []).map((t) => t.name);
     out.push(

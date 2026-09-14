@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import {
   AlertTriangle,
   CheckCircle2,
+  Handshake,
   Info,
   Package,
   Plane,
@@ -49,6 +50,7 @@ export const CATEGORY_META: Record<
   inventory: { label: "Inventory", icon: Package, className: "bg-amber-50 text-amber-600" },
   customer: { label: "Customer", icon: Users, className: "bg-violet-50 text-violet-600" },
   travel: { label: "Travel", icon: Plane, className: "bg-sky-50 text-sky-600" },
+  agent: { label: "Agent", icon: Handshake, className: "bg-indigo-50 text-indigo-600" },
 };
 
 export function notify(input: NotifyInput) {

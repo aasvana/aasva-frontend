@@ -60,6 +60,11 @@ const data = {
       icon: IconDashboard,
     },
     {
+      title: "Users",
+      url: "/dashboard/users",
+      icon: IconUsers,
+    },
+    {
       title: "Accounting",
       url: "/dashboard/accounting/dashboard",
       icon: IconReportMoney,
@@ -385,6 +390,10 @@ const data = {
         {
           title: "Customers",
           url: "/dashboard/travel/customers",
+        },
+        {
+          title: "Agents",
+          url: "/dashboard/agents",
         },
         {
           title: "Enquiries",
@@ -1081,12 +1090,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const modules = useAuthStore((s) => s.modules)
   const access = usePageAccessStore((s) => s.access)
   const hydrated = useHydrated()
+  const user = useAuthStore((s) => s.user)
 
   const visibleItems = React.useMemo(() => {
     if (!hydrated || !role) return data.navMain
     const systemAdmin = isSystemAdmin()
+    const isSuperAdmin = user?.roles?.some((r) => r.name === 'superadmin') ?? false
     return data.navMain.filter((item) => {
       if (systemAdmin) return true
+      if (item.title === 'Users' && isSuperAdmin) return true
       const allowedRoles = MODULE_ACCESS[item.title]
       if (allowedRoles && !allowedRoles.includes(role)) return false
       const pageKey = MODULE_PAGE_KEY[item.title]
@@ -1094,7 +1106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (modules.length > 0 && !modules.includes(item.title)) return false
       return true
     })
-  }, [hydrated, role, modules, access])
+  }, [hydrated, role, modules, access, user])
 
   const navMain: NavMainItem[] = React.useMemo(
     () =>

@@ -8,7 +8,6 @@ import {
   IconStethoscope,
   IconTruckDelivery,
   IconUserCheck,
-  IconUserShield,
   IconUsers,
 } from "@tabler/icons-react";
 
@@ -127,15 +126,6 @@ export const ROLE_OPTIONS: RoleOption[] = [
       "Administer healthcare operations, patients, appointments and pharmacy.",
     icon: IconUsers,
     accent: "bg-rose-50 text-rose-600 border-rose-200 group-hover:bg-rose-100",
-  },
-  {
-    value: "systemadmin",
-    label: "System Admin",
-    title: "I'm a System Admin",
-    description:
-      "Full access to all modules, user management and system configuration.",
-    icon: IconUserShield,
-    accent: "bg-red-50 text-red-600 border-red-200 group-hover:bg-red-100",
   },
 ];
 

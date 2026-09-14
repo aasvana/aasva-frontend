@@ -20,8 +20,8 @@
     "label": "Signup"
   },
   {
-    "source": "/profile",
-    "destination": "/user/profile",
+    "source": "/dashboard/profile",
+    "destination": "/pages/dashboard/profile",
     "label": "Profile"
   },
   {
