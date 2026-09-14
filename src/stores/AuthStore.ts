@@ -18,6 +18,8 @@ interface AuthState {
     firstName: string;
     lastName: string;
     email: string;
+    isActive?: boolean;
+    isApproved?: boolean;
     roles: { name: string }[];
     profileType?: { id: string; name: string; key: string } | null;
     detail?: {

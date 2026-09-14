@@ -54,6 +54,7 @@ type BackendUser = {
   lastName: string;
   email: string;
   isActive: boolean;
+  isApproved?: boolean;
   isEmailVerified: boolean;
   roles: BackendRole[];
   detail: BackendUserDetail | null;
@@ -135,6 +136,23 @@ export function UsersSection() {
       toast.success("User roles updated.");
     } catch (err: any) {
       toast.error(err.message || "Failed to update user roles.");
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleApprovalChange = async (userId: string, isApproved: boolean) => {
+    setUpdatingId(userId);
+    try {
+      await api.patch(`/users/${userId}`, { isApproved });
+      setUsers((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, isApproved } : u))
+      );
+      toast.success(
+        isApproved ? "User approved successfully." : "User approval revoked."
+      );
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update approval status.");
     } finally {
       setUpdatingId(null);
     }
@@ -293,11 +311,37 @@ export function UsersSection() {
                         {ROLE_LABELS[role.name as UserRole] || role.name}
                       </Badge>
                     ))}
-{(u.detail?.details?.profileTypeId as string) && (
-                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border border-blue-200">
-                         {profileTypes.find((pt) => pt.id === (u.detail!.details!.profileTypeId as string))?.name || (u.detail!.details!.profileTypeId as string)}
-                       </Badge>
-                     )}
+                    {u.isApproved !== false ? (
+                      <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                        Approved
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                        Pending Approval
+                      </Badge>
+                    )}
+                    {canEdit && !isUserSystemAdmin && (
+                      u.isApproved === false ? (
+                        <Button
+                          size="xs"
+                          onClick={() => handleApprovalChange(u.id, true)}
+                          disabled={updatingId === u.id}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium h-8 px-2.5 text-xs"
+                        >
+                          Approve
+                        </Button>
+                      ) : (
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          onClick={() => handleApprovalChange(u.id, false)}
+                          disabled={updatingId === u.id}
+                          className="text-amber-700 border-amber-300 hover:bg-amber-50 h-8 px-2 text-xs"
+                        >
+                          Revoke
+                        </Button>
+                      )
+                    )}
                     {canEdit && !isUserSystemAdmin && (
                       <Select
                         onValueChange={(selectedProfileTypeId) => {

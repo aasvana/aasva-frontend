@@ -48,7 +48,7 @@ import { useHydrated } from "@/hooks/useHydrated"
 import { useOutletStore } from "@/stores/outletStore"
 import { useAuthStore } from "@/stores/AuthStore"
 import { usePageAccessStore } from "@/stores/pageAccessStore"
-import { isSystemAdmin } from "@/helpers/pageAccess"
+import { isSystemAdmin, isModuleAllowedForUser } from "@/helpers/pageAccess"
 import type { NavMainItem } from "@/components/nav-main"
 import Link from "next/link"
 
@@ -1099,10 +1099,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return data.navMain.filter((item) => {
       if (systemAdmin) return true
       if (item.title === 'Users' && isSuperAdmin) return true
-      const allowedRoles = MODULE_ACCESS[item.title]
-      if (allowedRoles && !allowedRoles.includes(role)) return false
       const pageKey = MODULE_PAGE_KEY[item.title]
       if (pageKey && access[pageKey] === false) return false
+      if (!isModuleAllowedForUser(item.title, role, user)) return false
       if (modules.length > 0 && !modules.includes(item.title)) return false
       return true
     })

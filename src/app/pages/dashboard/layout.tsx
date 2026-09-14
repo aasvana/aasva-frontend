@@ -2,8 +2,10 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import AuthFooter from '@/components/generic/auth/footer';
 import { SiteHeader } from '@/components/site-header';
+import { WelcomeModal } from '@/components/dashboard/welcome-modal';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { getNextOnboardingRoute, getPageKeyFromPath, ALL_MODULE_TITLES } from '@/helpers/pageAccess';
+import { getNextOnboardingRoute, getPageKeyFromPath, ALL_MODULE_TITLES, isPathAllowedForUser, isSystemAdmin } from '@/helpers/pageAccess';
+import { UnapprovedUserScreen } from '@/components/generic/unapproved-user-screen';
 import { useSessionRestore } from '@/hooks/useSessionRestore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { usePageAccessStore } from '@/stores/pageAccessStore';
@@ -63,6 +65,11 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
 
     if (pathname === '/dashboard' || pathname === '/dashboard/settings') return;
 
+    if (!isPathAllowedForUser(pathname, role, user)) {
+      router.replace('/dashboard');
+      return;
+    }
+
     const key = getPageKeyFromPath(pathname);
     if (key && access[key] === false) {
       router.replace('/dashboard');
@@ -71,6 +78,10 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
 
   if (restoring) {
     return null;
+  }
+
+  if (user && (user as any).isApproved === false && !isSystemAdmin()) {
+    return <UnapprovedUserScreen />;
   }
 
   if (!role || modules.length === 0) {
@@ -97,6 +108,7 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
           </div>
         </div>
         <AuthFooter />
+        <WelcomeModal />
       </SidebarInset>
     </SidebarProvider>
   );
