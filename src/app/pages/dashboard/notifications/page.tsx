@@ -220,7 +220,7 @@ export default function NotificationsPage() {
                   No notifications yet
                 </p>
                 <p className="max-w-sm text-sm text-gray-500">
-                  You'll see updates here when documents are created, customers
+                  You&rsquo;ll see updates here when documents are created, customers
                   are added or stock runs low.
                 </p>
                 <Button asChild variant="outline">

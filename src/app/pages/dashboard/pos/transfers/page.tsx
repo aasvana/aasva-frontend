@@ -33,7 +33,7 @@ import { usePosStore } from "@/modules/pos";
 import { useOutletStore } from "@/stores/outletStore";
 import { useStockTransferStore } from "@/stores/stockTransferStore";
 import { notify } from "@/lib/notify";
-import { cn } from "@/lib/utils";
+
 
 export default function StockTransfersPage() {
   useHydrate(usePosStore((s) => s.hydrate));
@@ -120,7 +120,9 @@ export default function StockTransfersPage() {
       const { id, ...rest } = destProduct;
       updateProductById(id, { ...rest, stock: destProduct.stock + qtyNum });
     } else {
-      const { id: _id, ...rest } = origin;
+      const rest = Object.fromEntries(
+        Object.entries(origin).filter(([key]) => key !== "id")
+      ) as Omit<typeof origin, "id">;
       addProduct({ ...rest, outletId: toOutletId, stock: qtyNum });
     }
 

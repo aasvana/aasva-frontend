@@ -397,7 +397,7 @@ const HotelsDetails = () => {
                         shouldValidate: true,
                       })
                     }
-                    initialFocus
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>
@@ -438,7 +438,7 @@ const HotelsDetails = () => {
                         shouldValidate: true,
                       })
                     }
-                    initialFocus
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>

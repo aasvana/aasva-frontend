@@ -215,7 +215,7 @@ function Step1CustomerDetails() {
               onSelect={(day) =>
                 day && setValue("journeyDate", day, { shouldValidate: true })
               }
-              initialFocus
+              autoFocus
             />
           </PopoverContent>
         </Popover>
@@ -280,7 +280,7 @@ function Step2Boarding() {
               onSelect={(day) =>
                 day && setValue("boardingDate", day, { shouldValidate: true })
               }
-              initialFocus
+              autoFocus
             />
           </PopoverContent>
         </Popover>
@@ -403,7 +403,7 @@ function Step3Returning() {
               onSelect={(day) =>
                 day && setValue("returnDate", day, { shouldValidate: true })
               }
-              initialFocus
+              autoFocus
             />
           </PopoverContent>
         </Popover>

@@ -1,6 +1,4 @@
-import { defineConfig } from "tsup";
-
-export default defineConfig({
+export default {
   entry: ["src/index.ts"],
   format: ["esm", "cjs"],
   dts: true,
@@ -40,4 +38,4 @@ export default defineConfig({
     "@/components/ui/drawer",
     "@/components/ui/tooltip",
   ],
-});
+};

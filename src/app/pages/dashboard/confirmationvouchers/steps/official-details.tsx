@@ -101,7 +101,7 @@ const OfficialDetails = () => {
               onSelect={(day) =>
                 setValue("bookingDate", day as Date, { shouldValidate: true })
               }
-              initialFocus
+              autoFocus
             />
           </PopoverContent>
         </Popover>

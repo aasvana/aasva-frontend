@@ -178,7 +178,7 @@ export default function PosOverviewPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="rounded-[20px] border border-gray-100 bg-white p-5 shadow-sm">
-          <p className="text-sm font-semibold text-gray-800">Today's sales</p>
+          <p className="text-sm font-semibold text-gray-800">Today&rsquo;s sales</p>
           <p className="mt-1 text-3xl font-bold text-gray-900">
             {formatMoney(todayRevenue, outlet?.currency ?? "USD")}
           </p>

@@ -97,7 +97,7 @@ const ItineraryDetails = () => {
                           shouldValidate: true,
                         })
                       }
-                      initialFocus
+                      autoFocus
                     />
                   </PopoverContent>
                 </Popover>

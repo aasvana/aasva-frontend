@@ -130,7 +130,7 @@ export function DateField({
                 mode="single"
                 selected={field.value as Date | undefined}
                 onSelect={(day) => day && field.onChange(day)}
-                initialFocus
+                autoFocus
               />
             </PopoverContent>
           </Popover>
