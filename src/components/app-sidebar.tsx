@@ -442,12 +442,12 @@ const data = {
           url: "/dashboard/travel/settings/general-details",
           items: [
             {
-              title: "General Details",
+              title: "General",
               url: "/dashboard/travel/settings/general-details",
             },
             {
-              title: "Voucher Settings",
-              url: "/dashboard/travel/settings/voucher-settings",
+              title: "Bills and Documents",
+              url: "/dashboard/travel/settings/bills-documents",
             },
           ],
         },
@@ -1092,6 +1092,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const hydrated = useHydrated()
   const user = useAuthStore((s) => s.user)
 
+  const subModuleAccess = (user?.detail?.details as {
+    subModules?: Record<string, string[]>;
+  } | null | undefined)?.subModules ?? {}
+
+  const filterSubModules = React.useCallback(
+    (moduleName: string, items: NavMainItem["items"] | undefined) => {
+      const allowed = subModuleAccess[moduleName]
+      if (!allowed || allowed.length === 0 || !items) return items
+
+      const allowedSet = new Set(allowed)
+      const filter = (entries: NonNullable<NavMainItem["items"]>): NonNullable<NavMainItem["items"]> =>
+        entries
+          .map((entry) => {
+            if (entry.title === "Settings" && allowedSet.has("Settings")) {
+              return entry
+            }
+            return {
+              ...entry,
+              items: entry.items ? filter(entry.items) : undefined,
+            }
+          })
+          .filter((entry) =>
+            allowedSet.has(entry.title) || (entry.items?.length ?? 0) > 0
+          )
+
+      return filter(items)
+    },
+    [subModuleAccess]
+  )
+
   const visibleItems = React.useMemo(() => {
     if (!hydrated || !role) return data.navMain
     const systemAdmin = isSystemAdmin()
@@ -1100,19 +1130,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (item.title === 'Users') return false
       const pageKey = MODULE_PAGE_KEY[item.title]
       if (pageKey && access[pageKey] === false) return false
+      if (modules.length > 0 && modules.includes(item.title)) return true
       if (!isModuleAllowedForUser(item.title, role, user)) return false
-      if (modules.length > 0 && !modules.includes(item.title)) return false
-      return true
+      return modules.length === 0 && item.title === "Dashboard"
     })
   }, [hydrated, role, modules, access, user])
 
   const navMain: NavMainItem[] = React.useMemo(
     () =>
       visibleItems.map((item) => {
-        if (item.title !== "Store") return item
-        return {
+        const filteredItem = {
           ...item,
-          items: item.items?.map((sub) =>
+          items: filterSubModules(item.title, item.items),
+        }
+        if (item.title !== "Store") return filteredItem
+        return {
+          ...filteredItem,
+          items: filteredItem.items?.map((sub) =>
             sub.title === "Outlets"
               ? {
                   ...sub,
@@ -1126,7 +1160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           ),
         }
       }),
-    [visibleItems, activeOutletId]
+    [visibleItems, activeOutletId, filterSubModules]
   )
 
   return (

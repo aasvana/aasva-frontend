@@ -3,7 +3,7 @@ import { brand } from "@/constants/brand";
 import { ROLE_OPTIONS, type UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
-import { getNextOnboardingRoute, isSystemAdmin } from "@/helpers/pageAccess";
+import { getNextOnboardingRoute, getDefaultModulesForRole, isSystemAdmin } from "@/helpers/pageAccess";
 import { getSessionState, useSessionRestore } from "@/hooks/useSessionRestore";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -44,8 +44,14 @@ const RoleSelectionPage = () => {
       return;
     }
 
+    const nextRoute = getNextOnboardingRoute();
+    if (nextRoute !== '/onboarding/role') {
+      router.replace(nextRoute);
+      return;
+    }
+
     if (!(access["role-onboarding"] ?? true)) {
-      router.replace(getNextOnboardingRoute());
+      router.replace(nextRoute);
     }
   }, [access, router, token, user, lastUserId, role, modules, companyComplete]);
 
@@ -56,6 +62,9 @@ const RoleSelectionPage = () => {
     setSelected(value);
     setSubmitting(true);
     setRole(value);
+    useAuthStore.setState({
+      modules: getDefaultModulesForRole(value),
+    });
     router.push(getNextOnboardingRoute());
   };
 

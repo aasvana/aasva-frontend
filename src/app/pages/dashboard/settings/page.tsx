@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SettingsIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import {
   SettingsNav,
   SettingsSectionId,
@@ -12,6 +13,7 @@ import {
   BrandingSection,
   CompanyProfileSection,
   IntegrationsSection,
+  ModulesSection,
   NotificationsSection,
   RegistrationSection,
   SecuritySection,
@@ -21,11 +23,14 @@ import {
   UsersSection,
 } from "@/components/settings/settings-sections";
 import { PageAccessSection } from "@/components/settings/page-access-section";
+import { QuickCreateAccessSection } from "@/components/settings/quick-create-access-section";
 
 const sectionContent = (id: SettingsSectionId) => {
   switch (id) {
     case "user-profile":
       return <UserProfileSection />;
+    case "modules":
+      return <ModulesSection />;
     case "company-profile":
       return <CompanyProfileSection />;
     case "company-branding":
@@ -50,6 +55,8 @@ const sectionContent = (id: SettingsSectionId) => {
     return <UsersSection />;
   case "page-access":
     return <PageAccessSection />;
+  case "quick-create-access":
+    return <QuickCreateAccessSection />;
     default:
       return null;
   }
@@ -57,6 +64,14 @@ const sectionContent = (id: SettingsSectionId) => {
 
 export default function Settings() {
   const [active, setActive] = useState<SettingsSectionId>("user-profile");
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (section && section !== active) {
+      setActive(section as SettingsSectionId);
+    }
+  }, [searchParams, active]);
 
   return (
     <div className="flex flex-col gap-4">

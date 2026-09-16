@@ -11,6 +11,9 @@ import {
 import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/stores/AuthStore"
+import { useQuickCreateAccessStore, QUICK_CREATE_ACTIONS } from "@/stores/quickCreateAccessStore"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -51,6 +54,11 @@ export function NavMain({
   items: NavMainItem[]
 }) {
   const pathname = usePathname()
+  const role = useAuthStore((state) => state.role)
+  const access = useQuickCreateAccessStore((state) => state.access)
+  const quickCreateActions = QUICK_CREATE_ACTIONS.filter((action) =>
+    role ? access[role]?.[action.id] : false
+  )
 
   const findActiveGroup = (): string | null => {
     for (const item of items) {
@@ -83,13 +91,24 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <IconCirclePlusFilled />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  tooltip="Quick Create"
+                  className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+                >
+                  <IconCirclePlusFilled />
+                  <span>Quick Create</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" side="bottom">
+                {quickCreateActions.length > 0 ? quickCreateActions.map((action) => (
+                  <DropdownMenuItem key={action.id} onSelect={() => { window.location.href = action.href }}>
+                    {action.label}
+                  </DropdownMenuItem>
+                )) : <DropdownMenuItem disabled>No actions available</DropdownMenuItem>}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"

@@ -32,19 +32,24 @@ import { useCompanyStore } from "@/stores/companyStore";
 import { useCompanySettings, useEnhanceTagline } from "@/lib/company-query";
 import { useAuthStore } from "@/stores/AuthStore";
 import { currentUserName } from "@/utils/user";
+import { ROLE_MODULES, ROLE_LABELS } from "@/constants/roles";
+import { getDefaultModulesForRole } from "@/helpers/pageAccess";
 
 function Switch({
   checked,
   onCheckedChange,
+  disabled,
 }: {
   checked: boolean;
   onCheckedChange: (value: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
+      disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
         "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors",
@@ -1030,6 +1035,136 @@ export function SecuritySection() {
 }
 
 export { UsersSection } from "./users-section";
+
+export function ModulesSection() {
+  const userId = useAuthStore((state) => state.user?.id);
+  const role = useAuthStore((state) => state.role);
+  const modules = useAuthStore((state) => state.modules);
+  const setModules = useAuthStore((state) => state.setModules);
+  const [saving, setSaving] = useState(false);
+
+  const roleDefault = role ? getDefaultModulesForRole(role) : [];
+  const candidates = Array.from(
+    new Set([...(role ? ROLE_MODULES[role] ?? [] : []), ...modules])
+  );
+
+  const overridesFromTarget = (target: string[]) => ({
+    add: target.filter((m) => !roleDefault.includes(m)),
+    remove: roleDefault.filter((m) => !target.includes(m)),
+  });
+
+  const persistOverrides = async (
+    target: string[],
+    previous: string[]
+  ): Promise<boolean> => {
+    if (!userId || !role) return true;
+    setSaving(true);
+    try {
+      const { add, remove } = overridesFromTarget(target);
+      await api.patch(`/users/${userId}/modules`, { add, remove });
+      return true;
+    } catch (err: any) {
+      setModules(previous);
+      toast.error(err.message || "Failed to save your module choices.");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleModule = async (title: string) => {
+    const isOn = modules.includes(title);
+    if (isOn && modules.length === 1) {
+      toast.error("You need at least one module on your dashboard.");
+      return;
+    }
+    const previous = modules;
+    const next = isOn
+      ? modules.filter((m) => m !== title)
+      : [...modules, title];
+    setModules(next);
+    const ok = await persistOverrides(next, previous);
+    if (ok) {
+      toast.success(isOn ? `${title} removed.` : `${title} added.`);
+    }
+  };
+
+  const restoreDefaults = async () => {
+    if (roleDefault.length === 0) return;
+    const previous = modules;
+    setModules(roleDefault);
+    if (userId && role) {
+      setSaving(true);
+      try {
+        await api.patch(`/users/${userId}/modules`, { add: [], remove: [] });
+      } catch (err: any) {
+        setModules(previous);
+        toast.error(err.message || "Failed to restore module defaults.");
+        setSaving(false);
+        return;
+      }
+      setSaving(false);
+    }
+    toast.success("Modules restored to your role defaults.");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Modules</CardTitle>
+        <CardDescription>
+          Choose which modules appear on your dashboard. You can change this
+          anytime.{" "}
+          {role ? (
+            <>
+              Default modules for <span className="font-medium">{ROLE_LABELS[role]}</span>{" "}
+              are pre-selected.
+            </>
+          ) : null}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-5">
+        <div className="flex flex-col divide-y divide-border rounded-lg border">
+          {candidates.map((title) => {
+            const isOn = modules.includes(title);
+            return (
+              <div
+                key={title}
+                className="flex items-center justify-between gap-4 px-4 py-3"
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium">{title}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {isOn ? "Visible on your dashboard" : "Hidden from your dashboard"}
+                  </span>
+                </div>
+                <Switch
+                  checked={isOn}
+                  disabled={saving}
+                  onCheckedChange={() => toggleModule(title)}
+                />
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            Reset to the standard set of modules for your role.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={saving}
+            onClick={restoreDefaults}
+          >
+            Restore defaults
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export function ModuleConfigSection() {
   const [profileTypes, setProfileTypes] = useState<

@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   Bell,
+  Blocks,
   Building2,
   CreditCard,
   ImageIcon,
@@ -21,6 +22,7 @@ import { useAuthStore } from "@/stores/AuthStore";
 
 export type SettingsSectionId =
   | "user-profile"
+  | "modules"
   | "company-profile"
   | "company-branding"
   | "company-tax"
@@ -32,6 +34,7 @@ export type SettingsSectionId =
   | "notifications"
   | "security"
   | "page-access"
+  | "quick-create-access"
   | "users";
 
 export type SettingsSection = {
@@ -55,6 +58,12 @@ export const settingsGroups: SettingsGroup[] = [
         label: "User Profile",
         description: "Your personal information",
         icon: User,
+      },
+      {
+        id: "modules",
+        label: "Modules",
+        description: "Choose which modules appear on your dashboard",
+        icon: Blocks,
       },
       {
         id: "appearance",
@@ -141,6 +150,12 @@ export const settingsGroups: SettingsGroup[] = [
         id: "page-access",
         label: "Page Access",
         description: "Control which pages users can see",
+        icon: ShieldCheck,
+      },
+      {
+        id: "quick-create-access",
+        label: "Quick Create Access",
+        description: "Control Quick Create actions by role",
         icon: ShieldCheck,
       },
     ],

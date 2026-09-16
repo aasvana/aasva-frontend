@@ -686,13 +686,25 @@ const PAGE_ROUTES: {
     prefix: "/dashboard/travel/settings/general-details",
     group: "Travel",
     parent: "Settings",
-    label: "General Details",
+    label: "General",
   },
   {
     prefix: "/dashboard/travel/settings/voucher-settings",
     group: "Travel",
     parent: "Settings",
     label: "Voucher Settings",
+  },
+  {
+    prefix: "/dashboard/travel/settings/bills-documents",
+    group: "Travel",
+    parent: "Settings",
+    label: "Bills and Documents",
+  },
+  {
+    prefix: "/dashboard/travel/settings/invoice-settings",
+    group: "Travel",
+    parent: "Settings",
+    label: "Invoice Settings",
   },
   {
     prefix: "/dashboard/confirmation-vouchers",

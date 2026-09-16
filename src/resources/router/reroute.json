@@ -36,10 +36,6 @@
       "destination": "/pages/onboarding/company"
     },
     {
-      "source": "/onboarding/module",
-      "destination": "/pages/onboarding/module"
-    },
-    {
       "source": "/dashboard/profile",
       "destination": "/pages/dashboard/profile"
     },
@@ -130,6 +126,14 @@
     {
       "source": "/dashboard/travel/settings/voucher-settings",
       "destination": "/pages/dashboard/travel/settings/voucher-settings"
+    },
+    {
+      "source": "/dashboard/travel/settings/bills-documents",
+      "destination": "/pages/dashboard/travel/settings/bills-documents"
+    },
+    {
+      "source": "/dashboard/travel/settings/invoice-settings",
+      "destination": "/pages/dashboard/travel/settings/invoice-settings"
     },
     {
       "source": "/dashboard/estimates",

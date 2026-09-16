@@ -100,11 +100,13 @@ export const isModuleAllowedForUser = (
 ): boolean => {
   if (!isModuleEnabled(title)) return false;
 
-  const systemAdmin = role === "systemadmin" || (user?.roles?.some((r: any) => r.name === "systemadmin") ?? false);
+  const systemAdmin = role === "systemadmin" &&
+    (user?.roles?.some((r: any) => r.name === "systemadmin") ?? false);
   const superAdmin = user?.roles?.some((r: any) => r.name === "superadmin") ?? false;
   if (systemAdmin || superAdmin) return true;
 
-  if (isUserInTrialPeriod(user)) return true;
+  const assignedModules = Array.isArray(user?.modules) ? user.modules : [];
+  if (assignedModules.length > 0) return assignedModules.includes(title);
 
   const allowedRoles = MODULE_ACCESS[title];
   if (allowedRoles && role && !allowedRoles.includes(role)) return false;
@@ -127,14 +129,22 @@ export const isPathAllowedForUser = (
 ): boolean => {
   if (ALWAYS_ENABLED_PATHS.has(pathname) || pathname === "/dashboard") return true;
 
-  const systemAdmin = role === "systemadmin" || (user?.roles?.some((r: { name: string }) => r.name === "systemadmin") ?? false);
+  const systemAdmin = role === "systemadmin" &&
+    (user?.roles?.some((r: { name: string }) => r.name === "systemadmin") ?? false);
   const superAdmin = user?.roles?.some((r: { name: string }) => r.name === "superadmin") ?? false;
   if (systemAdmin || superAdmin) return true;
 
   const key = getPageKeyFromPath(pathname);
   if (key && !isPageEnabled(key)) return false;
 
-  if (isUserInTrialPeriod(user)) return true;
+  const explicitModules = Array.isArray(user?.modules) ? user.modules : [];
+  if (explicitModules.length > 0) {
+    const moduleEntry = Object.entries(MODULE_PAGE_KEY).find(
+      ([, pageKey]) => pageKey === key
+    );
+    if (moduleEntry && explicitModules.includes(moduleEntry[0])) return true;
+    if (moduleEntry && !explicitModules.includes(moduleEntry[0])) return false;
+  }
 
   const moduleEntry = Object.entries(MODULE_PAGE_KEY).find(
     ([, pageKey]) => pageKey === key
@@ -142,6 +152,8 @@ export const isPathAllowedForUser = (
 
   if (moduleEntry) {
     const [moduleTitle] = moduleEntry;
+    const assignedModules = Array.isArray(user?.modules) ? user.modules : [];
+    if (assignedModules.length > 0) return assignedModules.includes(moduleTitle);
     const allowedRoles = MODULE_ACCESS[moduleTitle];
     if (allowedRoles && role && !allowedRoles.includes(role)) return false;
   }
@@ -149,19 +161,65 @@ export const isPathAllowedForUser = (
   return true;
 };
 
+export const getDefaultModulesForRole = (role: UserRole): string[] =>
+  (ROLE_MODULES[role] ?? []).filter((title) => isModuleEnabled(title));
+
+const getBackendRole = (user: ReturnType<typeof useAuthStore.getState>): UserRole | null => {
+  const normalizeRole = (value: string): string =>
+    value.trim().toLowerCase().replace(/[_\s]+/g, '-');
+  const assignedRole = user.user?.assignedRole
+    ? normalizeRole(user.user.assignedRole)
+    : null;
+  if (assignedRole && assignedRole in ROLE_MODULES) {
+    return assignedRole as UserRole;
+  }
+
+  const profileTypeKey = user.user?.profileType?.key
+    ? normalizeRole(user.user.profileType.key)
+    : null;
+  if (profileTypeKey && profileTypeKey in ROLE_MODULES) {
+    return profileTypeKey as UserRole;
+  }
+
+  const roleName = user.user?.roles?.find((assigned) => {
+    const normalized = normalizeRole(assigned.name);
+    return normalized in ROLE_MODULES;
+  })?.name;
+  return roleName ? (normalizeRole(roleName) as UserRole) : null;
+};
+
+const getRoleFromModules = (modules: string[]): UserRole | null => {
+  if (modules.some((module) => module.toLowerCase() === 'travel')) {
+    return 'travel-agent';
+  }
+  if (modules.includes('Healthcare')) return 'healthcare-admin';
+  if (modules.includes('Delivery')) return 'delivery-partner';
+  if (modules.includes('Store')) return 'store-manager';
+  return null;
+};
+
 export const getNextOnboardingRoute = (): string => {
   const access = usePageAccessStore.getState().access;
   const authState = useAuthStore.getState();
-  const { role, modules, user } = authState;
+  const { role, modules, user, companyComplete } = authState;
 
-  const systemAdmin = user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
+  const backendModules = (user?.modules ?? []).filter((title) =>
+    isModuleEnabled(title)
+  );
+  const backendRole = getBackendRole(authState) ?? getRoleFromModules(backendModules);
+
+  const systemAdmin =
+    user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
 
   if (systemAdmin) {
-    const backendProfileKey = user?.detail?.details?.profileTypeId as string | undefined;
+    useAuthStore.setState({ companyComplete: true });
+    const backendProfileKey =
+      user?.detail?.details?.profileTypeId as string | undefined;
     if (role !== 'systemadmin' || modules.length === 0) {
       useAuthStore.setState({
         role: 'systemadmin',
-        modules: ALL_MODULE_TITLES,
+        modules:
+          backendModules.length > 0 ? backendModules : ALL_MODULE_TITLES,
         profileType: (backendProfileKey as string) ?? null,
       });
     }
@@ -169,29 +227,33 @@ export const getNextOnboardingRoute = (): string => {
   }
 
   const companyPage = access["company-onboarding"] ?? true;
-  if (companyPage && !authState.companyComplete) return "/onboarding/company";
+  if (companyPage && !companyComplete) return "/onboarding/company";
 
   const rolePage = access["role-onboarding"] ?? true;
-  const modulePage = access["module-onboarding"] ?? true;
 
   if (!role) {
-    const backendProfileKey = user?.detail?.details?.profileTypeId as string | undefined;
-    if (backendProfileKey && ROLE_MODULES[backendProfileKey as UserRole]) {
+    if (backendRole) {
       useAuthStore.setState({
-        role: backendProfileKey as UserRole,
-        profileType: backendProfileKey,
-        modules: (ROLE_MODULES[backendProfileKey as UserRole] ?? []).filter((title: string) =>
-          isModuleEnabled(title)
-        ),
+        role: backendRole,
+        profileType: user?.profileType?.key ?? backendRole,
+        modules:
+          backendModules.length > 0
+            ? backendModules
+            : getDefaultModulesForRole(backendRole),
       });
-      if (modulePage) return "/onboarding/module";
       return "/dashboard";
     }
     if (rolePage) return "/onboarding/role";
-    if (modulePage) return "/onboarding/module";
     return "/dashboard";
   }
 
-  if (modulePage && modules.length === 0) return "/onboarding/module";
+  if (modules.length === 0) {
+    useAuthStore.setState({
+      modules:
+        backendModules.length > 0
+          ? backendModules
+          : getDefaultModulesForRole(role),
+    });
+  }
   return "/dashboard";
 };

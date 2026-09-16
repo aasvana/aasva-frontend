@@ -1,6 +1,5 @@
 export type PageAccessKey =
   | "role-onboarding"
-  | "module-onboarding"
   | "company-onboarding"
   | "dashboard"
   | "accounting"
@@ -20,7 +19,6 @@ export type PageAccessKey =
 
 export const PAGE_ACCESS_KEYS: PageAccessKey[] = [
   "role-onboarding",
-  "module-onboarding",
   "company-onboarding",
   "dashboard",
   "accounting",
@@ -41,7 +39,6 @@ export const PAGE_ACCESS_KEYS: PageAccessKey[] = [
 
 export const DEFAULT_PAGE_ACCESS: Record<PageAccessKey, boolean> = {
   "role-onboarding": true,
-  "module-onboarding": true,
   "company-onboarding": true,
   dashboard: true,
   accounting: true,
@@ -67,10 +64,6 @@ export const PAGE_ACCESS_LABELS: Record<
   "role-onboarding": {
     label: "Role Selection",
     description: "Onboarding page that asks users what defines them best.",
-  },
-  "module-onboarding": {
-    label: "Module Selection",
-    description: "Onboarding page where users pick their modules.",
   },
   "company-onboarding": {
     label: "Company Profile",
@@ -135,7 +128,7 @@ export const PAGE_ACCESS_CATEGORIES: {
 }[] = [
   {
     label: "Onboarding",
-    keys: ["company-onboarding", "role-onboarding", "module-onboarding"],
+    keys: ["company-onboarding", "role-onboarding"],
   },
   {
     label: "Modules",

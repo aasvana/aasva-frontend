@@ -31,16 +31,16 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
   const { restoring } = useSessionRestore();
 
   useEffect(() => {
-    if (token && !user) {
-      api
-        .get('/auth/me')
-        .then((res) => {
-          useAuthStore.getState().setUser(res.data.user);
-          useAuthStore.getState().setSubscription(res.data.subscription);
-        })
-        .catch(() => {});
-    }
-  }, [token, user]);
+    if (!token) return;
+
+    api
+      .get('/auth/me')
+      .then((res) => {
+        useAuthStore.getState().setUser(res.data.user);
+        useAuthStore.getState().setSubscription(res.data.subscription);
+      })
+      .catch(() => {});
+  }, [token]);
 
   useEffect(() => {
     if (restoring) return;

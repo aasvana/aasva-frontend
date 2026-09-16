@@ -117,7 +117,9 @@ export function NavUser({ user: userProp }: NavUserProps) {
                 <IconSwitchHorizontal />
                 Switch Role
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push("/onboarding/module")}>
+              <DropdownMenuItem
+                onClick={() => router.push("/dashboard/settings?section=modules")}
+              >
                 <IconStack2 />
                 Customize Modules
               </DropdownMenuItem>

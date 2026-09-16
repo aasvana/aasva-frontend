@@ -4,7 +4,6 @@ import * as React from "react";
 import { useMemo, useState } from "react";
 import {
   Bell,
-  Blocks,
   Building2,
   ChartPie,
   CreditCard,
@@ -41,7 +40,7 @@ import { cn } from "@/lib/utils";
 
 const PAGE_ICONS: Partial<Record<PageAccessKey, React.ComponentType<{ className?: string }>>> = {
   "role-onboarding": Users,
-  "module-onboarding": Blocks,
+  "company-onboarding": Building2,
   dashboard: LayoutDashboard,
   accounting: Building2,
   auditing: ShieldCheck,
