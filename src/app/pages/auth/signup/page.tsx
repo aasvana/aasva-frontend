@@ -57,9 +57,9 @@ const SignUpPage = () => {
     },
     retry: 0,
     onSuccess: (res: any) => {
-      const { accessToken, refreshToken, user } = res?.data || {};
+      const { accessToken, refreshToken, user, subscription } = res?.data || {};
       if (accessToken) {
-        setAuth(accessToken, refreshToken, user);
+        setAuth(accessToken, refreshToken, user, subscription);
       }
       toast.success('Account created successfully!');
       router.push(getNextOnboardingRoute());

@@ -46,8 +46,8 @@ const beginRestore = (): void => {
         }
       );
 
-      const { accessToken, refreshToken: nextRefreshToken, user } = res.data;
-      useAuthStore.getState().restoreAuth(accessToken, nextRefreshToken, user);
+      const { accessToken, refreshToken: nextRefreshToken, user, subscription } = res.data;
+      useAuthStore.getState().restoreAuth(accessToken, nextRefreshToken, user, subscription);
       setSessionState('alive');
     } catch {
       useAuthStore.getState().clearAuth();

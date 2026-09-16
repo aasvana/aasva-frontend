@@ -32,6 +32,10 @@
       "destination": "/pages/onboarding/role"
     },
     {
+      "source": "/onboarding/company",
+      "destination": "/pages/onboarding/company"
+    },
+    {
       "source": "/onboarding/module",
       "destination": "/pages/onboarding/module"
     },

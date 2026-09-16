@@ -4,8 +4,9 @@ import AuthFooter from '@/components/generic/auth/footer';
 import { SiteHeader } from '@/components/site-header';
 import { WelcomeModal } from '@/components/dashboard/welcome-modal';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { getNextOnboardingRoute, getPageKeyFromPath, ALL_MODULE_TITLES, isPathAllowedForUser, isSystemAdmin } from '@/helpers/pageAccess';
+import { getNextOnboardingRoute, getPageKeyFromPath, ALL_MODULE_TITLES, isPathAllowedForUser, isSystemAdmin, isSubscriptionActive } from '@/helpers/pageAccess';
 import { UnapprovedUserScreen } from '@/components/generic/unapproved-user-screen';
+import { SubscriptionRequiredScreen } from '@/components/generic/subscription-required-screen';
 import { useSessionRestore } from '@/hooks/useSessionRestore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { usePageAccessStore } from '@/stores/pageAccessStore';
@@ -33,7 +34,10 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
     if (token && !user) {
       api
         .get('/auth/me')
-        .then((res) => useAuthStore.getState().setUser(res.data))
+        .then((res) => {
+          useAuthStore.getState().setUser(res.data.user);
+          useAuthStore.getState().setSubscription(res.data.subscription);
+        })
         .catch(() => {});
     }
   }, [token, user]);
@@ -82,6 +86,10 @@ const DashboardLayout = ({ children }: AuthLayoutProps) => {
 
   if (user && (user as any).isApproved === false && !isSystemAdmin()) {
     return <UnapprovedUserScreen />;
+  }
+
+  if (!isSubscriptionActive()) {
+    return <SubscriptionRequiredScreen />;
   }
 
   if (!role || modules.length === 0) {

@@ -18,6 +18,7 @@ const RoleSelectionPage = () => {
   const lastUserId = useAuthStore((state) => state.lastUserId);
   const role = useAuthStore((state) => state.role);
   const modules = useAuthStore((state) => state.modules);
+  const companyComplete = useAuthStore((state) => state.companyComplete);
   const access = usePageAccessStore((state) => state.access);
   const { restoring } = useSessionRestore();
   const [selected, setSelected] = useState<UserRole | null>(null);
@@ -38,10 +39,15 @@ const RoleSelectionPage = () => {
       return;
     }
 
+    if (!companyComplete) {
+      router.replace('/onboarding/company');
+      return;
+    }
+
     if (!(access["role-onboarding"] ?? true)) {
       router.replace(getNextOnboardingRoute());
     }
-  }, [access, router, token, user, lastUserId, role, modules]);
+  }, [access, router, token, user, lastUserId, role, modules, companyComplete]);
 
   if (restoring || !token) return null;
 

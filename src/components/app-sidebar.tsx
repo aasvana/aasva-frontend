@@ -1095,10 +1095,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const visibleItems = React.useMemo(() => {
     if (!hydrated || !role) return data.navMain
     const systemAdmin = isSystemAdmin()
-    const isSuperAdmin = user?.roles?.some((r) => r.name === 'superadmin') ?? false
     return data.navMain.filter((item) => {
       if (systemAdmin) return true
-      if (item.title === 'Users' && isSuperAdmin) return true
+      if (item.title === 'Users') return false
       const pageKey = MODULE_PAGE_KEY[item.title]
       if (pageKey && access[pageKey] === false) return false
       if (!isModuleAllowedForUser(item.title, role, user)) return false

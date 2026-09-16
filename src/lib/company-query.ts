@@ -8,9 +8,10 @@ import {
   CompanySettings,
 } from "@/lib/company-api";
 import { CompanyData, useCompanyStore } from "@/stores/companyStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 export const companyQueryKeys = {
-  all: ["company-settings"] as const,
+  all: (tenantId: string) => ["company-settings", tenantId] as const,
 };
 
 function toCompanyData(settings: CompanySettings): CompanyData {
@@ -37,9 +38,10 @@ function toCompanyData(settings: CompanySettings): CompanyData {
 
 export function useCompanySettings() {
   const queryClient = useQueryClient();
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
 
   const settingsQuery = useQuery({
-    queryKey: companyQueryKeys.all,
+    queryKey: companyQueryKeys.all(tenantId),
     queryFn: async () => {
       const data = await apiGetCompany();
       useCompanyStore.getState().updateCompany(toCompanyData(data));
@@ -51,7 +53,7 @@ export function useCompanySettings() {
     mutationFn: apiUpdateCompany,
     onSuccess: (data) => {
       useCompanyStore.getState().updateCompany(toCompanyData(data));
-      queryClient.setQueryData(companyQueryKeys.all, data);
+      queryClient.setQueryData(companyQueryKeys.all(tenantId), data);
     },
   });
 

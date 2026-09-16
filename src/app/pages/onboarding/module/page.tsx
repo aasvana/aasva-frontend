@@ -27,6 +27,7 @@ const ModuleSelectionPage = () => {
   const lastUserId = useAuthStore((state) => state.lastUserId);
   const modules = useAuthStore((state) => state.modules);
   const setModules = useAuthStore((state) => state.setModules);
+  const companyComplete = useAuthStore((state) => state.companyComplete);
   const access = usePageAccessStore((state) => state.access);
   const { restoring } = useSessionRestore();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -47,6 +48,11 @@ const ModuleSelectionPage = () => {
       return;
     }
 
+    if (!companyComplete) {
+      router.replace('/onboarding/company');
+      return;
+    }
+
     if (!role) {
       router.replace(getNextOnboardingRoute());
       return;
@@ -55,7 +61,7 @@ const ModuleSelectionPage = () => {
       isModuleAllowed(title, access)
     );
     setSelected(new Set(available));
-  }, [role, access, router, token, user, lastUserId, modules]);
+  }, [role, access, router, token, user, lastUserId, modules, companyComplete]);
 
   const availableModules = useMemo(() => {
     if (!role) return [];

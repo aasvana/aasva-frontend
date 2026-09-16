@@ -38,7 +38,8 @@ export default function AuthCallbackPage() {
         setAuth(token, refresh, null);
         try {
           const meRes = await api.get('/auth/me');
-          useAuthStore.getState().setUser(meRes.data);
+          useAuthStore.getState().setUser(meRes.data.user);
+          useAuthStore.getState().setSubscription(meRes.data.subscription);
         } catch {
           // Best-effort profile fetch; session is still valid without it.
         }

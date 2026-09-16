@@ -59,6 +59,40 @@ export const isModuleEnabled = (title: string): boolean => {
   return key ? isPageEnabled(key) : true;
 };
 
+export const isSubscriptionActive = (): boolean => {
+  const { subscription, role, user } = useAuthStore.getState();
+
+  const systemAdmin =
+    role === "systemadmin" ||
+    user?.roles?.some((r: any) => r.name === "systemadmin") ||
+    false;
+  if (systemAdmin) return true;
+
+  if (!subscription) return true;
+
+  if (subscription.status === "active") return true;
+
+  if (
+    subscription.status === "trial" &&
+    subscription.paidUntil &&
+    new Date(subscription.paidUntil).getTime() >= Date.now()
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+export const getSubscriptionExpiryLabel = (): string | null => {
+  const { subscription } = useAuthStore.getState();
+  if (!subscription?.paidUntil) return null;
+  return new Date(subscription.paidUntil).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 export const isModuleAllowedForUser = (
   title: string,
   role: UserRole | null,
@@ -133,6 +167,9 @@ export const getNextOnboardingRoute = (): string => {
     }
     return '/dashboard';
   }
+
+  const companyPage = access["company-onboarding"] ?? true;
+  if (companyPage && !authState.companyComplete) return "/onboarding/company";
 
   const rolePage = access["role-onboarding"] ?? true;
   const modulePage = access["module-onboarding"] ?? true;

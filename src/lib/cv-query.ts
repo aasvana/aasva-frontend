@@ -10,10 +10,12 @@ import {
   ConfirmationVoucherRecord,
 } from "@/lib/cv-api";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import { useAuthStore } from "@/stores/AuthStore";
 
 export const cvQueryKeys = {
-  all: ["confirmation-vouchers"] as const,
-  detail: (id: string) => [...cvQueryKeys.all, id] as const,
+  all: (tenantId: string) => ["confirmation-vouchers", tenantId] as const,
+  detail: (tenantId: string, id: string) =>
+    [...cvQueryKeys.all(tenantId), id] as const,
 };
 
 export type PaginatedVouchers = {
@@ -30,15 +32,17 @@ export function useConfirmationVouchers(params?: {
   sortBy?: string;
   sortOrder?: string;
 }) {
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
   return useQuery({
-    queryKey: [...cvQueryKeys.all, params],
+    queryKey: [...cvQueryKeys.all(tenantId), params],
     queryFn: () => apiGetVouchers(params),
   });
 }
 
 export function useConfirmationVoucher(id: string | undefined) {
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
   return useQuery({
-    queryKey: cvQueryKeys.detail(id ?? ""),
+    queryKey: cvQueryKeys.detail(tenantId, id ?? ""),
     queryFn: () => apiGetVoucher(id as string),
     enabled: !!id,
   });
@@ -46,31 +50,36 @@ export function useConfirmationVoucher(id: string | undefined) {
 
 export function useSaveConfirmationVoucher() {
   const queryClient = useQueryClient();
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
   return useMutation({
     mutationFn: (data: ConfirmationVoucherFormData) => apiSaveVoucher(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all(tenantId) });
     },
   });
 }
 
 export function useUpdateConfirmationVoucher(id: string) {
   const queryClient = useQueryClient();
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
   return useMutation({
     mutationFn: (data: ConfirmationVoucherFormData) => apiUpdateVoucher(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
-      queryClient.invalidateQueries({ queryKey: cvQueryKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all(tenantId) });
+      queryClient.invalidateQueries({
+        queryKey: cvQueryKeys.detail(tenantId, id),
+      });
     },
   });
 }
 
 export function useDeleteConfirmationVoucher() {
   const queryClient = useQueryClient();
+  const tenantId = useAuthStore((s) => s.user?.tenantId) ?? "";
   return useMutation({
     mutationFn: (id: string) => apiDeleteVoucher(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: cvQueryKeys.all(tenantId) });
     },
   });
 }

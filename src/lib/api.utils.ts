@@ -35,8 +35,8 @@ api.interceptors.response.use(
             { headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY } },
           );
 
-          const { accessToken, refreshToken: newRefreshToken, user } = res.data;
-          useAuthStore.getState().restoreAuth(accessToken, newRefreshToken, user);
+          const { accessToken, refreshToken: newRefreshToken, user, subscription } = res.data;
+          useAuthStore.getState().restoreAuth(accessToken, newRefreshToken, user, subscription);
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           return api(originalRequest);
         } catch {
