@@ -133,6 +133,11 @@ function Step1CustomerDetails() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="grid gap-1.5 md:col-span-2">
+        <Label htmlFor="packageName">Package name</Label>
+        <Input id="packageName" placeholder="e.g. Kashmir 5 Days" className="bg-gray-50" aria-invalid={!!errors.packageName} {...register("packageName")} />
+        {errors.packageName && <p className="text-sm text-red-500">{errors.packageName.message as string}</p>}
+      </div>
+      <div className="grid gap-1.5">
         <Label htmlFor="customerName">Customer name</Label>
         <SearchablePartyField
           id="customerName"
@@ -155,7 +160,7 @@ function Step1CustomerDetails() {
           <p className="text-sm text-red-500">{errors.customerName.message as string}</p>
         )}
       </div>
-      <div className="grid gap-1.5 md:col-span-2">
+      <div className="grid gap-1.5">
         <Label htmlFor="agentName">Agent name</Label>
         <SearchablePartyField
           id="agentName"

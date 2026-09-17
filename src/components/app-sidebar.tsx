@@ -404,16 +404,16 @@ const data = {
           url: "/dashboard/travel/itineraries",
         },
         {
+          title: "Packages",
+          url: "/dashboard/travel/packages",
+        },
+        {
           title: "Bookings",
           url: "/dashboard/travel/bookings",
         },
         {
           title: "Confirmation Vouchers",
           url: "/dashboard/confirmation-vouchers",
-        },
-        {
-          title: "Destination",
-          url: "/dashboard/confirmation-vouchers/destinations",
         },
         {
           title: "Suppliers",

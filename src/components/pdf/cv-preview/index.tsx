@@ -247,8 +247,13 @@ export function CvPreviewDocument({
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Customer Details</Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Package</Text>
+            <DetailRow label="Package Name" value={d.packageName} />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Customer Details</Text>
           <View style={styles.grid}>
             <DetailRow label="Customer Name" value={d.customerName} />
             <DetailRow label="Agent" value={d.agentName} />

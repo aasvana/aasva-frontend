@@ -42,6 +42,7 @@ const itinerarySchema = z.object({
 export const confirmationVoucherSchema = z
   .object({
   // Step 1 - Customer Details
+  packageName: z.string().min(1, "Package name is required"),
   customerName: z.string().min(1, "Customer name is required"),
   mobileNo: z
     .string()
@@ -154,7 +155,7 @@ export type ConfirmationVoucherFormData = z.infer<
 >;
 
 export const stepFieldMap: (keyof ConfirmationVoucherFormData)[][] = [
-  ["customerName", "mobileNo", "emailAddress", "companyName", "agentName", "numberOfPersons", "numberOfTourDays", "journeyDate"],
+  ["packageName", "customerName", "mobileNo", "emailAddress", "companyName", "agentName", "numberOfPersons", "numberOfTourDays", "journeyDate"],
   [
     "boardingAirline",
     "boardingDate",

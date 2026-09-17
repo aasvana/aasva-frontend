@@ -37,6 +37,7 @@ type ConfirmationVoucherFormProps = {
 };
 
 export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVoucherFormData> = {
+  packageName: "",
   customerName: "",
   mobileNo: "",
   emailAddress: "",
