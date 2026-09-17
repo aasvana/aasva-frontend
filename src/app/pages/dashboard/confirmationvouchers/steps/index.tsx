@@ -175,6 +175,16 @@ function Step1CustomerDetails() {
         />
       </div>
       <div className="grid gap-1.5">
+        <Label htmlFor="numberOfPersons">Number of persons</Label>
+        <Input type="number" min="1" id="numberOfPersons" className="bg-gray-50" aria-invalid={!!errors.numberOfPersons} {...register("numberOfPersons")} />
+        {errors.numberOfPersons && <p className="text-sm text-red-500">{errors.numberOfPersons.message as string}</p>}
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="numberOfTourDays">Number of tour days</Label>
+        <Input type="number" min="1" id="numberOfTourDays" className="bg-gray-50" aria-invalid={!!errors.numberOfTourDays} {...register("numberOfTourDays")} />
+        {errors.numberOfTourDays && <p className="text-sm text-red-500">{errors.numberOfTourDays.message as string}</p>}
+      </div>
+      <div className="grid gap-1.5">
         <Label htmlFor="mobileNo">Mobile no.</Label>
         <Input
           type="text"

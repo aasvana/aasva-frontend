@@ -15,12 +15,21 @@ const TravellersDetails = () => {
     formState: { errors },
   } = useFormContext<ConfirmationVoucherFormData>();
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "travellers",
   });
 
   const travellers = watch("travellers");
+  const numberOfPersons = watch("numberOfPersons");
+
+  React.useEffect(() => {
+    const count = Math.max(1, Number(numberOfPersons) || 0);
+    const current = travellers ?? [];
+    if (current.length !== count) {
+      replace(Array.from({ length: count }, (_, index) => current[index] ?? { name: "", age: "", gender: "male" }));
+    }
+  }, [numberOfPersons, replace]);
 
   const handleAddTraveller = () => {
     append({ name: "", age: "", gender: "male" });

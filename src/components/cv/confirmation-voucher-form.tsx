@@ -42,6 +42,8 @@ export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVouche
   emailAddress: "",
   companyName: "",
   agentName: "",
+  numberOfPersons: "2",
+  numberOfTourDays: "1",
   boardingAirline: "",
   boardingFrom: "",
   boardingTo: "",

@@ -23,12 +23,21 @@ const ItineraryDetails = () => {
     formState: { errors },
   } = useFormContext<ConfirmationVoucherFormData>();
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "itineraries",
   });
 
   const itinerariesValues = watch("itineraries");
+  const numberOfTourDays = watch("numberOfTourDays");
+
+  React.useEffect(() => {
+    const count = Math.max(1, Number(numberOfTourDays) || 0);
+    const current = itinerariesValues ?? [];
+    if (current.length !== count) {
+      replace(Array.from({ length: count }, (_, index) => current[index] ?? { date: new Date(), subject: "", itinerary: "" }));
+    }
+  }, [numberOfTourDays, replace]);
 
   const handleAddItinerary = () => {
     append({ date: new Date(), subject: "", itinerary: "" });

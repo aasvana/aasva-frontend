@@ -53,6 +53,8 @@ export const confirmationVoucherSchema = z
     .email("Invalid email address"),
   companyName: z.string(),
   agentName: z.string().min(1, "Agent name is required"),
+  numberOfPersons: z.string().min(1, "Number of persons is required").refine((v) => Number.isInteger(Number(v)) && Number(v) > 0, "Enter a valid number of persons"),
+  numberOfTourDays: z.string().min(1, "Number of tour days is required").refine((v) => Number.isInteger(Number(v)) && Number(v) > 0, "Enter a valid number of tour days"),
   journeyDate: z.date({ required_error: "Journey date is required" }),
 
   // Step 2 - Boarding
@@ -152,7 +154,7 @@ export type ConfirmationVoucherFormData = z.infer<
 >;
 
 export const stepFieldMap: (keyof ConfirmationVoucherFormData)[][] = [
-  ["customerName", "mobileNo", "emailAddress", "companyName", "agentName", "journeyDate"],
+  ["customerName", "mobileNo", "emailAddress", "companyName", "agentName", "numberOfPersons", "numberOfTourDays", "journeyDate"],
   [
     "boardingAirline",
     "boardingDate",
