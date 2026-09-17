@@ -84,6 +84,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
+  brandDetails: {
+    alignItems: "flex-start",
+  },
   headerRight: {
     alignItems: "flex-end",
   },
@@ -294,8 +297,10 @@ export function CvPreviewDocument({
                 <Text>{company.shortName}</Text>
               </View>
             )}
-            <Text style={styles.brandName}>{company.name}</Text>
-            <Text style={styles.sectionTitle}>Package - {d.packageName}</Text>
+            <View style={styles.brandDetails}>
+              <Text style={styles.brandName}>{company.name}</Text>
+              <Text style={styles.headerMeta}>Package - {d.packageName}</Text>
+            </View>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.headerTitle}>Confirmation Voucher</Text>
