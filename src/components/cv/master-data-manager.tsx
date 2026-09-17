@@ -59,6 +59,11 @@ type MasterDataManagerProps<T extends { id: string }> = {
   add: (data: Omit<T, "id">) => void;
   update: (id: string, data: Omit<T, "id">) => void;
   remove: (id: string) => void;
+  hideAddButton?: boolean;
+  onAddButton?: () => void;
+  onEditButton?: (item: T) => void;
+  hideFormDrawer?: boolean;
+  customDrawer?: (args: { open: boolean; editing: T | null; close: () => void }) => React.ReactNode;
 };
 
 export function MasterDataManager<T extends { id: string }>({
@@ -76,6 +81,11 @@ export function MasterDataManager<T extends { id: string }>({
   add,
   update,
   remove,
+  hideAddButton = false,
+  onAddButton,
+  onEditButton,
+  hideFormDrawer = false,
+  customDrawer,
 }: MasterDataManagerProps<T>) {
   const [searchTerm, setSearchTerm] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -142,9 +152,11 @@ export function MasterDataManager<T extends { id: string }>({
           <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
           <p className="text-sm text-gray-500">{description}</p>
         </div>
-        <Button onClick={openAdd}>
-          <CirclePlusIcon /> {addLabel}
-        </Button>
+        {!hideAddButton && (
+          <Button onClick={onAddButton ?? openAdd}>
+            <CirclePlusIcon /> {addLabel}
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col p-1.5">
@@ -174,7 +186,7 @@ export function MasterDataManager<T extends { id: string }>({
                       {emptyTitle}
                     </p>
                     <p className="text-sm text-gray-500">{emptyDescription}</p>
-                    <Button onClick={openAdd}>
+                    <Button onClick={onAddButton ?? openAdd}>
                       <CirclePlusIcon /> {addLabel}
                     </Button>
                   </div>
@@ -220,7 +232,7 @@ export function MasterDataManager<T extends { id: string }>({
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="left" align="start">
                                 <DropdownMenuItem
-                                  onClick={() => openEdit(item)}
+                                  onClick={() => onEditButton?.(item) ?? openEdit(item)}
                                 >
                                   <Pencil /> Edit
                                 </DropdownMenuItem>
@@ -243,7 +255,8 @@ export function MasterDataManager<T extends { id: string }>({
         </div>
       </div>
 
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      {customDrawer?.({ open: sheetOpen, editing, close: () => setSheetOpen(false) })}
+      {!hideFormDrawer && <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent className="w-full sm:max-w-md">
           <SheetHeader>
             <SheetTitle>
@@ -303,7 +316,7 @@ export function MasterDataManager<T extends { id: string }>({
             </Button>
           </SheetFooter>
         </SheetContent>
-      </Sheet>
+      </Sheet>}
     </div>
   );
 }

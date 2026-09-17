@@ -32,6 +32,7 @@ export type Supplier = {
   rating: string;
   notes: string;
   isActive: string;
+  destinationId?: string;
 };
 
 const newId = () =>
@@ -40,6 +41,7 @@ const newId = () =>
     : `sup_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 const seedSuppliers = (): Supplier[] => [
+  /* hotel seeds are intentionally omitted; hotels come from shared master data */
   {
     id: newId(),
     category: "hotel",
@@ -146,18 +148,22 @@ const seedSuppliers = (): Supplier[] => [
   },
 ];
 
+const seedNonHotelSuppliers = () =>
+  seedSuppliers().filter((supplier) => supplier.category !== "hotel");
+
 type SupplierState = {
   suppliers: Supplier[];
   addSupplier: (data: Omit<Supplier, "id">) => void;
   updateSupplier: (id: string, data: Omit<Supplier, "id">) => void;
   deleteSupplier: (id: string) => void;
+  clearHotelSuppliers: () => void;
   resetSuppliers: () => void;
 };
 
 export const useSupplierStore = create<SupplierState>()(
   persist(
     (set) => ({
-      suppliers: seedSuppliers(),
+      suppliers: seedNonHotelSuppliers(),
 
       addSupplier: (data) =>
         set((state) => ({
@@ -178,10 +184,26 @@ export const useSupplierStore = create<SupplierState>()(
           ),
         })),
 
+      clearHotelSuppliers: () =>
+        set((state) => ({
+          suppliers: state.suppliers.filter((supplier) => supplier.category !== "hotel"),
+        })),
+
       resetSuppliers: () => set({ suppliers: seedSuppliers() }),
     }),
     {
       name: "xmerge_travel_suppliers",
+      version: 2,
+      migrate: (persistedState) => {
+        if (!persistedState || typeof persistedState !== "object") return persistedState;
+        const state = persistedState as SupplierState;
+        return {
+          ...state,
+          suppliers: Array.isArray(state.suppliers)
+            ? state.suppliers.filter((supplier) => supplier.category !== "hotel")
+            : [],
+        };
+      },
       storage: createJSONStorage(() => localStorage),
     }
   )

@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
 import { useCvConfigStore } from "@/stores/cvConfigStore";
 import { useCustomerStore } from "@/stores/customerStore";
 import { useAgentStore } from "@/stores/agentStore";
-import Link from "next/link";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
+import { PartyDetailsSheet } from "@/components/cv/party-details-sheet";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import TravellersDetails from "./travellers-details";
 import HotelsDetails from "./hotels-details";
@@ -48,6 +48,46 @@ function useTravelOptions() {
   return { airlineOptions, airportOptions };
 }
 
+type SearchablePartyFieldProps = {
+  id: string;
+  value: string;
+  options: ComboboxOption[];
+  placeholder: string;
+  searchPlaceholder: string;
+  addLabel: string;
+  invalid?: boolean;
+  onChange: (value: string) => void;
+  onAddNew: (value: string) => void;
+};
+
+function SearchablePartyField({
+  id,
+  value,
+  options,
+  placeholder,
+  searchPlaceholder,
+  addLabel,
+  invalid,
+  onChange,
+  onAddNew,
+}: SearchablePartyFieldProps) {
+  return (
+    <Combobox
+      id={id}
+      options={options}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      searchPlaceholder={searchPlaceholder}
+      addNewLabel={addLabel}
+      onAddNew={(name) => {
+        if (name.trim()) onAddNew(name.trim());
+      }}
+      invalid={invalid}
+    />
+  );
+}
+
 export function getSteps(): Step[] {
   return [
     { id: 1, title: "Customer Details", content: <Step1CustomerDetails /> },
@@ -74,17 +114,11 @@ function Step1CustomerDetails() {
   const agentName = watch("agentName");
 
   const customers = useCustomerStore((s) => s.customers);
+  const addCustomer = useCustomerStore((s) => s.addCustomer);
   const agents = useAgentStore((s) => s.agents);
-
-  const customerOptions: ComboboxOption[] = customers.map((c) => ({
-    value: c.name,
-    label: `${c.name}${c.company ? ` (${c.company})` : ""}`,
-  }));
-
-  const agentOptions: ComboboxOption[] = agents.map((a) => ({
-    value: a.name,
-    label: `${a.name}${a.company ? ` (${a.company})` : ""}`,
-  }));
+  const addAgent = useAgentStore((s) => s.addAgent);
+  const [partySheet, setPartySheet] = useState<"customer" | "agent" | null>(null);
+  const [partyName, setPartyName] = useState("");
 
   const handleCustomerSelect = (name: string) => {
     const customer = customers.find((c) => c.name === name);
@@ -95,65 +129,50 @@ function Step1CustomerDetails() {
     setValue("mobileNo", customer.phone ?? "");
   };
 
-  const handleAgentSelect = (name: string) => {
-    setValue("agentName", name, { shouldValidate: true });
-  };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="grid gap-1.5 md:col-span-2">
-        <Label>Saved customer</Label>
-        <Combobox
-          options={customerOptions}
-          value={customerOptions.some((o) => o.value === customerName)
-            ? customerName
-            : ""}
-          onChange={handleCustomerSelect}
-          placeholder="Select a saved customer to prefill"
-          searchPlaceholder="Search customers..."
-        />
-        <p className="text-sm text-gray-500">
-          <Link
-            href="/dashboard/customers"
-            className="font-medium text-emerald-600 hover:underline"
-          >
-            Manage customers
-          </Link>
-        </p>
-      </div>
-      <div className="grid gap-1.5 md:col-span-2">
-        <Label>Saved agent</Label>
-        <Combobox
-          options={agentOptions}
-          value={agentOptions.some((o) => o.value === agentName)
-            ? agentName
-            : ""}
-          onChange={handleAgentSelect}
-          placeholder="Select a saved agent (optional)"
-          searchPlaceholder="Search agents..."
-        />
-        <p className="text-sm text-gray-500">
-          <Link
-            href="/dashboard/agents"
-            className="font-medium text-emerald-600 hover:underline"
-          >
-            Manage agents
-          </Link>
-        </p>
-      </div>
-      <div className="grid gap-1.5">
         <Label htmlFor="customerName">Customer name</Label>
-        <Input
-          type="text"
+        <SearchablePartyField
           id="customerName"
-          placeholder="John Doe"
-          className="bg-gray-50"
-          aria-invalid={!!errors.customerName}
-          {...register("customerName")}
+          value={customerName}
+          options={customers.map((customer) => ({
+            value: customer.name,
+            label: `${customer.name}${customer.company ? ` (${customer.company})` : ""}`,
+          }))}
+          placeholder="Search or enter customer name"
+          searchPlaceholder="Search customers..."
+          addLabel="Add customer"
+          invalid={!!errors.customerName}
+          onChange={handleCustomerSelect}
+          onAddNew={(name) => {
+            setPartyName(name);
+            setPartySheet("customer");
+          }}
         />
         {errors.customerName && (
           <p className="text-sm text-red-500">{errors.customerName.message as string}</p>
         )}
+      </div>
+      <div className="grid gap-1.5 md:col-span-2">
+        <Label htmlFor="agentName">Agent name</Label>
+        <SearchablePartyField
+          id="agentName"
+          value={agentName}
+          options={agents.map((agent) => ({
+            value: agent.name,
+            label: `${agent.name}${agent.company ? ` (${agent.company})` : ""}`,
+          }))}
+          placeholder="Search or enter agent name"
+          searchPlaceholder="Search agents..."
+          addLabel="Add agent"
+          onChange={(name) => setValue("agentName", name, { shouldValidate: true })}
+          onAddNew={(name) => {
+            setPartyName(name);
+            setPartySheet("agent");
+          }}
+        />
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="mobileNo">Mobile no.</Label>
@@ -223,7 +242,49 @@ function Step1CustomerDetails() {
           <p className="text-sm text-red-500">{errors.journeyDate.message as string}</p>
         )}
       </div>
-    </div>
+      </div>
+      {partySheet && (
+        <PartyDetailsSheet
+          kind={partySheet}
+          open
+          initialName={partyName}
+          onOpenChange={(open) => {
+            if (!open) setPartySheet(null);
+          }}
+          onSave={(details) => {
+            if (partySheet === "customer") {
+              addCustomer({
+                name: details.name,
+                company: details.company,
+                email: details.email,
+                phone: details.phone,
+                place: details.place,
+                country: details.country ?? "",
+                address: details.address ?? "",
+                currency: details.currency ?? "",
+                taxId: details.taxId ?? "",
+                notes: details.notes,
+              });
+              setValue("customerName", details.name, { shouldValidate: true });
+              setValue("companyName", details.company);
+              setValue("emailAddress", details.email, { shouldValidate: true });
+              setValue("mobileNo", details.phone, { shouldValidate: true });
+            } else {
+              addAgent({
+                name: details.name,
+                company: details.company,
+                phone: details.phone,
+                email: details.email,
+                place: details.place,
+                notes: details.notes,
+              });
+              setValue("agentName", details.name, { shouldValidate: true });
+            }
+            setPartySheet(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -235,6 +296,7 @@ function Step2Boarding() {
     setValue,
   } = useFormContext<ConfirmationVoucherFormData>();
   const boardingDate = watch("boardingDate");
+  const journeyDate = watch("journeyDate");
   const boardingAirline = watch("boardingAirline");
   const boardingFrom = watch("boardingFrom");
   const boardingTo = watch("boardingTo");
@@ -277,6 +339,7 @@ function Step2Boarding() {
             <Calendar
               mode="single"
               selected={boardingDate}
+              disabled={journeyDate ? { before: journeyDate } : undefined}
               onSelect={(day) =>
                 day && setValue("boardingDate", day, { shouldValidate: true })
               }
@@ -358,6 +421,7 @@ function Step3Returning() {
     setValue,
   } = useFormContext<ConfirmationVoucherFormData>();
   const returnDate = watch("returnDate");
+  const boardingDate = watch("boardingDate");
   const returnAirline = watch("returnAirline");
   const returnFrom = watch("returnFrom");
   const returnTo = watch("returnTo");
@@ -400,6 +464,7 @@ function Step3Returning() {
             <Calendar
               mode="single"
               selected={returnDate}
+              disabled={boardingDate ? { before: boardingDate } : undefined}
               onSelect={(day) =>
                 day && setValue("returnDate", day, { shouldValidate: true })
               }

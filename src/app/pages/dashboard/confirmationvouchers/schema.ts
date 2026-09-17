@@ -39,7 +39,8 @@ const itinerarySchema = z.object({
   itinerary: z.string().min(1, "Itinerary description is required"),
 });
 
-export const confirmationVoucherSchema = z.object({
+export const confirmationVoucherSchema = z
+  .object({
   // Step 1 - Customer Details
   customerName: z.string().min(1, "Customer name is required"),
   mobileNo: z
@@ -51,7 +52,7 @@ export const confirmationVoucherSchema = z.object({
     .min(1, "Email is required")
     .email("Invalid email address"),
   companyName: z.string(),
-  agentName: z.string(),
+  agentName: z.string().min(1, "Agent name is required"),
   journeyDate: z.date({ required_error: "Journey date is required" }),
 
   // Step 2 - Boarding
@@ -128,7 +129,23 @@ export const confirmationVoucherSchema = z.object({
     .string()
     .min(1, "Amount balanced is required")
     .refine((v) => !isNaN(Number(v)) && Number(v) >= 0, "Must be a valid amount"),
-});
+  })
+  .superRefine((data, context) => {
+    if (data.boardingDate < data.journeyDate) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["boardingDate"],
+        message: "Boarding date cannot be before the journey date",
+      });
+    }
+    if (data.returnDate < data.boardingDate) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["returnDate"],
+        message: "Return date cannot be before the boarding date",
+      });
+    }
+  });
 
 export type ConfirmationVoucherFormData = z.infer<
   typeof confirmationVoucherSchema

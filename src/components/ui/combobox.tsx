@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, LoaderCircle, Plus } from "lucide-react";
 
 export interface ComboboxOption {
   value: string;
@@ -13,6 +13,7 @@ export interface ComboboxOption {
 }
 
 interface ComboboxProps {
+  id?: string;
   options: ComboboxOption[];
   value?: string;
   onChange: (value: string) => void;
@@ -22,9 +23,13 @@ interface ComboboxProps {
   invalid?: boolean;
   onAddNew?: (value: string) => void;
   addNewLabel?: string;
+  onSearchChange?: (value: string) => void;
+  loading?: boolean;
+  emptyLabel?: string;
 }
 
 export function Combobox({
+  id,
   options,
   value,
   onChange,
@@ -34,17 +39,24 @@ export function Combobox({
   invalid,
   onAddNew,
   addNewLabel = "Add",
+  onSearchChange,
+  loading = false,
+  emptyLabel = "No results found.",
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const safeOptions = Array.isArray(options) ? options : [];
 
   const normalizedSearch = search.trim();
 
-  const filtered = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase())
+  const filtered = safeOptions.filter((opt) =>
+    String(opt.label ?? "").toLowerCase().includes(search.toLowerCase())
+  );
+  const hasExactMatch = safeOptions.some(
+    (opt) => String(opt.value ?? "").toLowerCase() === normalizedSearch.toLowerCase()
   );
 
-  const selectedLabel = options.find((opt) => opt.value === value)?.label;
+  const selectedLabel = safeOptions.find((opt) => opt.value === value)?.label;
 
   const handleAddNew = () => {
     onAddNew?.(normalizedSearch);
@@ -56,6 +68,7 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          id={id}
           variant="outline"
           role="combobox"
           aria-expanded={open}
@@ -75,12 +88,15 @@ export function Combobox({
           <Input
             placeholder={searchPlaceholder}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              onSearchChange?.(e.target.value);
+            }}
             className="h-8"
             autoFocus
           />
         </div>
-        {onAddNew && (
+        {onAddNew && normalizedSearch && !hasExactMatch && (
           <div className="border-b p-1">
             <button
               type="button"
@@ -94,8 +110,13 @@ export function Combobox({
           </div>
         )}
         <div className="max-h-[200px] overflow-auto p-1">
-          {filtered.length === 0 ? (
-            <p className="py-2 px-3 text-sm text-muted-foreground">No results found.</p>
+          {loading ? (
+            <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
+              <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <span>Searching...</span>
+            </div>
+          ) : filtered.length === 0 ? (
+            <p className="py-2 px-3 text-sm text-muted-foreground">{emptyLabel}</p>
           ) : (
             filtered.map((opt, index) => (
               <button

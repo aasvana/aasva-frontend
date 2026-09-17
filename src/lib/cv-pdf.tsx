@@ -5,18 +5,31 @@ import { CvPreviewDocument } from "@/components/pdf/cv-preview";
 import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
+const safeFilePart = (value: string | undefined, fallback: string) => {
+  const normalized = (value ?? "")
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, " ")
+    .replace(/\s+/g, " ");
+  return normalized || fallback;
+};
+
 export async function downloadCvPdf(
   data: ConfirmationVoucherFormData,
   company: CompanyData,
-  fileName = `confirmation-voucher-${data.voucherNo || "download"}.pdf`
+  fileName?: string,
 ) {
+  const generatedFileName = fileName ?? [
+    safeFilePart(data.customerName, "customer"),
+    safeFilePart(data.voucherNo, "voucher"),
+    safeFilePart(company.name, "tenant"),
+  ].join(" - ") + ".pdf";
   const blob = await pdf(
     <CvPreviewDocument data={data} company={company} />
   ).toBlob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = fileName;
+  a.download = generatedFileName;
   document.body.appendChild(a);
   a.click();
   a.remove();

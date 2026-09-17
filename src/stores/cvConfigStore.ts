@@ -4,7 +4,6 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import airlinesSeed from "@/constants/json/airlines.json";
 import airportsSeed from "@/constants/json/airports.json";
-import { hotels as hotelsSeed } from "@/constants/hotels";
 
 export type CvHotel = {
   id: string;
@@ -61,14 +60,6 @@ const newId = () =>
     ? crypto.randomUUID()
     : `cv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-const seedHotels = (): CvHotel[] =>
-  hotelsSeed.map((h) => ({
-    id: newId(),
-    name: h.name,
-    destination: h.destination,
-    rating: h.rating,
-  }));
-
 const seedAirlines = (): CvAirline[] =>
   airlinesSeed.map((a) => ({
     id: newId(),
@@ -104,6 +95,24 @@ const seedSettings = (): CvSettings => ({
   defaultTaxRate: 18,
 });
 
+const LEGACY_SEEDED_HOTEL_NAMES = new Set([
+  "Taj Mahal Palace",
+  "The Taj Lake Palace",
+  "Umaid Bhawan Palace",
+  "The Leela Palace",
+  "The Oberoi Udaivilas",
+  "JW Marriott",
+  "ITC Grand Bharat",
+  "Radisson Blu Resort",
+  "The Fern Residency",
+  "Holiday Inn Resort",
+  "The Ritz-Carlton",
+  "Atlantis The Palm",
+  "Marina Bay Sands",
+  "Hilton Singapore Orchard",
+  "Grand Hyatt Bangkok",
+]);
+
 type CvConfigState = {
   hotels: CvHotel[];
   airlines: CvAirline[];
@@ -129,7 +138,7 @@ type CvConfigState = {
 export const useCvConfigStore = create<CvConfigState>()(
   persist(
     (set) => ({
-      hotels: seedHotels(),
+      hotels: [],
       airlines: seedAirlines(),
       airports: seedAirports(),
       generalDetails: seedGeneralDetails(),
@@ -198,7 +207,7 @@ export const useCvConfigStore = create<CvConfigState>()(
 
       resetConfig: () =>
         set({
-          hotels: seedHotels(),
+          hotels: [],
           airlines: seedAirlines(),
           airports: seedAirports(),
           generalDetails: seedGeneralDetails(),
@@ -208,6 +217,17 @@ export const useCvConfigStore = create<CvConfigState>()(
     {
       name: "xmerge_cv_config",
       storage: createJSONStorage(() => localStorage),
+      version: 2,
+      migrate: (persistedState) => {
+        if (!persistedState || typeof persistedState !== "object") return persistedState;
+        const state = persistedState as CvConfigState;
+        return {
+          ...state,
+          hotels: Array.isArray(state.hotels)
+            ? state.hotels.filter((hotel) => !LEGACY_SEEDED_HOTEL_NAMES.has(hotel.name))
+            : [],
+        };
+      },
     }
   )
 );

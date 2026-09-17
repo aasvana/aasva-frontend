@@ -60,8 +60,8 @@
       "destination": "/pages/dashboard/confirmationvouchers/:id/view"
     },
     {
-      "source": "/dashboard/confirmation-vouchers/hotels",
-      "destination": "/pages/dashboard/confirmationvouchers/hotels"
+      "source": "/dashboard/confirmation-vouchers/destinations",
+      "destination": "/pages/dashboard/confirmationvouchers/destinations"
     },
     {
       "source": "/dashboard/confirmation-vouchers/airlines",

@@ -711,6 +711,11 @@ const PAGE_ROUTES: {
     group: "Travel",
     label: "Confirmation Vouchers",
   },
+  {
+    prefix: "/dashboard/confirmation-vouchers/destinations",
+    group: "Travel",
+    label: "Destination",
+  },
   { prefix: "/dashboard/customers", label: "Customers" },
   { prefix: "/dashboard/agents", label: "Agents" },
   {
