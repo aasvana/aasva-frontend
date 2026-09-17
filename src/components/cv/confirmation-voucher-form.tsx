@@ -36,7 +36,7 @@ type ConfirmationVoucherFormProps = {
   defaultValues?: DefaultValues<ConfirmationVoucherFormData>;
 };
 
-const createDefaults: DefaultValues<ConfirmationVoucherFormData> = {
+export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVoucherFormData> = {
   customerName: "",
   mobileNo: "",
   emailAddress: "",
@@ -117,7 +117,7 @@ export function ConfirmationVoucherForm({
   const methods = useForm<ConfirmationVoucherFormData>({
     resolver: zodResolver(confirmationVoucherSchema),
     mode: "onChange",
-    defaultValues: defaultValues ?? createDefaults,
+    defaultValues: defaultValues ?? createConfirmationVoucherDefaults,
   });
 
   const steps = getSteps();
@@ -169,7 +169,7 @@ export function ConfirmationVoucherForm({
         }
 
         methods.reset({
-          ...createDefaults,
+          ...createConfirmationVoucherDefaults,
           ...general,
           bookingDate: new Date(),
           paymentType: defaultPaymentType,

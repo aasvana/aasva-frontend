@@ -129,6 +129,24 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     marginBottom: 6,
   },
+  fullWidthCell: {
+    width: "100%",
+    marginBottom: 8,
+  },
+  itineraryDay: {
+    padding: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 4,
+    fontSize: 9,
+  },
+  itineraryDayTitle: {
+    marginBottom: 6,
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#111827",
+  },
   label: {
     fontSize: 7,
     textTransform: "uppercase",
@@ -136,7 +154,7 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   value: {
-    fontSize: 9,
+    fontSize: 10,
     marginTop: 1,
   },
   table: {
@@ -149,11 +167,13 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f3f4f6",
   },
   tableHeaderRow: {
+    flexDirection: "row",
     backgroundColor: "#f9fafb",
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
   },
   tableHeaderCell: {
+    flexShrink: 0,
     padding: 6,
     fontSize: 7,
     textTransform: "uppercase",
@@ -162,6 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   tableCell: {
+    flexShrink: 0,
     padding: 6,
     fontSize: 9,
   },
@@ -321,12 +342,12 @@ export function CvPreviewDocument({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Package Details</Text>
-          <View style={styles.grid}>
-            <View style={[styles.cell, { width: "50%" }]}>
+          <View>
+            <View style={styles.fullWidthCell}>
               <Text style={styles.label}>Included</Text>
               <Text style={styles.value}>{stripHtml(d.packageIncluded)}</Text>
             </View>
-            <View style={[styles.cell, { width: "50%" }]}>
+            <View style={styles.fullWidthCell}>
               <Text style={styles.label}>Excluded</Text>
               <Text style={styles.value}>{stripHtml(d.packageExcluded)}</Text>
             </View>
@@ -335,32 +356,17 @@ export function CvPreviewDocument({
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Tour Itinerary</Text>
-          <View style={styles.table}>
-            <View style={styles.tableHeaderRow}>
-              <Text style={[styles.tableHeaderCell, { width: "20%" }]}>
-                Date
+          {d.itineraries.map((it, i) => (
+            <View key={i} style={styles.itineraryDay}>
+              <Text style={styles.itineraryDayTitle}>
+                Day {i + 1} - {formatDate(it.date)}
               </Text>
-              <Text style={[styles.tableHeaderCell, { width: "30%" }]}>
-                Subject
-              </Text>
-              <Text style={[styles.tableHeaderCell, { width: "50%" }]}>
-                Itinerary
-              </Text>
+              <Text style={styles.label}>Subject</Text>
+              <Text style={styles.value}>{it.subject || "-"}</Text>
+              <Text style={[styles.label, { marginTop: 5 }]}>Itinerary</Text>
+              <Text style={styles.value}>{it.itinerary || "-"}</Text>
             </View>
-            {d.itineraries.map((it, i) => (
-              <View key={i} style={styles.tableRow}>
-                <Text style={[styles.tableCell, { width: "20%" }]}>
-                  {formatDate(it.date)}
-                </Text>
-                <Text style={[styles.tableCell, { width: "30%" }]}>
-                  {it.subject}
-                </Text>
-                <Text style={[styles.tableCell, { width: "50%" }]}>
-                  {it.itinerary}
-                </Text>
-              </View>
-            ))}
-          </View>
+          ))}
         </View>
 
         <View style={styles.section}>

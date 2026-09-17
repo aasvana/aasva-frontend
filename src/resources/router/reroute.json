@@ -80,6 +80,10 @@
       "destination": "/pages/dashboard/confirmationvouchers/settings"
     },
     {
+      "source": "/dashboard/settings/confirmation-voucher-pdf",
+      "destination": "/pages/dashboard/settings/confirmation-voucher-pdf"
+    },
+    {
       "source": "/dashboard/travel/dashboard",
       "destination": "/pages/dashboard/travel/dashboard"
     },
