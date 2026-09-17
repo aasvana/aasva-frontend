@@ -21,19 +21,24 @@ import {
 import { downloadCvPdf } from "@/lib/cv-pdf";
 import { useCompanySettings } from "@/lib/company-query";
 import { useCompanyStore } from "@/stores/companyStore";
-import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import {
+  confirmationVoucherSchema,
+  ConfirmationVoucherFormData,
+} from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { ConfirmationVoucher } from "./confirmation-voucher";
 
 type CvPreviewDrawerProps = {
   mode?: "create" | "edit";
   existingId?: string;
   data?: ConfirmationVoucherFormData | null;
+  onSaved?: (id: string) => void;
 };
 
 export function CvPreviewDrawer({
   mode = "create",
   existingId,
   data,
+  onSaved,
 }: CvPreviewDrawerProps) {
   const previewOpen = useCvStore((s) => s.previewOpen);
   const closePreview = useCvStore((s) => s.closePreview);
@@ -46,6 +51,10 @@ export function CvPreviewDrawer({
   const company = useCompanyStore((s) => s.company);
   useCompanySettings();
   const [downloading, setDownloading] = React.useState(false);
+
+  const isComplete = draft
+    ? confirmationVoucherSchema.safeParse(draft).success
+    : false;
 
   const handleDownload = async () => {
     if (!draft) return;
@@ -65,12 +74,15 @@ export function CvPreviewDrawer({
 
   const handleSave = () => {
     if (!draft) return;
-    const onSuccess = () => {
+    const onSuccess = (record?: { id?: string }) => {
       toast.success(
         mode === "edit"
           ? "Confirmation voucher updated successfully!"
           : "Confirmation voucher saved successfully!"
       );
+      if (mode === "create" && record?.id) {
+        onSaved?.(record.id);
+      }
       closePreview();
     };
     const onError = () => {
@@ -114,9 +126,14 @@ export function CvPreviewDrawer({
           </div>
 
           <DrawerFooter className="flex-row justify-end border-t">
+            {!isComplete && draft && (
+              <span className="mr-auto flex items-center text-xs text-amber-600">
+                Complete all steps to download the PDF.
+              </span>
+            )}
             <Button
               variant="outline"
-              disabled={!draft}
+              disabled={!draft || !isComplete}
               onClick={() => window.print()}
             >
               <PrinterIcon className="size-4" />
@@ -124,7 +141,7 @@ export function CvPreviewDrawer({
             </Button>
             <Button
               variant="outline"
-              disabled={!draft || downloading}
+              disabled={!draft || !isComplete || downloading}
               onClick={handleDownload}
             >
               <DownloadIcon className="size-4" />

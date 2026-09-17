@@ -104,13 +104,17 @@ export function ConfirmationVoucherForm({
   const [currentStep, setCurrentStep] = useState(0);
   const [previewData, setPreviewData] =
     useState<ConfirmationVoucherFormData | null>(null);
+  const [createdId, setCreatedId] = useState<string | undefined>(undefined);
 
   const setDraft = useCvStore((s) => s.setDraft);
   const clearDraft = useCvStore((s) => s.clearDraft);
   const openPreview = useCvStore((s) => s.openPreview);
 
+  const effectiveId = mode === "edit" ? existingId : createdId;
+  const effectiveMode = effectiveId ? "edit" : mode;
+
   const saveMutation = useSaveConfirmationVoucher();
-  const updateMutation = useUpdateConfirmationVoucher(existingId ?? "");
+  const updateMutation = useUpdateConfirmationVoucher(effectiveId ?? "");
 
   const { data: vouchersData, isLoading: vouchersLoading } =
     useConfirmationVouchers({ limit: 1000, sortBy: "updatedAt", sortOrder: "desc" });
@@ -136,6 +140,12 @@ export function ConfirmationVoucherForm({
       initializedRef.current = true;
       const draft = useCvStore.getState().draft;
       if (draft) {
+        const existing = existingVouchers.find(
+          (v) => v.voucherNo === draft.voucherNo
+        );
+        if (existing) {
+          setCreatedId(existing.id);
+        }
         methods.reset(draft);
       } else {
         const config = useCvConfigStore.getState();
@@ -198,27 +208,27 @@ export function ConfirmationVoucherForm({
   };
 
   const handleSave = () => {
-    methods.handleSubmit((data) => {
-      if (mode === "edit") {
-        updateMutation.mutate(data, {
-          onSuccess: () => {
-            toast.success("Confirmation voucher updated successfully!");
-          },
-          onError: () => {
-            toast.error("Failed to update the confirmation voucher.");
-          },
-        });
-      } else {
-        saveMutation.mutate(data, {
-          onSuccess: () => {
-            toast.success("Confirmation voucher saved successfully!");
-          },
-          onError: () => {
-            toast.error("Failed to save the confirmation voucher.");
-          },
-        });
-      }
-    }, showValidationError)();
+    const data = methods.getValues() as ConfirmationVoucherFormData;
+    if (effectiveMode === "edit") {
+      updateMutation.mutate(data, {
+        onSuccess: () => {
+          toast.success("Confirmation voucher updated successfully!");
+        },
+        onError: () => {
+          toast.error("Failed to update the confirmation voucher.");
+        },
+      });
+    } else {
+      saveMutation.mutate(data, {
+        onSuccess: (record) => {
+          setCreatedId(record.id);
+          toast.success("Confirmation voucher saved successfully!");
+        },
+        onError: () => {
+          toast.error("Failed to save the confirmation voucher.");
+        },
+      });
+    }
   };
 
   const handleFinish = () => {
@@ -226,13 +236,13 @@ export function ConfirmationVoucherForm({
       const onSuccess = (record?: { id: string }) => {
         if (!record) {
           toast.error(
-            mode === "edit"
+            effectiveMode === "edit"
               ? "Could not update the confirmation voucher."
               : "Could not save the confirmation voucher."
           );
           return;
         }
-        if (mode === "create") {
+        if (effectiveMode === "create") {
           clearDraft();
           notify({
             type: "success",
@@ -254,13 +264,13 @@ export function ConfirmationVoucherForm({
       };
       const onError = () => {
         toast.error(
-          mode === "edit"
+          effectiveMode === "edit"
             ? "Failed to update the confirmation voucher."
             : "Failed to save the confirmation voucher."
         );
       };
 
-      if (mode === "edit") {
+      if (effectiveMode === "edit") {
         updateMutation.mutate(data, { onSuccess, onError });
       } else {
         saveMutation.mutate(data, { onSuccess, onError });
@@ -308,7 +318,7 @@ export function ConfirmationVoucherForm({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>
-                    {mode === "edit"
+                    {effectiveMode === "edit"
                       ? "Update Confirmation Voucher"
                       : "Save Confirmation Voucher"}
                   </p>
@@ -395,13 +405,18 @@ export function ConfirmationVoucherForm({
               <Button onClick={handleNext}>Next</Button>
             ) : (
               <Button onClick={handleFinish}>
-                {mode === "edit" ? "Update" : "Finish"}
+                {effectiveMode === "edit" ? "Update" : "Finish"}
               </Button>
             )}
           </div>
         </div>
       </div>
-      <CvPreviewDrawer mode={mode} existingId={existingId} data={previewData} />
+      <CvPreviewDrawer
+        mode={effectiveMode}
+        existingId={effectiveId}
+        data={previewData}
+        onSaved={(id) => setCreatedId(id)}
+      />
     </FormProvider>
   );
 }

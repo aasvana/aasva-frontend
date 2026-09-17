@@ -11,6 +11,7 @@ import { useCompanySettings } from "@/lib/company-query";
 import { useCompanyStore } from "@/stores/companyStore";
 import { downloadCvPdf } from "@/lib/cv-pdf";
 import { ConfirmationVoucher } from "@/components/cv/confirmation-voucher";
+import { confirmationVoucherSchema } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
 const EmptyState = () => {
   const router = useRouter();
@@ -35,6 +36,10 @@ export default function ViewConfirmationVoucher() {
   const company = useCompanyStore((s) => s.company);
   useCompanySettings();
   const [downloading, setDownloading] = useState(false);
+
+  const isComplete = voucher
+    ? confirmationVoucherSchema.safeParse(voucher.data).success
+    : false;
 
   const handleDownload = async () => {
     if (!voucher) return;
@@ -64,11 +69,24 @@ export default function ViewConfirmationVoucher() {
         <BackButton />
         <h1 className="text-2xl font-bold">Confirmation Voucher</h1>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => window.print()}>
+          {!isComplete && (
+            <span className="mr-auto flex items-center text-xs text-amber-600">
+              Complete all steps to download the PDF.
+            </span>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => window.print()}
+            disabled={!isComplete}
+          >
             <PrinterIcon className="size-4" />
             Print
           </Button>
-          <Button variant="outline" onClick={handleDownload} disabled={downloading}>
+          <Button
+            variant="outline"
+            onClick={handleDownload}
+            disabled={!isComplete || downloading}
+          >
             <DownloadIcon className="size-4" />
             {downloading ? "Generating..." : "Download PDF"}
           </Button>
