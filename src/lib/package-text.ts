@@ -26,7 +26,7 @@ export const cleanPackageText = (value: string) => {
     .replace(/\bwww\.[^\s<>"']+/gi, "")
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "");
   const lines = withoutContactDetails
-    .replace(/[^\p{L}\p{N}\s.,:;!?\"'()[\]-]/gu, "")
+    .replace(/[^\p{L}\p{N}\s.,:;!?"'()\[\]-]/gu, "")
     .split(/\r?\n/)
     .map((line) => line.replace(/\s+/g, " ").trim());
   const result: string[] = [];
