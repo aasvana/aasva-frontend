@@ -18,8 +18,8 @@ import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 import { Save } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { apiCreatePackage } from "@/lib/itinerary-templates-api";
-import { useItineraryTemplateSearch } from "@/lib/itinerary-templates-query";
+import { apiCreatePackage } from "@/lib/packages-api";
+import { usePackageSearch } from "@/lib/packages-query";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -48,7 +48,7 @@ const ItineraryDetails = () => {
   const [reorderOpen, setReorderOpen] = React.useState(false);
   const [reorderItems, setReorderItems] = React.useState<typeof itinerariesValues>([]);
   const sensors = useSensors(useSensor(PointerSensor));
-  const { data: templates = [] } = useItineraryTemplateSearch(templateSearch);
+  const { data: templates = [] } = usePackageSearch(templateSearch);
   const journeyDate = watch("journeyDate");
 
   React.useEffect(() => {
@@ -190,7 +190,7 @@ const ItineraryDetails = () => {
         );
       })}
       <Sheet open={reorderOpen} onOpenChange={setReorderOpen}><SheetContent className="w-full sm:max-w-md"><SheetHeader><SheetTitle>Reorder Itineraries</SheetTitle><SheetDescription>Drag the items to change the itinerary order.</SheetDescription></SheetHeader><div className="px-4"><DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={({ active, over }) => { if (!over || active.id === over.id) return; const oldIndex = Number(active.id); const newIndex = Number(over.id); const next = [...(reorderItems ?? [])]; const [moved] = next.splice(oldIndex, 1); next.splice(newIndex, 0, moved); setReorderItems(next); }}><SortableContext items={(reorderItems ?? []).map((_, index) => String(index))} strategy={verticalListSortingStrategy}><div className="grid gap-2">{(reorderItems ?? []).map((item, index) => <ReorderRow key={index} id={String(index)} index={index} item={item} startDate={journeyDate} />)}</div></SortableContext></DndContext></div><SheetFooter><Button variant="outline" onClick={() => setReorderOpen(false)}>Cancel</Button><Button onClick={saveReorder}>Save Order</Button></SheetFooter></SheetContent></Sheet>
-      <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}><DialogContent><DialogHeader><DialogTitle>Select Package</DialogTitle></DialogHeader><div className="grid gap-3">{templates.map((template) => <button key={template.id} type="button" className="rounded-lg border p-3 text-left hover:bg-gray-50" onClick={() => applyTemplate(template)}><p className="font-medium">{template.subject}</p><p className="text-xs text-gray-500">{template.days.length} Days · Updated {new Date(template.updatedAt).toLocaleDateString()}</p>{template.days.map((day) => <p key={day.dayOrder} className="text-sm">Day {day.dayOrder} — {day.subject}</p>)}</button>)}</div></DialogContent></Dialog>
+      <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}><DialogContent><DialogHeader><DialogTitle>Select Package</DialogTitle></DialogHeader><div className="grid gap-3">{templates.map((template) => <button key={template.id} type="button" className="rounded-lg border p-3 text-left hover:bg-gray-50" onClick={() => applyTemplate(template)}><p className="font-medium">{template.name}</p><p className="text-xs text-gray-500">{template.days.length} Days · Updated {new Date(template.updatedAt).toLocaleDateString()}</p>{template.days.map((day) => <p key={day.dayOrder} className="text-sm">Day {day.dayOrder} — {day.subject}</p>)}</button>)}</div></DialogContent></Dialog>
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}><DialogContent><DialogHeader><DialogTitle>Save as Package</DialogTitle></DialogHeader><div className="grid gap-4"><div className="grid gap-1.5"><Label htmlFor="package-name">Package Name</Label><Input id="package-name" value={templateName} onChange={(event) => setTemplateName(event.target.value)} placeholder="Andaman Family Package" autoFocus /></div><div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setSaveDialogOpen(false)}>Cancel</Button><Button disabled={!templateName.trim()} onClick={() => void apiCreatePackage({ name: templateName.trim(), days: (itinerariesValues ?? []).map((day, index) => ({ dayOrder: index + 1, subject: day.subject, description: day.itinerary })) }).then(() => { toast.success("Package saved."); setTemplateName(""); setSaveDialogOpen(false); }).catch(() => toast.error("Unable to save Package."))}>Save Package</Button></div></div></DialogContent></Dialog>
     </>
   );
