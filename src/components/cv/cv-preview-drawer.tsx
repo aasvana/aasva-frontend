@@ -84,6 +84,10 @@ export function CvPreviewDrawer({
 
   const handleSave = () => {
     if (!draft) return;
+    if (!draft.customerName?.trim()) {
+      toast.error("Customer name is required to save a draft.");
+      return;
+    }
     const onSuccess = (record?: { id?: string }) => {
       toast.success(
         mode === "edit"
@@ -95,8 +99,8 @@ export function CvPreviewDrawer({
       }
       closePreview();
     };
-    const onError = () => {
-      toast.error("Failed to save the confirmation voucher.");
+    const onError = (error: Error) => {
+      toast.error(error.message || "Failed to save the confirmation voucher.");
     };
     if (mode === "edit") {
       updateMutation.mutate(draft, { onSuccess, onError });

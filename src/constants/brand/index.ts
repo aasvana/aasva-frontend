@@ -1,4 +1,4 @@
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Xmerge";
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "aasvana";
 
 export const brand = {
     name: APP_NAME,

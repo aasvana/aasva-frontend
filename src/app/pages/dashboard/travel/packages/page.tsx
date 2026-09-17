@@ -351,7 +351,7 @@ export default function PackagesPage() {
               <h3 className="text-sm font-semibold text-gray-500">Basic info</h3>
               <div className="grid gap-1.5">
                 <Label htmlFor="package-name">Package name</Label>
-                <Input id="package-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Andaman Family Package" />
+                <Input id="package-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="e.g. Kashmir 5 Days" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-1.5"><Label htmlFor="package-days">Duration days</Label><Input id="package-days" type="number" min="1" value={durationDays} onChange={(event) => setDurationDays(event.target.value)} /></div>

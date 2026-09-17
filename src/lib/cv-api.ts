@@ -28,6 +28,14 @@ function reviveVoucherData(data: ConfirmationVoucherFormData): ConfirmationVouch
   return JSON.parse(JSON.stringify(data), reviveDates) as ConfirmationVoucherFormData;
 }
 
+function serializeVoucherData(data: ConfirmationVoucherFormData) {
+  return JSON.parse(
+    JSON.stringify(data, (key, value) =>
+      DATE_FIELDS.has(key) && typeof value === "string" ? value.slice(0, 10) : value
+    )
+  ) as ConfirmationVoucherFormData;
+}
+
 export type ConfirmationVoucherRecord = {
   id: string;
   voucherNo: string;
@@ -82,9 +90,10 @@ export async function apiGetVoucher(
 export async function apiSaveVoucher(
   data: ConfirmationVoucherFormData,
 ): Promise<ConfirmationVoucherRecord> {
+  const serializedData = serializeVoucherData(data);
   const { data: saved } = await api.post<ConfirmationVoucherRecord>("/vouchers", {
-    voucherNo: data.voucherNo,
-    data,
+    voucherNo: serializedData.voucherNo,
+    data: serializedData,
   });
   return reviveRecord(saved);
 }
@@ -93,9 +102,10 @@ export async function apiUpdateVoucher(
   id: string,
   data: ConfirmationVoucherFormData,
 ): Promise<ConfirmationVoucherRecord> {
+  const serializedData = serializeVoucherData(data);
   const { data: updated } = await api.patch<ConfirmationVoucherRecord>(
     `/vouchers/${id}`,
-    { voucherNo: data.voucherNo, data },
+    { voucherNo: serializedData.voucherNo, data: serializedData },
   );
   return reviveRecord(updated);
 }

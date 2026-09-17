@@ -141,57 +141,46 @@ export function ConfirmationVoucherForm({
 
     if (!initializedRef.current) {
       initializedRef.current = true;
-      const draft = useCvStore.getState().draft;
-      if (draft) {
-        const existing = existingVouchers.find(
-          (v) => v.voucherNo === draft.voucherNo
-        );
-        if (existing) {
-          setCreatedId(existing.id);
-        }
-        methods.reset(draft);
-      } else {
-        const config = useCvConfigStore.getState();
-        const existing = existingVouchers;
-        const { voucherPrefix, voucherSuffix, defaultPaymentType } =
-          config.settings;
+      const config = useCvConfigStore.getState();
+      const existing = existingVouchers;
+      const { voucherPrefix, voucherSuffix, defaultPaymentType } =
+        config.settings;
 
-        let nextNumber = existing.length + 1;
-        if (voucherPrefix || voucherSuffix) {
-          const numbers = existing
-            .map((v) => v.voucherNo)
-            .filter((no) => {
-              const inner = no.slice(
-                voucherPrefix.length,
-                no.length - voucherSuffix.length
-              );
-              return (
-                no.startsWith(voucherPrefix) &&
-                no.endsWith(voucherSuffix) &&
-                /^\d+$/.test(inner)
-              );
-            })
-            .map((no) =>
-              Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
+      let nextNumber = existing.length + 1;
+      if (voucherPrefix || voucherSuffix) {
+        const numbers = existing
+          .map((v) => v.voucherNo)
+          .filter((no) => {
+            const inner = no.slice(
+              voucherPrefix.length,
+              no.length - voucherSuffix.length
             );
-          if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
-        }
-
-        const general: Partial<ConfirmationVoucherFormData> = {};
-        for (const detail of config.generalDetails) {
-          if (detail.value) {
-            (general as Record<string, unknown>)[detail.key] = detail.value;
-          }
-        }
-
-        methods.reset({
-          ...createConfirmationVoucherDefaults,
-          ...general,
-          bookingDate: new Date(),
-          paymentType: defaultPaymentType,
-          voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
-        });
+            return (
+              no.startsWith(voucherPrefix) &&
+              no.endsWith(voucherSuffix) &&
+              /^\d+$/.test(inner)
+            );
+          })
+          .map((no) =>
+            Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
+          );
+        if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
       }
+
+      const general: Partial<ConfirmationVoucherFormData> = {};
+      for (const detail of config.generalDetails) {
+        if (detail.value) {
+          (general as Record<string, unknown>)[detail.key] = detail.value;
+        }
+      }
+
+      methods.reset({
+        ...createConfirmationVoucherDefaults,
+        ...general,
+        bookingDate: new Date(),
+        paymentType: defaultPaymentType,
+        voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
+      });
     }
     const subscription = methods.watch((values) => {
       setDraft(values as ConfirmationVoucherFormData);
@@ -212,13 +201,18 @@ export function ConfirmationVoucherForm({
 
   const handleSave = () => {
     const data = methods.getValues() as ConfirmationVoucherFormData;
+    if (!data.customerName?.trim()) {
+      toast.error("Customer name is required to save a draft.");
+      methods.setFocus("customerName");
+      return;
+    }
     if (effectiveMode === "edit") {
       updateMutation.mutate(data, {
         onSuccess: () => {
           toast.success("Confirmation voucher updated successfully!");
         },
-        onError: () => {
-          toast.error("Failed to update the confirmation voucher.");
+        onError: (error) => {
+          toast.error(error.message || "Failed to update the confirmation voucher.");
         },
       });
     } else {
@@ -227,8 +221,8 @@ export function ConfirmationVoucherForm({
           setCreatedId(record.id);
           toast.success("Confirmation voucher saved successfully!");
         },
-        onError: () => {
-          toast.error("Failed to save the confirmation voucher.");
+        onError: (error) => {
+          toast.error(error.message || "Failed to save the confirmation voucher.");
         },
       });
     }
@@ -265,11 +259,12 @@ export function ConfirmationVoucherForm({
         }
         router.push(`/dashboard/confirmation-vouchers/${record.id}/view`);
       };
-      const onError = () => {
+      const onError = (error: Error) => {
         toast.error(
-          effectiveMode === "edit"
-            ? "Failed to update the confirmation voucher."
-            : "Failed to save the confirmation voucher."
+          error.message ||
+            (effectiveMode === "edit"
+              ? "Failed to update the confirmation voucher."
+              : "Failed to save the confirmation voucher.")
         );
       };
 
