@@ -1,6 +1,7 @@
 "use client";
 
 import { pdf } from "@react-pdf/renderer";
+import { format } from "date-fns";
 import { CvPreviewDocument } from "@/components/pdf/cv-preview";
 import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
@@ -9,8 +10,8 @@ import { TermSnapshot } from "@/lib/terms-api";
 const safeFilePart = (value: string | undefined, fallback: string) => {
   const normalized = (value ?? "")
     .trim()
-    .replace(/[\\/:*?"<>|]+/g, " ")
-    .replace(/\s+/g, " ");
+    .replace(/[\\/:*?"<>|]+/g, "_")
+    .replace(/\s+/g, "_");
   return normalized || fallback;
 };
 
@@ -22,10 +23,11 @@ export async function downloadCvPdf(
   showTerms = false,
 ) {
   const generatedFileName = fileName ?? [
-    safeFilePart(data.customerName, "customer"),
     safeFilePart(data.voucherNo, "voucher"),
+    safeFilePart(data.customerName, "customer"),
     safeFilePart(company.name, "tenant"),
-  ].join(" - ") + ".pdf";
+    format(new Date(), "yyyy-MM-dd"),
+  ].join("_") + ".pdf";
   const blob = await pdf(
     <CvPreviewDocument data={data} company={company} terms={terms} showTerms={showTerms} />
   ).toBlob();
