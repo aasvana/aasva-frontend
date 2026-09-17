@@ -14,6 +14,7 @@ import { hotelMealPlans } from "@/constants/hotelMealPlans";
 import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
 import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import { TermSnapshot } from "@/lib/terms-api";
 
 const mealTypeLabel = (code: string) =>
   hotelMealPlans.find((m) => m.code === code)?.name ?? code;
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: "Helvetica",
     color: "#111827",
+    flexDirection: "column",
   },
   header: {
     flexDirection: "row",
@@ -194,13 +196,44 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   footer: {
-    marginTop: 14,
+    marginTop: "14",
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
-    paddingTop: 8,
+    paddingTCoop: 8,
     textAlign: "center",
     fontSize: 8,
     color: "#6b7280",
+  },
+  footerDivider: {
+    fontSize: 6,
+  },
+  footerNotice: {
+    marginTop: 3,
+  },
+  footerBrand: {
+    marginTop: 4,
+  },
+  termRow: {
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: 4,
+  },
+  termNumber: {
+    width: 16,
+    fontSize: 9,
+    color: "#374151",
+  },
+  termBody: {
+    flex: 1,
+  },
+  termTitle: {
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#111827",
+  },
+  termText: {
+    fontSize: 9,
+    marginTop: 1,
   },
 });
 
@@ -216,9 +249,13 @@ function DetailRow({ label, value }: { label: string; value?: string | null }) {
 export function CvPreviewDocument({
   data,
   company,
+  terms = [],
+  showTerms = false,
 }: {
   data: ConfirmationVoucherFormData;
   company: CompanyData;
+  terms?: TermSnapshot[];
+  showTerms?: boolean;
 }) {
   const d = data;
   const logoSource = renderableLogo(company.logo);
@@ -409,10 +446,32 @@ export function CvPreviewDocument({
           </View>
         </View>
 
-        <Text style={styles.footer}>
-          This is a system-generated confirmation voucher. Please verify all
-          details before travel.
-        </Text>
+        {showTerms && terms.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Terms & Conditions</Text>
+            {terms.map((term, index) => (
+              <View key={term.id ?? index} style={styles.termRow}>
+                <Text style={styles.termNumber}>{index + 1}.</Text>
+                <View style={styles.termBody}>
+                  {term.title ? (
+                    <Text style={styles.termTitle}>{term.title}</Text>
+                  ) : null}
+                  <Text style={styles.termText}>{term.content}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.footer}>
+          <Text style={styles.footerNotice}>
+            This is a system-generated confirmation voucher. Please verify all
+            details before travel.
+          </Text>
+          <Text style={styles.footerBrand}>
+            Powered by Aasvana · aasvana.com
+          </Text>
+        </View>
       </Page>
     </Document>
   );

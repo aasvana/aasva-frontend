@@ -416,6 +416,10 @@ const data = {
           url: "/dashboard/confirmation-vouchers",
         },
         {
+          title: "Terms & Conditions",
+          url: "/dashboard/travel/terms",
+        },
+        {
           title: "Suppliers",
           url: "/dashboard/travel/suppliers/hotels",
           items: [

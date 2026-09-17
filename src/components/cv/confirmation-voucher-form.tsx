@@ -29,11 +29,13 @@ import {
   ConfirmationVoucherFormData,
   stepFieldMap,
 } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import { TermSnapshot } from "@/lib/terms-api";
 
 type ConfirmationVoucherFormProps = {
   mode: "create" | "edit";
   existingId?: string;
   defaultValues?: DefaultValues<ConfirmationVoucherFormData>;
+  savedTerms?: TermSnapshot[];
 };
 
 export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVoucherFormData> = {
@@ -99,6 +101,7 @@ export function ConfirmationVoucherForm({
   mode,
   existingId,
   defaultValues,
+  savedTerms,
 }: ConfirmationVoucherFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
@@ -415,6 +418,7 @@ export function ConfirmationVoucherForm({
         mode={effectiveMode}
         existingId={effectiveId}
         data={previewData}
+        savedTerms={savedTerms}
         onSaved={(id) => setCreatedId(id)}
       />
     </FormProvider>

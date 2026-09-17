@@ -88,6 +88,10 @@
       "destination": "/pages/dashboard/travel/packages"
     },
     {
+      "source": "/dashboard/travel/terms",
+      "destination": "/pages/dashboard/travel/terms"
+    },
+    {
       "source": "/dashboard/travel/dashboard",
       "destination": "/pages/dashboard/travel/dashboard"
     },

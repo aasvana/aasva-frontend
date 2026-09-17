@@ -5,7 +5,10 @@ import { format } from "date-fns";
 import { hotelMealPlans } from "@/constants/hotelMealPlans";
 import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
 import { CompanyData } from "@/stores/companyStore";
+import { useAuthStore } from "@/stores/AuthStore";
+import { canViewVoucherTerms } from "@/helpers/pageAccess";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import { TermSnapshot } from "@/lib/terms-api";
 
 const mealTypeLabel = (code: string) =>
   hotelMealPlans.find((m) => m.code === code)?.name ?? code;
@@ -64,11 +67,15 @@ function Section({
 export function ConfirmationVoucher({
   data,
   company,
+  terms = [],
 }: {
   data: ConfirmationVoucherFormData;
   company: CompanyData;
+  terms?: TermSnapshot[];
 }) {
   const d = data;
+  const userRoles = useAuthStore((s) => s.user?.roles);
+  const showTerms = canViewVoucherTerms(userRoles);
 
   return (
     <div className="bg-white px-6 py-6 md:px-10 md:py-8">
@@ -254,6 +261,22 @@ export function ConfirmationVoucher({
           <DetailRow label="Amount Balanced" value={d.amountBalanced} />
         </div>
       </Section>
+
+      {showTerms && terms.length > 0 && (
+        <Section title="Terms & Conditions">
+          <ol className="grid gap-3">
+            {terms.map((term, index) => (
+              <li key={term.id ?? index} className="flex gap-2 text-sm text-gray-900">
+                <span className="w-5 shrink-0 font-medium text-gray-500">{index + 1}.</span>
+                <span>
+                  {term.title ? <span className="font-semibold">{term.title}: </span> : null}
+                  <span className="whitespace-pre-line">{term.content}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </Section>
+      )}
 
       <div className="border-t border-gray-200 pt-4 text-center text-xs text-gray-500">
         This is a system-generated confirmation voucher. Please verify all

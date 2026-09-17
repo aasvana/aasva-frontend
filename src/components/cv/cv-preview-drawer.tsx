@@ -14,10 +14,14 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useCvStore } from "@/stores/useCvStore";
+import { useAuthStore } from "@/stores/AuthStore";
+import { canViewVoucherTerms } from "@/helpers/pageAccess";
 import {
   useSaveConfirmationVoucher,
   useUpdateConfirmationVoucher,
 } from "@/lib/cv-query";
+import { TermSnapshot } from "@/lib/terms-api";
+import { useActiveTerms } from "@/lib/terms-query";
 import { downloadCvPdf } from "@/lib/cv-pdf";
 import { useCompanySettings } from "@/lib/company-query";
 import { useCompanyStore } from "@/stores/companyStore";
@@ -31,6 +35,7 @@ type CvPreviewDrawerProps = {
   mode?: "create" | "edit";
   existingId?: string;
   data?: ConfirmationVoucherFormData | null;
+  savedTerms?: TermSnapshot[];
   onSaved?: (id: string) => void;
 };
 
@@ -38,6 +43,7 @@ export function CvPreviewDrawer({
   mode = "create",
   existingId,
   data,
+  savedTerms,
   onSaved,
 }: CvPreviewDrawerProps) {
   const previewOpen = useCvStore((s) => s.previewOpen);
@@ -50,6 +56,10 @@ export function CvPreviewDrawer({
   const updateMutation = useUpdateConfirmationVoucher(existingId ?? "");
   const company = useCompanyStore((s) => s.company);
   useCompanySettings();
+  const { data: activeTerms } = useActiveTerms();
+  const userRoles = useAuthStore((s) => s.user?.roles);
+  const showTerms = canViewVoucherTerms(userRoles);
+  const previewTerms = savedTerms ?? activeTerms ?? [];
   const [downloading, setDownloading] = React.useState(false);
 
   const isComplete = draft
@@ -60,7 +70,7 @@ export function CvPreviewDrawer({
     if (!draft) return;
     try {
       setDownloading(true);
-      await downloadCvPdf(draft, company);
+      await downloadCvPdf(draft, company, previewTerms, undefined, showTerms);
       toast.success("PDF downloaded successfully!");
     } catch {
       toast.error("Failed to generate the PDF.");
@@ -116,7 +126,7 @@ export function CvPreviewDrawer({
           <div className="flex-1 overflow-y-auto px-6 py-6 md:px-10 md:py-8">
             {draft ? (
               <div className="rounded-lg border bg-white shadow-sm">
-                <ConfirmationVoucher data={draft} company={company} />
+                <ConfirmationVoucher data={draft} company={company} terms={previewTerms} />
               </div>
             ) : (
               <div className="flex h-full items-center justify-center text-sm text-muted-foreground">

@@ -39,6 +39,7 @@ export default function EditConfirmationVoucher() {
       mode="edit"
       existingId={voucher.id}
       defaultValues={voucher.data}
+      savedTerms={voucher.termsSnapshot}
     />
   );
 }

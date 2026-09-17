@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import BackButton from "@/components/generic/back-button";
 import { DownloadIcon, PrinterIcon } from "lucide-react";
 import { useConfirmationVoucher } from "@/lib/cv-query";
+import { useActiveTerms } from "@/lib/terms-query";
 import { useCompanySettings } from "@/lib/company-query";
 import { useCompanyStore } from "@/stores/companyStore";
+import { useAuthStore } from "@/stores/AuthStore";
+import { canViewVoucherTerms } from "@/helpers/pageAccess";
 import { downloadCvPdf } from "@/lib/cv-pdf";
 import { ConfirmationVoucher } from "@/components/cv/confirmation-voucher";
 import { confirmationVoucherSchema } from "@/app/pages/dashboard/confirmationvouchers/schema";
@@ -33,6 +36,10 @@ const EmptyState = () => {
 export default function ViewConfirmationVoucher() {
   const params = useParams<{ id: string }>();
   const { data: voucher, isLoading } = useConfirmationVoucher(params?.id);
+  const { data: activeTerms } = useActiveTerms();
+  const terms = voucher?.termsSnapshot ?? activeTerms ?? [];
+  const userRoles = useAuthStore((s) => s.user?.roles);
+  const showTerms = canViewVoucherTerms(userRoles);
   const company = useCompanyStore((s) => s.company);
   useCompanySettings();
   const [downloading, setDownloading] = useState(false);
@@ -45,7 +52,7 @@ export default function ViewConfirmationVoucher() {
     if (!voucher) return;
     try {
       setDownloading(true);
-      await downloadCvPdf(voucher.data, company);
+      await downloadCvPdf(voucher.data, company, terms, undefined, showTerms);
       toast.success("PDF downloaded successfully!");
     } catch {
       toast.error("Failed to generate the PDF.");
@@ -94,7 +101,7 @@ export default function ViewConfirmationVoucher() {
       </div>
 
       <div className="print-area bg-white border rounded-lg overflow-hidden">
-        <ConfirmationVoucher data={voucher.data} company={company} />
+        <ConfirmationVoucher data={voucher.data} company={company} terms={terms} />
       </div>
     </div>
         </>

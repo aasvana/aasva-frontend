@@ -1,5 +1,6 @@
 import api from "@/lib/api.utils";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
+import { TermSnapshot } from "@/lib/terms-api";
 
 const DATE_FIELDS = new Set([
   "journeyDate",
@@ -36,6 +37,7 @@ export type ConfirmationVoucherRecord = {
   paymentType: string;
   journeyDate: string | null;
   data: ConfirmationVoucherFormData;
+  termsSnapshot?: TermSnapshot[];
   createdAt: string;
   updatedAt: string;
 };

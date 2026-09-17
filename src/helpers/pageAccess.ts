@@ -1,6 +1,6 @@
 import { MODULE_PAGE_KEY, PATH_ACCESS_PREFIXES } from "@/constants/pages";
 import type { PageAccessKey } from "@/constants/pages";
-import { MODULE_ACCESS, ROLE_MODULES } from "@/constants/roles";
+import { MODULE_ACCESS, ROLE_MODULES, VOUCHER_TERMS_ADMIN_ROLES } from "@/constants/roles";
 import type { UserRole } from "@/constants/roles";
 import { useAuthStore } from "@/stores/AuthStore";
 import { usePageAccessStore } from "@/stores/pageAccessStore";
@@ -18,6 +18,16 @@ export { ALL_MODULE_TITLES, TRIAL_DURATION_DAYS };
 export const isSystemAdmin = (): boolean => {
   const user = useAuthStore.getState().user;
   return user?.roles?.some((r) => r.name === 'systemadmin') ?? false;
+};
+
+export const canViewVoucherTerms = (
+  roles?: ReadonlyArray<{ name?: string | null } | null | undefined> | null
+): boolean => {
+  if (!roles) return false;
+  return roles.some((role) => {
+    const name = role?.name?.trim().toLowerCase().replace(/[_\s]+/g, "-") ?? "";
+    return (VOUCHER_TERMS_ADMIN_ROLES as readonly string[]).includes(name);
+  });
 };
 
 export const getUserTrialStartDate = (user?: Record<string, any> | null): number => {

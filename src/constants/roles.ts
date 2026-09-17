@@ -36,6 +36,12 @@ export const ALL_ROLES: UserRole[] = [
   "systemadmin",
 ];
 
+export const VOUCHER_TERMS_ADMIN_ROLES = [
+  "admin",
+  "superadmin",
+  "systemadmin",
+] as const;
+
 export type RoleOption = {
   value: UserRole;
   label: string;
