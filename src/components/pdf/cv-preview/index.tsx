@@ -15,6 +15,7 @@ import { hotelRoomTypes } from "@/constants/hotelRoomTypes";
 import { CompanyData } from "@/stores/companyStore";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
+import { cleanPackageText } from "@/lib/package-text";
 
 const mealTypeLabel = (code: string) =>
   hotelMealPlans.find((m) => m.code === code)?.name ?? code;
@@ -28,15 +29,6 @@ const formatDate = (value: Date | string | undefined) => {
   if (isNaN(d.getTime())) return "-";
   return format(d, "dd MMM yyyy");
 };
-
-const stripHtml = (html: string) =>
-  html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/p>|<\/div>|<\/li>/gi, "\n")
-    .replace(/&nbsp;/g, " ")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
 
 function renderableLogo(logo?: string | null): string | null {
   if (!logo) return null;
@@ -235,6 +227,35 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginTop: 1,
   },
+  cancellationPolicy: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 4,
+    padding: 10,
+  },
+  cancellationHeading: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#b45309",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  cancellationSubtitle: {
+    fontSize: 9,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  cancellationRule: {
+    fontSize: 9,
+    lineHeight: 1.35,
+    marginBottom: 4,
+  },
+  cancellationNote: {
+    fontSize: 8,
+    lineHeight: 1.35,
+    marginTop: 7,
+  },
 });
 
 function DetailRow({ label, value }: { label: string; value?: string | null }) {
@@ -274,6 +295,7 @@ export function CvPreviewDocument({
               </View>
             )}
             <Text style={styles.brandName}>{company.name}</Text>
+            <Text style={styles.sectionTitle}>Package - {d.packageName}</Text>
           </View>
           <View style={styles.headerRight}>
             <Text style={styles.headerTitle}>Confirmation Voucher</Text>
@@ -283,11 +305,6 @@ export function CvPreviewDocument({
             </Text>
           </View>
         </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Package</Text>
-            <DetailRow label="Package Name" value={d.packageName} />
-          </View>
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Customer Details</Text>
@@ -387,11 +404,11 @@ export function CvPreviewDocument({
           <View>
             <View style={styles.fullWidthCell}>
               <Text style={styles.label}>Included</Text>
-              <Text style={styles.value}>{stripHtml(d.packageIncluded)}</Text>
+              <Text style={styles.value}>{cleanPackageText(d.packageIncluded)}</Text>
             </View>
             <View style={styles.fullWidthCell}>
               <Text style={styles.label}>Excluded</Text>
-              <Text style={styles.value}>{stripHtml(d.packageExcluded)}</Text>
+              <Text style={styles.value}>{cleanPackageText(d.packageExcluded)}</Text>
             </View>
           </View>
         </View>
@@ -462,6 +479,37 @@ export function CvPreviewDocument({
             ))}
           </View>
         )}
+
+        <View style={styles.section} wrap>
+          <View style={styles.cancellationPolicy}>
+            <Text style={styles.cancellationHeading}>
+              IMPORTANT - CANCELLATION POLICY
+            </Text>
+            <Text style={styles.cancellationSubtitle}>Cancellation Policy</Text>
+            <Text style={styles.cancellationRule}>
+              Percentage of Cancellation Prior to 35 Days or more: 05% of the package cost
+            </Text>
+            <Text style={styles.cancellationRule}>
+              Between 20-34 days of departure: 50% of tour cost
+            </Text>
+            <Text style={styles.cancellationRule}>
+              Between 19-11 days of departure: 75% of tour cost
+            </Text>
+            <Text style={styles.cancellationRule}>10 days to date of departure: 100%</Text>
+            <Text style={styles.cancellationNote}>
+              *Cancellation Policy is subject to change. It depends upon the cancellation policy of respective hotels.
+            </Text>
+            <Text style={[styles.cancellationSubtitle, { marginTop: 9 }]}>Peak Season Cancellation Policy</Text>
+            <Text style={styles.cancellationRule}>Between 15th Dec to 15th Jan: Non refundable</Text>
+            <Text style={[styles.cancellationSubtitle, { marginTop: 9 }]}>Please Note</Text>
+            <Text style={styles.cancellationRule}>
+              However, if your bookings are for the stay between 01st December to 15th January, no refund will be made for the cancellations.
+            </Text>
+            <Text style={styles.cancellationRule}>
+              Company may charge a separate service fee of Rs 1500 for all cancellations.
+            </Text>
+          </View>
+        </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerNotice}>

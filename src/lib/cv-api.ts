@@ -1,6 +1,7 @@
 import api from "@/lib/api.utils";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
+import { cleanPackageText } from "@/lib/package-text";
 
 const DATE_FIELDS = new Set([
   "journeyDate",
@@ -30,9 +31,11 @@ function reviveVoucherData(data: ConfirmationVoucherFormData): ConfirmationVouch
 
 function serializeVoucherData(data: ConfirmationVoucherFormData) {
   return JSON.parse(
-    JSON.stringify(data, (key, value) =>
-      DATE_FIELDS.has(key) && typeof value === "string" ? value.slice(0, 10) : value
-    )
+    JSON.stringify(data, (key, value) => {
+      if (DATE_FIELDS.has(key) && typeof value === "string") return value.slice(0, 10);
+      if ((key === "packageIncluded" || key === "packageExcluded") && typeof value === "string") return cleanPackageText(value);
+      return value;
+    })
   ) as ConfirmationVoucherFormData;
 }
 

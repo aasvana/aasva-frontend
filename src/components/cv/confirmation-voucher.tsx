@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/AuthStore";
 import { canViewVoucherTerms } from "@/helpers/pageAccess";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
+import { cleanPackageText } from "@/lib/package-text";
 
 const mealTypeLabel = (code: string) =>
   hotelMealPlans.find((m) => m.code === code)?.name ?? code;
@@ -21,19 +22,6 @@ const formatDate = (value: Date | string | undefined) => {
   const d = typeof value === "string" ? new Date(value) : value;
   if (isNaN(d.getTime())) return "-";
   return format(d, "dd MMM yyyy");
-};
-
-const renderRichText = (html: string) => {
-  if (!html) return null;
-  if (!/<\/?[a-z][\s\S]*>/i.test(html)) {
-    return <p className="whitespace-pre-line text-sm text-gray-900">{html}</p>;
-  }
-  return (
-    <div
-      className="rte-content text-sm text-gray-900"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
 };
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
@@ -191,13 +179,13 @@ export function ConfirmationVoucher({
             <p className="mb-1 text-[10px] uppercase tracking-wide text-gray-500">
               Included
             </p>
-            {renderRichText(d.packageIncluded)}
+            <p className="whitespace-pre-line text-sm text-gray-900">{cleanPackageText(d.packageIncluded)}</p>
           </div>
           <div>
             <p className="mb-1 text-[10px] uppercase tracking-wide text-gray-500">
               Excluded
             </p>
-            {renderRichText(d.packageExcluded)}
+            <p className="whitespace-pre-line text-sm text-gray-900">{cleanPackageText(d.packageExcluded)}</p>
           </div>
         </div>
       </Section>
