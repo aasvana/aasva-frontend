@@ -408,6 +408,14 @@ const data = {
           url: "/dashboard/travel/packages",
         },
         {
+          title: "Destination",
+          url: "/dashboard/confirmation-vouchers/destinations",
+        },
+        {
+          title: "Hotels",
+          url: "/dashboard/travel/suppliers/hotels",
+        },
+        {
           title: "Bookings",
           url: "/dashboard/travel/bookings",
         },
@@ -423,10 +431,6 @@ const data = {
           title: "Suppliers",
           url: "/dashboard/travel/suppliers/hotels",
           items: [
-            {
-              title: "Hotels",
-              url: "/dashboard/travel/suppliers/hotels",
-            },
             {
               title: "Airlines",
               url: "/dashboard/travel/suppliers/airlines",

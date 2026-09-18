@@ -43,6 +43,16 @@ export type TourPackage = {
   exclusions: PackageItem[];
 };
 
+function normalizePackage(item: TourPackage): TourPackage {
+  return {
+    ...item,
+    days: Array.isArray(item.days) ? item.days : [],
+    images: Array.isArray(item.images) ? item.images : [],
+    inclusions: Array.isArray(item.inclusions) ? item.inclusions : [],
+    exclusions: Array.isArray(item.exclusions) ? item.exclusions : [],
+  };
+}
+
 export type CreatePackagePayload = {
   name: string;
   slug?: string;
@@ -68,22 +78,22 @@ export async function apiSearchPackages(name?: string, destinationId?: string) {
   const { data } = await api.get<TourPackage[]>("/packages", {
     params: { name: name || undefined, destinationId: destinationId || undefined },
   });
-  return Array.isArray(data) ? data : [];
+  return Array.isArray(data) ? data.map(normalizePackage) : [];
 }
 
 export async function apiGetPackage(id: string) {
   const { data } = await api.get<TourPackage>(`/packages/${id}`);
-  return data;
+  return normalizePackage(data);
 }
 
 export async function apiCreatePackage(data: CreatePackagePayload) {
   const { data: saved } = await api.post<TourPackage>("/packages", data);
-  return saved;
+  return normalizePackage(saved);
 }
 
 export async function apiUpdatePackage(id: string, data: UpdatePackagePayload) {
   const { data: saved } = await api.patch<TourPackage>(`/packages/${id}`, data);
-  return saved;
+  return normalizePackage(saved);
 }
 
 export async function apiDeletePackage(id: string) {

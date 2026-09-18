@@ -120,22 +120,22 @@ export default function PackagesPage() {
     setShortDescription(item?.shortDescription ?? "");
     setDescription(item?.description ?? "");
     setDays(
-      item?.days.map((day) => ({ subject: day.subject, description: day.description })) ?? [
+       (item?.days ?? []).map((day) => ({ subject: day.subject, description: day.description })) ?? [
         EMPTY_DAY,
       ],
     );
     setImages(
-      item?.images.map((image) => ({
+       (item?.images ?? []).map((image) => ({
         imageUrl: image.imageUrl,
         altText: image.altText ?? "",
         isCover: image.isCover ?? false,
       })) ?? [],
     );
     setInclusions(
-      item?.inclusions.map((entry) => ({ title: entry.title })) ?? [],
+       (item?.inclusions ?? []).map((entry) => ({ title: entry.title })),
     );
     setExclusions(
-      item?.exclusions.map((entry) => ({ title: entry.title })) ?? [],
+       (item?.exclusions ?? []).map((entry) => ({ title: entry.title })),
     );
     setOpen(true);
   };
