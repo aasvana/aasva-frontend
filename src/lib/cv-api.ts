@@ -29,14 +29,40 @@ function reviveVoucherData(data: ConfirmationVoucherFormData): ConfirmationVouch
   return JSON.parse(JSON.stringify(data), reviveDates) as ConfirmationVoucherFormData;
 }
 
+function formatDateOnly(value: Date | string): string {
+  if (typeof value === "string") return value.slice(0, 10);
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function serializeVoucherValue(key: string, value: unknown): unknown {
+  if (DATE_FIELDS.has(key) && (value instanceof Date || typeof value === "string")) {
+    return formatDateOnly(value);
+  }
+  if (
+    (key === "packageIncluded" || key === "packageExcluded") &&
+    typeof value === "string"
+  ) {
+    return cleanPackageText(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => serializeVoucherValue("", item));
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([childKey, childValue]) => [
+        childKey,
+        serializeVoucherValue(childKey, childValue),
+      ]),
+    );
+  }
+  return value;
+}
+
 function serializeVoucherData(data: ConfirmationVoucherFormData) {
-  return JSON.parse(
-    JSON.stringify(data, (key, value) => {
-      if (DATE_FIELDS.has(key) && typeof value === "string") return value.slice(0, 10);
-      if ((key === "packageIncluded" || key === "packageExcluded") && typeof value === "string") return cleanPackageText(value);
-      return value;
-    })
-  ) as ConfirmationVoucherFormData;
+  return serializeVoucherValue("", data) as ConfirmationVoucherFormData;
 }
 
 export type ConfirmationVoucherRecord = {
