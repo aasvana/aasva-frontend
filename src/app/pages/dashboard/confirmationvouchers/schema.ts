@@ -79,6 +79,7 @@ export const confirmationVoucherSchema = z
   .object({
   // Step 1 - Customer Details
   packageName: z.string().min(1, "Package name is required"),
+  packageId: z.string().uuid().optional(),
   customerTitle: z.enum(["", "Mr", "Mrs", "Ms"]).default(""),
   customerName: z.string().min(1, "Customer name is required"),
   mobileNo: z

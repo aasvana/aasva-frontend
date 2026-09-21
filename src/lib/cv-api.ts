@@ -142,6 +142,7 @@ export async function apiSaveVoucher(
   const serializedData = serializeVoucherData(data);
   const { data: saved } = await api.post<ConfirmationVoucherRecord>("/vouchers", {
     voucherNo: serializedData.voucherNo,
+    packageId: serializedData.packageId,
     data: serializedData,
   });
   return reviveRecord(saved);
@@ -154,7 +155,7 @@ export async function apiUpdateVoucher(
   const serializedData = serializeVoucherData(data);
   const { data: updated } = await api.patch<ConfirmationVoucherRecord>(
     `/vouchers/${id}`,
-    { voucherNo: serializedData.voucherNo, data: serializedData },
+    { voucherNo: serializedData.voucherNo, packageId: serializedData.packageId, data: serializedData },
   );
   return reviveRecord(updated);
 }

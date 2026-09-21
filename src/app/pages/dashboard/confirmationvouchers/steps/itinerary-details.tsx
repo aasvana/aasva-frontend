@@ -72,6 +72,7 @@ const ItineraryDetails = () => {
       itinerary: template.days[index]?.description ?? "",
     })));
     setValue("packageName", template.name, { shouldDirty: true, shouldValidate: true });
+    setValue("packageId", template.id, { shouldDirty: true, shouldValidate: true });
     if (template.days.length !== count) toast.info(`This saved itinerary contains ${template.days.length} days, but this voucher has ${count} tour days. Only the first ${Math.min(template.days.length, count)} days were applied.`);
     setTemplateDialogOpen(false);
   };
