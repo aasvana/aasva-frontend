@@ -6,6 +6,7 @@ import { Mars, Venus, X } from "lucide-react";
 import React from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
+import { capitalizeWords } from "@/lib/text-format";
 
 const TravellersDetails = () => {
   const {
@@ -75,7 +76,7 @@ const TravellersDetails = () => {
               placeholder="John Doe"
               className="bg-gray-50"
               aria-invalid={!!errors.travellers?.[index]?.name}
-              {...control.register(`travellers.${index}.name`)}
+               {...control.register(`travellers.${index}.name`, { setValueAs: capitalizeWords })}
             />
             {errors.travellers?.[index]?.name && (
               <p className="text-sm text-red-500">

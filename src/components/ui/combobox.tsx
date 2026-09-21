@@ -79,8 +79,8 @@ export function Combobox({
             className
           )}
         >
-          <span className="min-w-0 flex-1 truncate text-left" title={selectedLabel || placeholder}>
-            {selectedLabel || placeholder}
+          <span className="min-w-0 flex-1 truncate text-left" title={selectedLabel || value || placeholder}>
+            {selectedLabel || value || placeholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

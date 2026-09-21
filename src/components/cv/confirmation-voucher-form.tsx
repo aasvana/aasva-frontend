@@ -100,6 +100,13 @@ export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVouche
   amountBalanced: "",
 };
 
+function splitCustomerTitle(value: string | undefined) {
+  const match = value?.match(/^(Mr|Mrs|Ms)\s+(.+)$/i);
+  return match
+    ? { customerTitle: (match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase()) as "Mr" | "Mrs" | "Ms", customerName: match[2] }
+    : { customerTitle: "" as const, customerName: value ?? "" };
+}
+
 export function ConfirmationVoucherForm({
   mode,
   existingId,
@@ -177,9 +184,11 @@ export function ConfirmationVoucherForm({
         }
       }
 
+      const customer = splitCustomerTitle(general.customerName);
       methods.reset({
         ...createConfirmationVoucherDefaults,
         ...general,
+        ...customer,
         bookingDate: new Date(),
         paymentType: defaultPaymentType,
         voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
@@ -190,6 +199,16 @@ export function ConfirmationVoucherForm({
     });
     return () => subscription.unsubscribe();
   }, [methods, setDraft, mode, vouchersLoading, existingVouchers]);
+
+  useEffect(() => {
+    if (mode !== "edit" || !defaultValues?.customerName) return;
+    const customer = splitCustomerTitle(defaultValues.customerName);
+    methods.reset({
+      ...createConfirmationVoucherDefaults,
+      ...defaultValues,
+      ...customer,
+    });
+  }, [defaultValues, methods, mode]);
 
   const showValidationError = (
     errors: FieldErrors<ConfirmationVoucherFormData>

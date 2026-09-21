@@ -123,9 +123,10 @@ function Step1CustomerDetails() {
   const [partyName, setPartyName] = useState("");
 
   const handleCustomerSelect = (name: string) => {
-    const customer = customers.find((c) => c.name === name);
+    const cleanSelectedName = name.replace(/^(Mr|Mrs|Ms)\s+/i, "");
+    const customer = customers.find((c) => c.name === name || c.name === cleanSelectedName);
     if (!customer) return;
-    setValue("customerName", capitalizeWords(customer.name), { shouldValidate: true });
+    setValue("customerName", capitalizeWords(customer.name).replace(/^(Mr|Mrs|Ms)\s+/i, ""), { shouldValidate: true });
     setValue("companyName", customer.company ?? "");
     setValue("emailAddress", customer.email ?? "");
     setValue("mobileNo", customer.phone ?? "");
@@ -145,7 +146,10 @@ function Step1CustomerDetails() {
           <select
             aria-label="Customer title"
             value={customerTitle}
-            onChange={(event) => setValue("customerTitle", event.target.value as "" | "Mr" | "Mrs" | "Ms", { shouldValidate: true })}
+            onChange={(event) => {
+              const title = event.target.value as "" | "Mr" | "Mrs" | "Ms";
+              setValue("customerTitle", title, { shouldValidate: true });
+            }}
             className="h-12 w-24 rounded-xl border border-gray-200 bg-gray-50 px-3 text-[15px]"
           >
             <option value="">Title</option>
@@ -297,7 +301,7 @@ function Step1CustomerDetails() {
                 taxId: details.taxId ?? "",
                 notes: details.notes,
               });
-              setValue("customerName", capitalizeWords(details.name), { shouldValidate: true });
+              setValue("customerName", capitalizeWords(details.name).replace(/^(Mr|Mrs|Ms)\s+/i, ""), { shouldValidate: true });
               setValue("companyName", details.company);
               setValue("emailAddress", details.email, { shouldValidate: true });
               setValue("mobileNo", details.phone, { shouldValidate: true });
