@@ -39,10 +39,47 @@ const itinerarySchema = z.object({
   itinerary: z.string().min(1, "Itinerary description is required"),
 });
 
+type VoucherDateData = {
+  journeyDate?: Date;
+  boardingDate?: Date;
+  returnDate?: Date;
+  hotels?: Array<{ checkinDate?: Date; checkoutDate?: Date }>;
+  itineraries?: Array<{ date?: Date }>;
+};
+
+export function getVoucherDateIssues(data: VoucherDateData) {
+  const issues: { path: (string | number)[]; message: string }[] = [];
+  if (!data.journeyDate) return issues;
+  if (data.boardingDate && data.boardingDate < data.journeyDate) {
+    issues.push({ path: ["boardingDate"], message: "Boarding date cannot be before the journey date" });
+  }
+  if (data.returnDate && data.boardingDate && data.returnDate < data.boardingDate) {
+    issues.push({ path: ["returnDate"], message: "Return date cannot be before the boarding date" });
+  }
+  data.hotels?.forEach((hotel, index) => {
+    if (hotel.checkinDate && hotel.checkinDate < data.journeyDate!) {
+      issues.push({ path: ["hotels", index, "checkinDate"], message: "Hotel check-in date cannot be before the journey date" });
+    }
+    if (hotel.checkoutDate && hotel.checkoutDate < data.journeyDate!) {
+      issues.push({ path: ["hotels", index, "checkoutDate"], message: "Hotel check-out date cannot be before the journey date" });
+    }
+    if (hotel.checkinDate && hotel.checkoutDate && hotel.checkoutDate < hotel.checkinDate) {
+      issues.push({ path: ["hotels", index, "checkoutDate"], message: "Hotel check-out date cannot be before check-in date" });
+    }
+  });
+  data.itineraries?.forEach((itinerary, index) => {
+    if (itinerary.date && itinerary.date < data.journeyDate!) {
+      issues.push({ path: ["itineraries", index, "date"], message: "Itinerary date cannot be before the journey date" });
+    }
+  });
+  return issues;
+}
+
 export const confirmationVoucherSchema = z
   .object({
   // Step 1 - Customer Details
   packageName: z.string().min(1, "Package name is required"),
+  customerTitle: z.enum(["", "Mr", "Mrs", "Ms"]).default(""),
   customerName: z.string().min(1, "Customer name is required"),
   mobileNo: z
     .string()
@@ -134,20 +171,9 @@ export const confirmationVoucherSchema = z
     .refine((v) => !isNaN(Number(v)) && Number(v) >= 0, "Must be a valid amount"),
   })
   .superRefine((data, context) => {
-    if (data.boardingDate < data.journeyDate) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["boardingDate"],
-        message: "Boarding date cannot be before the journey date",
-      });
-    }
-    if (data.returnDate < data.boardingDate) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["returnDate"],
-        message: "Return date cannot be before the boarding date",
-      });
-    }
+    getVoucherDateIssues(data).forEach((issue) =>
+      context.addIssue({ code: z.ZodIssueCode.custom, ...issue }),
+    );
   });
 
 export type ConfirmationVoucherFormData = z.infer<

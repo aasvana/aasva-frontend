@@ -135,6 +135,7 @@ const ItineraryDetails = () => {
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
+                      disabled={journeyDate ? { before: journeyDate } : undefined}
                       selected={
                         itineraryData?.date
                           ? new Date(itineraryData.date)

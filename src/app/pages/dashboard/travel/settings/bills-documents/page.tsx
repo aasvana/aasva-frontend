@@ -1,41 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useCvConfigStore } from "@/stores/cvConfigStore";
-import { useAccountSettingsStore } from "@/stores/accountSettingsStore";
 import { CURRENCIES } from "@/modules/invoice";
 import { paymentTypes } from "@/constants/paymentTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTravelSettings } from "@/lib/travel-settings-query";
 
 export default function BillsDocumentsSettingsPage() {
-  const settings = useCvConfigStore((state) => state.settings);
-  const updateSettings = useCvConfigStore((state) => state.updateSettings);
-  const resetConfig = useCvConfigStore((state) => state.resetConfig);
-  const invoiceNumbering = useAccountSettingsStore((state) => state.numbering.invoice);
-  const updateNumbering = useAccountSettingsStore((state) => state.updateNumbering);
-  const [prefix, setPrefix] = useState(settings.voucherPrefix);
-  const [suffix, setSuffix] = useState(settings.voucherSuffix);
-  const [invoicePrefix, setInvoicePrefix] = useState(invoiceNumbering.prefix);
-  const [invoiceSuffix, setInvoiceSuffix] = useState(invoiceNumbering.next);
-  const [defaultCurrency, setDefaultCurrency] = useState(settings.defaultCurrency);
-  const [defaultPaymentType, setDefaultPaymentType] = useState(settings.defaultPaymentType);
-  const [defaultTaxRate, setDefaultTaxRate] = useState(String(settings.defaultTaxRate));
+  const { settings: serverSettings, updateMutation } = useTravelSettings();
+  const [prefix, setPrefix] = useState("");
+  const [suffix, setSuffix] = useState("");
+  const [invoicePrefix, setInvoicePrefix] = useState("");
+  const [invoiceSuffix, setInvoiceSuffix] = useState("");
+  const [defaultCurrency, setDefaultCurrency] = useState("USD");
+  const [defaultPaymentType, setDefaultPaymentType] = useState("Full Payment");
+  const [defaultTaxRate, setDefaultTaxRate] = useState("18");
   const example = `${prefix}001${suffix}`;
 
+  useEffect(() => {
+    if (!serverSettings) return;
+    setPrefix(serverSettings.voucherPrefix);
+    setSuffix(serverSettings.voucherSuffix);
+    setInvoicePrefix(serverSettings.invoicePrefix);
+    setInvoiceSuffix(serverSettings.invoiceSuffix);
+    setDefaultCurrency(serverSettings.defaultCurrency);
+    setDefaultPaymentType(serverSettings.defaultPaymentType);
+    setDefaultTaxRate(String(serverSettings.defaultTaxRate));
+  }, [serverSettings]);
+
   const save = () => {
-    updateSettings({ voucherPrefix: prefix, voucherSuffix: suffix, defaultCurrency, defaultPaymentType, defaultTaxRate: Number(defaultTaxRate) || 0 });
-    updateNumbering("invoice", { prefix: invoicePrefix, next: invoiceSuffix });
-    toast.success("Bills and documents settings saved.");
+    updateMutation.mutate(
+      { voucherPrefix: prefix, voucherSuffix: suffix, invoicePrefix, invoiceSuffix, defaultCurrency, defaultPaymentType, defaultTaxRate: Number(defaultTaxRate) || 0 },
+      { onSuccess: () => toast.success("Bills and documents settings saved."), onError: (error) => toast.error(error.message) },
+    );
   };
 
   const reset = () => {
-    resetConfig();
     setPrefix("");
     setSuffix("");
     setInvoicePrefix("INV-");
@@ -43,7 +49,7 @@ export default function BillsDocumentsSettingsPage() {
     setDefaultCurrency("USD");
     setDefaultPaymentType("Full Payment");
     setDefaultTaxRate("18");
-    toast.success("Bills and documents settings reset.");
+    updateMutation.mutate({ voucherPrefix: "", voucherSuffix: "", invoicePrefix: "INV-", invoiceSuffix: "1001", defaultCurrency: "USD", defaultPaymentType: "Full Payment", defaultTaxRate: 18 }, { onSuccess: () => toast.success("Bills and documents settings reset."), onError: (error) => toast.error(error.message) });
   };
 
   return (

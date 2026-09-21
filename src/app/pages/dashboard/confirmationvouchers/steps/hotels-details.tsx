@@ -40,10 +40,14 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
 import { useDestinationSearch } from "@/lib/destinations-query";
 import { apiCreateDestination, apiGetDestinations } from "@/lib/destinations-api";
+import { apiCreateHotel } from "@/lib/hotels-api";
 import { useHotelSearch } from "@/lib/hotels-query";
 import { DestinationDrawer } from "@/components/cv/destination-drawer";
+import { capitalizeWords } from "@/lib/text-format";
+import { toast } from "sonner";
 
 type DestinationItem = {
+  id?: string;
   name: string;
   state: string;
   city: string;
@@ -69,6 +73,8 @@ const HotelsDetails = () => {
     formState: { errors },
   } = useFormContext<ConfirmationVoucherFormData>();
 
+  const journeyDate = watch("journeyDate");
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "hotels",
@@ -79,7 +85,7 @@ const HotelsDetails = () => {
   const [destinations, setDestinations] = useState<DestinationItem[]>([]);
   React.useEffect(() => {
     void apiGetDestinations().then((items) => {
-      setDestinations(items.map((item) => ({ name: item.name, state: item.state, city: item.city, country: item.country })));
+      setDestinations(items.map((item) => ({ id: item.id, name: item.name, state: item.state, city: item.city, country: item.country })));
     });
   }, []);
 
@@ -159,11 +165,10 @@ const HotelsDetails = () => {
     return () => window.clearTimeout(timer);
   }, [drawerDestinationSearch]);
 
-  const savedHotelOptions = (hotelsValues ?? []).map((hotel) => hotel?.hotelName).filter((name): name is string => Boolean(name?.trim())).map((name) => ({ value: name, label: name }));
-  const hotelOptions: ComboboxOption[] = [...savedHotelOptions, ...searchedHotels.map((hotel) => ({
+  const hotelOptions: ComboboxOption[] = searchedHotels.map((hotel) => ({
     value: hotel.name,
     label: `${hotel.name}${hotel.destination?.name ? ` · ${hotel.destination.name}` : ""}`,
-  }))].filter((option, index, options) => options.findIndex((candidate) => candidate.value === option.value) === index);
+  }));
 
   const handleAddHotel = () => {
     const selectedDestination = [...(hotelsValues ?? [])]
@@ -208,26 +213,49 @@ const HotelsDetails = () => {
 
   const handleSaveEntity = async () => {
     if (drawerState.mode === "destination") {
-      const name = newDestination.name.trim();
+      const name = capitalizeWords(newDestination.name);
       const state = newDestination.state.trim();
       const city = newDestination.city.trim();
       const country = newDestination.country.trim();
       if (!name) return;
-      const created = await apiCreateDestination({ name, state, city, country });
-      setDestinations((prev) =>
+       const created = await apiCreateDestination({ name, state, city, country });
+       setDestinations((prev) =>
         prev.some((d) => d.name.toLowerCase() === name.toLowerCase())
           ? prev
-          : [...prev, { name: created.name, state: created.state, city: created.city, country: created.country }]
+           : [...prev, { id: created.id, name: created.name, state: created.state, city: created.city, country: created.country }]
       );
       setValue(`hotels.${drawerState.index}.destination`, name, {
         shouldValidate: true,
       });
     } else {
-      const name = newHotel.name.trim();
+      const name = capitalizeWords(newHotel.name);
       if (!name) return;
-      setValue(`hotels.${drawerState.index}.hotelName`, name, {
-        shouldValidate: true,
-      });
+      const destinationName = (newHotel.destination ?? "").trim();
+      const destination = destinations.find(
+        (item) => item.name.trim().toLowerCase() === destinationName.toLowerCase(),
+      );
+      if (!destination?.id) {
+        toast.error("Select a saved destination before adding a hotel.");
+        return;
+      }
+      try {
+        await apiCreateHotel({
+          name,
+          destinationId: destination.id,
+          starRating: newHotel.rating,
+          notes: newHotel.notes,
+        });
+        setValue(`hotels.${drawerState.index}.destination`, destination.name, {
+          shouldValidate: true,
+        });
+        setValue(`hotels.${drawerState.index}.hotelName`, name, {
+          shouldValidate: true,
+        });
+        toast.success("Hotel saved. Save the confirmation voucher to store it in the voucher.");
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Unable to save hotel.");
+        return;
+      }
     }
     setDrawerOpen(false);
   };
@@ -309,7 +337,7 @@ const HotelsDetails = () => {
                       ? previous
                       : [...previous, { name: saved.name, state: saved.state, city: saved.city, country: saved.country }]);
                   }
-                  setValue(`hotels.${index}.destination`, val, { shouldValidate: true });
+                  setValue(`hotels.${index}.destination`, capitalizeWords(val), { shouldValidate: true });
                 }}
                 placeholder="Select or add destination"
                 searchPlaceholder="Search destinations..."
@@ -337,7 +365,7 @@ const HotelsDetails = () => {
                 options={hotelOptions}
                 value={hotelData?.hotelName}
                 onChange={(val) =>
-                  setValue(`hotels.${index}.hotelName`, val, {
+                  setValue(`hotels.${index}.hotelName`, capitalizeWords(val), {
                     shouldValidate: true,
                   })
                 }
@@ -517,6 +545,7 @@ const HotelsDetails = () => {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
+                    disabled={journeyDate ? { before: journeyDate } : undefined}
                     selected={
                       hotelData?.checkinDate
                         ? new Date(hotelData.checkinDate)
@@ -558,6 +587,20 @@ const HotelsDetails = () => {
                 <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
+                    disabled={
+                      journeyDate || hotelData?.checkinDate
+                        ? {
+                            before: new Date(
+                              Math.max(
+                                journeyDate?.getTime() ?? 0,
+                                hotelData?.checkinDate
+                                  ? new Date(hotelData.checkinDate).getTime()
+                                  : 0,
+                              ),
+                            ),
+                          }
+                        : undefined
+                    }
                     selected={
                       hotelData?.checkoutDate
                         ? new Date(hotelData.checkoutDate)
@@ -611,7 +654,7 @@ const HotelsDetails = () => {
                 ? previous
                 : [...previous, { name: created.name, state: created.state, city: created.city, country: created.country }],
             );
-            setValue(`hotels.${drawerState.index}.destination`, created.name, { shouldValidate: true });
+                setValue(`hotels.${drawerState.index}.destination`, capitalizeWords(created.name), { shouldValidate: true });
             setDrawerOpen(false);
           }}
         />
@@ -735,13 +778,9 @@ const HotelsDetails = () => {
                   <Input
                     id="hotel-destination"
                     value={newHotel.destination ?? ""}
-                    onChange={(e) =>
-                      setNewHotel({
-                        ...newHotel,
-                        destination: e.target.value,
-                      })
-                    }
-                    placeholder="e.g. Mumbai"
+                    readOnly
+                    aria-readonly="true"
+                    className="bg-gray-100"
                   />
                 </div>
                 <div className="grid gap-1.5">

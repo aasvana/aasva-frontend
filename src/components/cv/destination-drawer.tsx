@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { INDIA_CITIES_BY_STATE, INDIA_COUNTRY, INDIA_STATES } from "@/constants/indiaLocations";
 import { useDestinationSearch } from "@/lib/destinations-query";
+import { capitalizeWords } from "@/lib/text-format";
 
 export type DestinationDraft = {
   name: string;
@@ -116,7 +117,7 @@ export function DestinationDrawer({ open, initialValue, title = "Add Destination
 
   const submit = () => {
     if (!draft.name.trim()) return;
-    void onSave({ ...draft, name: draft.name.trim() });
+    void onSave({ ...draft, name: capitalizeWords(draft.name) });
   };
 
   return (

@@ -2,6 +2,7 @@ import api from "@/lib/api.utils";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
 import { cleanPackageText } from "@/lib/package-text";
+import { capitalizeWords } from "@/lib/text-format";
 
 const DATE_FIELDS = new Set([
   "journeyDate",
@@ -12,6 +13,7 @@ const DATE_FIELDS = new Set([
   "checkoutDate",
   "date",
 ]);
+const TITLE_CASE_FIELDS = new Set(["customerName", "packageName", "hotelName", "destination"]);
 
 export const reviveDates = (key: string, value: unknown) => {
   if (
@@ -26,7 +28,13 @@ export const reviveDates = (key: string, value: unknown) => {
 };
 
 function reviveVoucherData(data: ConfirmationVoucherFormData): ConfirmationVoucherFormData {
-  return JSON.parse(JSON.stringify(data), reviveDates) as ConfirmationVoucherFormData;
+  const revived = JSON.parse(JSON.stringify(data ?? {}), reviveDates) as Partial<ConfirmationVoucherFormData>;
+  return {
+    ...revived,
+    travellers: Array.isArray(revived.travellers) ? revived.travellers : [],
+    hotels: Array.isArray(revived.hotels) ? revived.hotels : [],
+    itineraries: Array.isArray(revived.itineraries) ? revived.itineraries : [],
+  } as ConfirmationVoucherFormData;
 }
 
 function formatDateOnly(value: Date | string): string {
@@ -38,6 +46,9 @@ function formatDateOnly(value: Date | string): string {
 }
 
 function serializeVoucherValue(key: string, value: unknown): unknown {
+  if (TITLE_CASE_FIELDS.has(key) && typeof value === "string") {
+    return capitalizeWords(value);
+  }
   if (DATE_FIELDS.has(key) && (value instanceof Date || typeof value === "string")) {
     return formatDateOnly(value);
   }
@@ -62,7 +73,16 @@ function serializeVoucherValue(key: string, value: unknown): unknown {
 }
 
 function serializeVoucherData(data: ConfirmationVoucherFormData) {
-  return serializeVoucherValue("", data) as ConfirmationVoucherFormData;
+  const serialized = serializeVoucherValue("", data) as ConfirmationVoucherFormData & {
+    customerTitle?: string;
+  };
+  const title = serialized.customerTitle?.trim();
+  if (title && serialized.customerName) {
+    serialized.customerName = `${title} ${serialized.customerName.replace(/^(Mr|Mrs|Ms)\s+/i, "")}`.trim();
+  }
+  const { customerTitle: _customerTitle, ...voucherData } = serialized;
+  void _customerTitle;
+  return voucherData as ConfirmationVoucherFormData;
 }
 
 export type ConfirmationVoucherRecord = {

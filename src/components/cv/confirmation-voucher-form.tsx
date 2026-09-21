@@ -27,6 +27,7 @@ import {
 import {
   confirmationVoucherSchema,
   ConfirmationVoucherFormData,
+  getVoucherDateIssues,
   stepFieldMap,
 } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
@@ -40,6 +41,7 @@ type ConfirmationVoucherFormProps = {
 
 export const createConfirmationVoucherDefaults: DefaultValues<ConfirmationVoucherFormData> = {
   packageName: "",
+  customerTitle: "",
   customerName: "",
   mobileNo: "",
   emailAddress: "",
@@ -204,6 +206,11 @@ export function ConfirmationVoucherForm({
     if (!data.customerName?.trim()) {
       toast.error("Customer name is required to save a draft.");
       methods.setFocus("customerName");
+      return;
+    }
+    const dateError = getVoucherDateIssues(data)[0];
+    if (dateError) {
+      toast.error(dateError.message);
       return;
     }
     if (effectiveMode === "edit") {

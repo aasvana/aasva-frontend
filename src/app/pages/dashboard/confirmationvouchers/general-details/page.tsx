@@ -5,6 +5,8 @@ import {
   GENERAL_DETAIL_KEYS,
   useCvConfigStore,
 } from "@/stores/cvConfigStore";
+import { useTravelSettings } from "@/lib/travel-settings-query";
+import { toast } from "sonner";
 
 const KEY_OPTIONS = GENERAL_DETAIL_KEYS.map((k) => ({
   value: k.key,
@@ -16,6 +18,7 @@ export default function CvGeneralDetailsPage() {
   const addGeneralDetail = useCvConfigStore((s) => s.addGeneralDetail);
   const updateGeneralDetail = useCvConfigStore((s) => s.updateGeneralDetail);
   const deleteGeneralDetail = useCvConfigStore((s) => s.deleteGeneralDetail);
+  const { updateMutation } = useTravelSettings();
 
   return (
     <MasterDataManager
@@ -44,6 +47,7 @@ export default function CvGeneralDetailsPage() {
           name: "value",
           label: "Default Value",
           placeholder: "e.g. 14:00",
+          type: "text",
           required: true,
         },
       ]}
@@ -54,9 +58,9 @@ export default function CvGeneralDetailsPage() {
       ]}
       items={generalDetails}
       searchText={(g) => `${g.key} ${g.label} ${g.value}`}
-      add={addGeneralDetail}
-      update={updateGeneralDetail}
-      remove={deleteGeneralDetail}
+       add={(data) => updateMutation.mutate({ generalDetails: [...generalDetails, { id: crypto.randomUUID(), ...data }] }, { onError: (error) => toast.error(error.message) })}
+       update={(id, data) => updateMutation.mutate({ generalDetails: generalDetails.map((item) => item.id === id ? { id, ...data } : item) }, { onError: (error) => toast.error(error.message) })}
+       remove={(id) => updateMutation.mutate({ generalDetails: generalDetails.filter((item) => item.id !== id) }, { onError: (error) => toast.error(error.message) })}
     />
   );
 }

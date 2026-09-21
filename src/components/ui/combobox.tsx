@@ -73,13 +73,15 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "h-12 w-full justify-between rounded-xl border-gray-200 bg-gray-50 px-4 text-[15px] font-normal hover:bg-gray-50 hover:text-foreground focus-visible:border-emerald-400 focus-visible:ring-emerald-100",
+            "h-12 w-full min-w-0 justify-between rounded-xl border-gray-200 bg-gray-50 px-4 text-[15px] font-normal hover:bg-gray-50 hover:text-foreground focus-visible:border-emerald-400 focus-visible:ring-emerald-100",
             invalid && "border-red-500",
             !value && "text-muted-foreground",
             className
           )}
         >
-          {selectedLabel || placeholder}
+          <span className="min-w-0 flex-1 truncate text-left" title={selectedLabel || placeholder}>
+            {selectedLabel || placeholder}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -138,7 +140,9 @@ export function Combobox({
                     value === opt.value ? "opacity-100" : "opacity-0"
                   )}
                 />
-                {opt.label}
+                <span className="min-w-0 truncate text-left" title={opt.label}>
+                  {opt.label}
+                </span>
               </button>
             ))
           )}

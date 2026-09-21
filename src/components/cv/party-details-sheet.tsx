@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Agent } from "@/stores/agentStore";
 import type { Customer } from "@/stores/customerStore";
+import { capitalizeWords } from "@/lib/text-format";
 
 type PartyDetails = {
   name: string;
@@ -81,7 +82,7 @@ export function PartyDetailsSheet({
 
   const handleSave = () => {
     if (!details.name.trim()) return;
-    onSave({ ...details, name: details.name.trim() });
+    onSave({ ...details, name: capitalizeWords(details.name) });
     onOpenChange(false);
   };
 

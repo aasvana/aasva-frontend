@@ -5,14 +5,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import airlinesSeed from "@/constants/json/airlines.json";
 import airportsSeed from "@/constants/json/airports.json";
 
-export type CvHotel = {
-  id: string;
-  name: string;
-  destination: string;
-  rating: string;
-  notes?: string;
-};
-
 export type CvAirline = {
   id: string;
   code: string;
@@ -95,33 +87,11 @@ const seedSettings = (): CvSettings => ({
   defaultTaxRate: 18,
 });
 
-const LEGACY_SEEDED_HOTEL_NAMES = new Set([
-  "Taj Mahal Palace",
-  "The Taj Lake Palace",
-  "Umaid Bhawan Palace",
-  "The Leela Palace",
-  "The Oberoi Udaivilas",
-  "JW Marriott",
-  "ITC Grand Bharat",
-  "Radisson Blu Resort",
-  "The Fern Residency",
-  "Holiday Inn Resort",
-  "The Ritz-Carlton",
-  "Atlantis The Palm",
-  "Marina Bay Sands",
-  "Hilton Singapore Orchard",
-  "Grand Hyatt Bangkok",
-]);
-
 type CvConfigState = {
-  hotels: CvHotel[];
   airlines: CvAirline[];
   airports: CvAirport[];
   generalDetails: CvGeneralDetail[];
   settings: CvSettings;
-  addHotel: (data: Omit<CvHotel, "id">) => void;
-  updateHotel: (id: string, data: Omit<CvHotel, "id">) => void;
-  deleteHotel: (id: string) => void;
   addAirline: (data: Omit<CvAirline, "id">) => void;
   updateAirline: (id: string, data: Omit<CvAirline, "id">) => void;
   deleteAirline: (id: string) => void;
@@ -132,30 +102,17 @@ type CvConfigState = {
   updateGeneralDetail: (id: string, data: Omit<CvGeneralDetail, "id">) => void;
   deleteGeneralDetail: (id: string) => void;
   updateSettings: (data: Partial<CvSettings>) => void;
+  hydrateSettings: (data: { settings: CvSettings; generalDetails: CvGeneralDetail[] }) => void;
   resetConfig: () => void;
 };
 
 export const useCvConfigStore = create<CvConfigState>()(
   persist(
     (set) => ({
-      hotels: [],
       airlines: seedAirlines(),
       airports: seedAirports(),
       generalDetails: seedGeneralDetails(),
       settings: seedSettings(),
-
-      addHotel: (data) =>
-        set((state) => ({ hotels: [...state.hotels, { id: newId(), ...data }] })),
-      updateHotel: (id, data) =>
-        set((state) => ({
-          hotels: state.hotels.map((item) =>
-            item.id === id ? { ...item, ...data } : item
-          ),
-        })),
-      deleteHotel: (id) =>
-        set((state) => ({
-          hotels: state.hotels.filter((item) => item.id !== id),
-        })),
 
       addAirline: (data) =>
         set((state) => ({
@@ -204,10 +161,11 @@ export const useCvConfigStore = create<CvConfigState>()(
 
       updateSettings: (data) =>
         set((state) => ({ settings: { ...state.settings, ...data } })),
+      hydrateSettings: (data) =>
+        set({ settings: data.settings, generalDetails: data.generalDetails }),
 
       resetConfig: () =>
         set({
-          hotels: [],
           airlines: seedAirlines(),
           airports: seedAirports(),
           generalDetails: seedGeneralDetails(),
@@ -217,15 +175,17 @@ export const useCvConfigStore = create<CvConfigState>()(
     {
       name: "xmerge_cv_config",
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      partialize: (state) => ({
+        airlines: state.airlines,
+        airports: state.airports,
+      }),
+      version: 4,
       migrate: (persistedState) => {
         if (!persistedState || typeof persistedState !== "object") return persistedState;
         const state = persistedState as CvConfigState;
         return {
-          ...state,
-          hotels: Array.isArray(state.hotels)
-            ? state.hotels.filter((hotel) => !LEGACY_SEEDED_HOTEL_NAMES.has(hotel.name))
-            : [],
+          airlines: Array.isArray(state.airlines) ? state.airlines : seedAirlines(),
+          airports: Array.isArray(state.airports) ? state.airports : seedAirports(),
         };
       },
     }

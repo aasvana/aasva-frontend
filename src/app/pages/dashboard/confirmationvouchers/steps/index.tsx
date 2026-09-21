@@ -24,6 +24,7 @@ import HotelsDetails from "./hotels-details";
 import GeneralDetails from "./general-details";
 import ItineraryDetails from "./itinerary-details";
 import OfficialDetails from "./official-details";
+import { capitalizeWords } from "@/lib/text-format";
 
 export type Step = {
   id: number;
@@ -76,12 +77,12 @@ function SearchablePartyField({
       id={id}
       options={options}
       value={value}
-      onChange={onChange}
+      onChange={(nextValue) => onChange(capitalizeWords(nextValue))}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
       addNewLabel={addLabel}
       onAddNew={(name) => {
-        if (name.trim()) onAddNew(name.trim());
+        if (name.trim()) onAddNew(capitalizeWords(name));
       }}
       invalid={invalid}
     />
@@ -111,6 +112,7 @@ function Step1CustomerDetails() {
   } = useFormContext<ConfirmationVoucherFormData>();
   const journeyDate = watch("journeyDate");
   const customerName = watch("customerName");
+  const customerTitle = watch("customerTitle");
   const agentName = watch("agentName");
 
   const customers = useCustomerStore((s) => s.customers);
@@ -123,7 +125,7 @@ function Step1CustomerDetails() {
   const handleCustomerSelect = (name: string) => {
     const customer = customers.find((c) => c.name === name);
     if (!customer) return;
-    setValue("customerName", customer.name, { shouldValidate: true });
+    setValue("customerName", capitalizeWords(customer.name), { shouldValidate: true });
     setValue("companyName", customer.company ?? "");
     setValue("emailAddress", customer.email ?? "");
     setValue("mobileNo", customer.phone ?? "");
@@ -134,28 +136,43 @@ function Step1CustomerDetails() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="grid gap-1.5 md:col-span-2">
         <Label htmlFor="packageName">Package name</Label>
-        <Input id="packageName" placeholder="e.g. Kashmir 5 Days" className="bg-gray-50" aria-invalid={!!errors.packageName} {...register("packageName")} />
+        <Input id="packageName" placeholder="e.g. Kashmir 5 Days" className="bg-gray-50" aria-invalid={!!errors.packageName} {...register("packageName", { setValueAs: capitalizeWords })} />
         {errors.packageName && <p className="text-sm text-red-500">{errors.packageName.message as string}</p>}
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="customerName">Customer name</Label>
-        <SearchablePartyField
-          id="customerName"
-          value={customerName}
-          options={customers.map((customer) => ({
-            value: customer.name,
-            label: `${customer.name}${customer.company ? ` (${customer.company})` : ""}`,
-          }))}
-          placeholder="Search or enter customer name"
-          searchPlaceholder="Search customers..."
-          addLabel="Add customer"
-          invalid={!!errors.customerName}
-          onChange={handleCustomerSelect}
-          onAddNew={(name) => {
-            setPartyName(name);
-            setPartySheet("customer");
-          }}
-        />
+        <div className="flex gap-2">
+          <select
+            aria-label="Customer title"
+            value={customerTitle}
+            onChange={(event) => setValue("customerTitle", event.target.value as "" | "Mr" | "Mrs" | "Ms", { shouldValidate: true })}
+            className="h-12 w-24 rounded-xl border border-gray-200 bg-gray-50 px-3 text-[15px]"
+          >
+            <option value="">Title</option>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Ms">Ms</option>
+          </select>
+          <div className="min-w-0 flex-1">
+            <SearchablePartyField
+              id="customerName"
+              value={customerName}
+              options={customers.map((customer) => ({
+                value: customer.name,
+                label: `${customer.name}${customer.company ? ` (${customer.company})` : ""}`,
+              }))}
+              placeholder="Search or enter customer name"
+              searchPlaceholder="Search customers..."
+              addLabel="Add customer"
+              invalid={!!errors.customerName}
+              onChange={handleCustomerSelect}
+              onAddNew={(name) => {
+                setPartyName(name);
+                setPartySheet("customer");
+              }}
+            />
+          </div>
+        </div>
         {errors.customerName && (
           <p className="text-sm text-red-500">{errors.customerName.message as string}</p>
         )}
@@ -180,12 +197,12 @@ function Step1CustomerDetails() {
         />
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="numberOfPersons">Number of persons</Label>
+        <Label htmlFor="numberOfPersons">No. of pax</Label>
         <Input type="number" min="1" id="numberOfPersons" className="bg-gray-50" aria-invalid={!!errors.numberOfPersons} {...register("numberOfPersons")} />
         {errors.numberOfPersons && <p className="text-sm text-red-500">{errors.numberOfPersons.message as string}</p>}
       </div>
       <div className="grid gap-1.5">
-        <Label htmlFor="numberOfTourDays">Number of tour days</Label>
+        <Label htmlFor="numberOfTourDays">No. of tour days</Label>
         <Input type="number" min="1" id="numberOfTourDays" className="bg-gray-50" aria-invalid={!!errors.numberOfTourDays} {...register("numberOfTourDays")} />
         {errors.numberOfTourDays && <p className="text-sm text-red-500">{errors.numberOfTourDays.message as string}</p>}
       </div>
@@ -280,7 +297,7 @@ function Step1CustomerDetails() {
                 taxId: details.taxId ?? "",
                 notes: details.notes,
               });
-              setValue("customerName", details.name, { shouldValidate: true });
+              setValue("customerName", capitalizeWords(details.name), { shouldValidate: true });
               setValue("companyName", details.company);
               setValue("emailAddress", details.email, { shouldValidate: true });
               setValue("mobileNo", details.phone, { shouldValidate: true });

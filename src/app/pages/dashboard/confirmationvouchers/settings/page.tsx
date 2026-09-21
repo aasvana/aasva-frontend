@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import {
 import { brand } from "@/constants/brand";
 import { paymentTypes } from "@/constants/paymentTypes";
 import { CURRENCIES } from "@/modules/invoice";
-import { useCvConfigStore } from "@/stores/cvConfigStore";
+import { useTravelSettings } from "@/lib/travel-settings-query";
 
 function Field({
   label,
@@ -43,44 +43,51 @@ function Field({
 }
 
 export default function CvSettingsPage() {
-  const settings = useCvConfigStore((s) => s.settings);
-  const updateSettings = useCvConfigStore((s) => s.updateSettings);
-  const resetConfig = useCvConfigStore((s) => s.resetConfig);
+  const { settings: serverSettings, updateMutation } = useTravelSettings();
 
-  const [defaultCurrency, setDefaultCurrency] = useState(settings.defaultCurrency);
-  const [voucherPrefix, setVoucherPrefix] = useState(settings.voucherPrefix);
-  const [voucherSuffix, setVoucherSuffix] = useState(settings.voucherSuffix);
-  const [defaultPaymentType, setDefaultPaymentType] = useState(
-    settings.defaultPaymentType
-  );
-  const [defaultTaxRate, setDefaultTaxRate] = useState(
-    String(settings.defaultTaxRate)
-  );
+  const [defaultCurrency, setDefaultCurrency] = useState("USD");
+  const [voucherPrefix, setVoucherPrefix] = useState("");
+  const [voucherSuffix, setVoucherSuffix] = useState("");
+  const [defaultPaymentType, setDefaultPaymentType] = useState("Full Payment");
+  const [defaultTaxRate, setDefaultTaxRate] = useState("18");
+
+  useEffect(() => {
+    if (!serverSettings) return;
+    setDefaultCurrency(serverSettings.defaultCurrency);
+    setVoucherPrefix(serverSettings.voucherPrefix);
+    setVoucherSuffix(serverSettings.voucherSuffix);
+    setDefaultPaymentType(serverSettings.defaultPaymentType);
+    setDefaultTaxRate(String(serverSettings.defaultTaxRate));
+  }, [serverSettings]);
 
   const exampleVoucherNo = `${voucherPrefix}001${voucherSuffix}`;
 
   const handleSave = () => {
-    updateSettings({
-      defaultCurrency,
-      voucherPrefix,
-      voucherSuffix,
-      defaultPaymentType,
-      defaultTaxRate: Number(defaultTaxRate) || 0,
-    });
-    toast.success("Confirmation voucher settings updated successfully!");
+    updateMutation.mutate(
+      {
+        defaultCurrency,
+        voucherPrefix,
+        voucherSuffix,
+        defaultPaymentType,
+        defaultTaxRate: Number(defaultTaxRate) || 0,
+      },
+      {
+        onSuccess: () => toast.success("Confirmation voucher settings updated successfully!"),
+        onError: (error) => toast.error(error.message),
+      },
+    );
   };
 
   const handleReset = () => {
     if (!window.confirm("Reset all confirmation voucher settings and lists?")) {
       return;
     }
-    resetConfig();
     setDefaultCurrency("USD");
     setVoucherPrefix("");
     setVoucherSuffix("");
     setDefaultPaymentType("Full Payment");
     setDefaultTaxRate("18");
-    toast.success("Confirmation voucher settings reset.");
+    updateMutation.mutate({ defaultCurrency: "USD", voucherPrefix: "", voucherSuffix: "", defaultPaymentType: "Full Payment", defaultTaxRate: 18 }, { onSuccess: () => toast.success("Confirmation voucher settings reset."), onError: (error) => toast.error(error.message) });
   };
 
   return (

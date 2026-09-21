@@ -39,7 +39,7 @@ export type MasterField = {
   name: string;
   label: string;
   placeholder?: string;
-  type?: "text" | "number" | "date" | "select";
+  type?: "text" | "number" | "date" | "time" | "select";
   options?: { value: string; label: string }[];
   required?: boolean;
 };
@@ -296,7 +296,12 @@ export function MasterDataManager<T extends { id: string }>({
                 ) : (
                   <Input
                     id={field.name}
-                    type={field.type ?? "text"}
+                    type={
+                      field.name === "value" &&
+                      (draft.key === "checkinTime" || draft.key === "checkoutTime")
+                        ? "time"
+                        : field.type ?? "text"
+                    }
                     value={draft[field.name] ?? ""}
                     onChange={(e) =>
                       setDraft((prev) => ({
