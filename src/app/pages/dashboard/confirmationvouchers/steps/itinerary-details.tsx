@@ -67,7 +67,7 @@ const ItineraryDetails = () => {
     const count = Math.max(1, Number(numberOfTourDays) || 1);
     const current = itinerariesValues ?? [];
     replace(Array.from({ length: count }, (_, index) => ({
-      date: current[index]?.date ?? new Date(),
+      date: current[index]?.date ?? journeyDate ?? new Date(),
       subject: template.days[index]?.subject ?? "",
       itinerary: template.days[index]?.description ?? "",
     })));

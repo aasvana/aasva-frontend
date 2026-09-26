@@ -58,7 +58,7 @@ export function useCompanySettings() {
   });
 
   return {
-    company: settingsQuery.data,
+    company: settingsQuery.data ? toCompanyData(settingsQuery.data) : null,
     isLoading: settingsQuery.isLoading,
     updateMutation,
   };

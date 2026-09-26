@@ -23,6 +23,7 @@ import { CalendarIcon } from "lucide-react";
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { ConfirmationVoucherFormData } from "../schema";
+import { useAuthStore } from "@/stores/AuthStore";
 
 const OfficialDetails = () => {
   const {
@@ -36,6 +37,8 @@ const OfficialDetails = () => {
   const paymentType = watch("paymentType");
   const totalAmount = watch("totalAmount");
   const amountReceived = watch("amountReceived");
+  const user = useAuthStore((state) => state.user);
+  const isSystemAdmin = user?.roles?.some((role) => role.name === "systemadmin") ?? false;
 
   const defaultCurrency = useCvConfigStore(
     (s) => s.settings.defaultCurrency
@@ -71,6 +74,8 @@ const OfficialDetails = () => {
           className="bg-gray-50"
           aria-invalid={!!errors.voucherNo}
           {...register("voucherNo")}
+          readOnly={!isSystemAdmin}
+          aria-readonly={!isSystemAdmin}
         />
         {errors.voucherNo && (
           <p className="text-sm text-red-500">{errors.voucherNo.message}</p>

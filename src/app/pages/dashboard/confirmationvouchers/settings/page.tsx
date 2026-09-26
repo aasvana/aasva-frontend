@@ -66,8 +66,8 @@ export default function CvSettingsPage() {
     updateMutation.mutate(
       {
         defaultCurrency,
-        voucherPrefix,
-        voucherSuffix,
+         voucherPrefix: voucherPrefix.trim(),
+         voucherSuffix: voucherSuffix.trim(),
         defaultPaymentType,
         defaultTaxRate: Number(defaultTaxRate) || 0,
       },

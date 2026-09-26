@@ -1,7 +1,6 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { brand } from "@/constants/brand";
 import { CURRENCIES } from "@/modules/invoice";
 
@@ -51,14 +50,15 @@ interface CompanyState {
   resetCompany: () => void;
 }
 
-export const useCompanyStore = create<CompanyState>()(
-  persist(
-    (set) => ({
-      company: COMPANY_DEFAULTS,
-      updateCompany: (data) =>
-        set((state) => ({ company: { ...state.company, ...data } })),
-      resetCompany: () => set({ company: COMPANY_DEFAULTS }),
-    }),
-    { name: "xmerge_company" }
-  )
-);
+const LEGACY_PERSISTED_KEY = "xmerge_company";
+
+if (typeof window !== "undefined") {
+  window.localStorage.removeItem(LEGACY_PERSISTED_KEY);
+}
+
+export const useCompanyStore = create<CompanyState>()((set) => ({
+  company: COMPANY_DEFAULTS,
+  updateCompany: (data) =>
+    set((state) => ({ company: { ...state.company, ...data } })),
+  resetCompany: () => set({ company: COMPANY_DEFAULTS }),
+}));

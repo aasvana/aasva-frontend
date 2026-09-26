@@ -2,11 +2,12 @@
 
 import { AdminPdfTemplateViewer } from "@/components/cv/admin-pdf-template-viewer";
 import { createConfirmationVoucherDefaults } from "@/components/cv/confirmation-voucher-form";
-import { useCompanyStore } from "@/stores/companyStore";
+import { useCompanySettings } from "@/lib/company-query";
 import { ConfirmationVoucherFormData } from "@/app/pages/dashboard/confirmationvouchers/schema";
 
 export default function ConfirmationVoucherPdfSettingsPage() {
-  const company = useCompanyStore((state) => state.company);
+  const { company } = useCompanySettings();
+  if (!company) return null;
   return (
     <main className="space-y-6 p-6">
       <div>

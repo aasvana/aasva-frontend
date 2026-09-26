@@ -82,6 +82,23 @@ const HotelsDetails = () => {
 
   const hotelsValues = watch("hotels");
 
+  React.useEffect(() => {
+    if (!journeyDate || !hotelsValues) return;
+    hotelsValues.forEach((hotel, index) => {
+      if (!hotel.checkinDate || new Date(hotel.checkinDate) < journeyDate) {
+        setValue(`hotels.${index}.checkinDate`, journeyDate, { shouldValidate: true });
+      }
+      if (!hotel.checkoutDate || new Date(hotel.checkoutDate) < journeyDate) {
+        setValue(`hotels.${index}.checkoutDate`, journeyDate, { shouldValidate: true });
+      }
+      const checkout = hotel.checkoutDate ? new Date(hotel.checkoutDate) : journeyDate;
+      const checkin = hotel.checkinDate ? new Date(hotel.checkinDate) : journeyDate;
+      if (checkout < checkin) {
+        setValue(`hotels.${index}.checkoutDate`, checkin, { shouldValidate: true });
+      }
+    });
+  }, [journeyDate, hotelsValues, setValue]);
+
   const [destinations, setDestinations] = useState<DestinationItem[]>([]);
   React.useEffect(() => {
     void apiGetDestinations().then((items) => {
@@ -184,8 +201,8 @@ const HotelsDetails = () => {
       adults: "",
       children: "",
       extraMattress: "",
-      checkinDate: new Date(),
-      checkoutDate: new Date(),
+       checkinDate: journeyDate ?? new Date(),
+       checkoutDate: journeyDate ?? new Date(),
     });
   };
 

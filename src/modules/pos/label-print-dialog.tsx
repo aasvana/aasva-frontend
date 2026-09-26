@@ -11,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useCompanyStore } from "@/stores/companyStore";
+import { useCompanySettings } from "@/lib/company-query";
 import { useOutletStore } from "@/stores/outletStore";
 import { usePosSettingsStore } from "@/stores/posSettingsStore";
 import { PosProduct } from "./schema";
@@ -26,7 +26,8 @@ export function LabelPrintDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const businessName = useCompanyStore((s) => s.company.name);
+  const { company } = useCompanySettings();
+  const businessName = company?.name ?? "";
   const outlets = useOutletStore((s) => s.outlets);
   const defaultCopies = usePosSettingsStore(
     (s) => s.settings.defaultLabelCopies

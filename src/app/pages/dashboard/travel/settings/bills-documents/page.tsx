@@ -36,7 +36,7 @@ export default function BillsDocumentsSettingsPage() {
 
   const save = () => {
     updateMutation.mutate(
-      { voucherPrefix: prefix, voucherSuffix: suffix, invoicePrefix, invoiceSuffix, defaultCurrency, defaultPaymentType, defaultTaxRate: Number(defaultTaxRate) || 0 },
+      { voucherPrefix: prefix.trim(), voucherSuffix: suffix.trim(), invoicePrefix, invoiceSuffix, defaultCurrency, defaultPaymentType, defaultTaxRate: Number(defaultTaxRate) || 0 },
       { onSuccess: () => toast.success("Bills and documents settings saved."), onError: (error) => toast.error(error.message) },
     );
   };

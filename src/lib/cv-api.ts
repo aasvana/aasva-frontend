@@ -136,6 +136,11 @@ export async function apiGetVoucher(
   return reviveRecord(data);
 }
 
+export async function apiGetNextVoucherNumber(): Promise<{ voucherNo: string; sequence: number }> {
+  const { data } = await api.get<{ voucherNo: string; sequence: number }>("/vouchers/next-number");
+  return data;
+}
+
 export async function apiSaveVoucher(
   data: ConfirmationVoucherFormData,
 ): Promise<ConfirmationVoucherRecord> {

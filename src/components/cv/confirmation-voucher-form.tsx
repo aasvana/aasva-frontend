@@ -31,6 +31,7 @@ import {
   stepFieldMap,
 } from "@/app/pages/dashboard/confirmationvouchers/schema";
 import { TermSnapshot } from "@/lib/terms-api";
+import { apiGetNextVoucherNumber } from "@/lib/cv-api";
 
 type ConfirmationVoucherFormProps = {
   mode: "create" | "edit";
@@ -152,30 +153,7 @@ export function ConfirmationVoucherForm({
     if (!initializedRef.current) {
       initializedRef.current = true;
       const config = useCvConfigStore.getState();
-      const existing = existingVouchers;
-      const { voucherPrefix, voucherSuffix, defaultPaymentType } =
-        config.settings;
-
-      let nextNumber = existing.length + 1;
-      if (voucherPrefix || voucherSuffix) {
-        const numbers = existing
-          .map((v) => v.voucherNo)
-          .filter((no) => {
-            const inner = no.slice(
-              voucherPrefix.length,
-              no.length - voucherSuffix.length
-            );
-            return (
-              no.startsWith(voucherPrefix) &&
-              no.endsWith(voucherSuffix) &&
-              /^\d+$/.test(inner)
-            );
-          })
-          .map((no) =>
-            Number(no.slice(voucherPrefix.length, no.length - voucherSuffix.length))
-          );
-        if (numbers.length > 0) nextNumber = Math.max(...numbers) + 1;
-      }
+       const { defaultPaymentType } = config.settings;
 
       const general: Partial<ConfirmationVoucherFormData> = {};
       for (const detail of config.generalDetails) {
@@ -191,14 +169,25 @@ export function ConfirmationVoucherForm({
         ...customer,
         bookingDate: new Date(),
         paymentType: defaultPaymentType,
-        voucherNo: `${voucherPrefix}${nextNumber}${voucherSuffix}`,
-      });
+         voucherNo: "",
+       });
     }
     const subscription = methods.watch((values) => {
       setDraft(values as ConfirmationVoucherFormData);
     });
     return () => subscription.unsubscribe();
   }, [methods, setDraft, mode, vouchersLoading, existingVouchers]);
+
+  useEffect(() => {
+    if (mode !== "create" || vouchersLoading) return;
+    void apiGetNextVoucherNumber()
+      .then(({ voucherNo }) => {
+        methods.setValue("voucherNo", voucherNo, { shouldValidate: true });
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : "Unable to generate voucher number.");
+      });
+  }, [methods, mode, vouchersLoading]);
 
   useEffect(() => {
     if (mode !== "edit" || !defaultValues?.customerName) return;
@@ -235,7 +224,8 @@ export function ConfirmationVoucherForm({
     }
     if (effectiveMode === "edit") {
       updateMutation.mutate(data, {
-        onSuccess: () => {
+        onSuccess: (record) => {
+          methods.setValue("voucherNo", record.voucherNo, { shouldValidate: true });
           toast.success("Confirmation voucher updated successfully!");
         },
         onError: (error) => {
@@ -245,6 +235,7 @@ export function ConfirmationVoucherForm({
     } else {
       saveMutation.mutate(data, {
         onSuccess: (record) => {
+          methods.setValue("voucherNo", record.voucherNo, { shouldValidate: true });
           setCreatedId(record.id);
           toast.success("Confirmation voucher saved successfully!");
         },
