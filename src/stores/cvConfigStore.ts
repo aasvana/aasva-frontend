@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import airlinesSeed from "@/constants/json/airlines.json";
 import airportsSeed from "@/constants/json/airports.json";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type CvAirline = {
   id: string;
@@ -174,7 +175,7 @@ export const useCvConfigStore = create<CvConfigState>()(
     }),
     {
       name: "xmerge_cv_config",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
       partialize: (state) => ({
         airlines: state.airlines,
         airports: state.airports,
@@ -191,3 +192,7 @@ export const useCvConfigStore = create<CvConfigState>()(
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useCvConfigStore.persist.rehydrate();
+});

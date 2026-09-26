@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 import {
   DEFAULT_PAGE_ACCESS,
   type PageAccessKey,
@@ -28,7 +29,11 @@ export const usePageAccessStore = create<PageAccessState>()(
     }),
     {
       name: "xmerge_page_access",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void usePageAccessStore.persist.rehydrate();
+});

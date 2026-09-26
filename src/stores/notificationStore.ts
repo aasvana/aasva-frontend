@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type NotificationType = "success" | "info" | "warning" | "error";
 
@@ -94,7 +95,11 @@ export const useNotificationStore = create<NotificationState>()(
     }),
     {
       name: "xmerge_notifications",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useNotificationStore.persist.rehydrate();
+});

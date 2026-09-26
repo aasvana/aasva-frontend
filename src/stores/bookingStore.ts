@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { SupplierCategory } from "./supplierStore";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const BOOKING_STATUSES = [
   "Pending",
@@ -155,7 +156,11 @@ export const useBookingStore = create<BookingState>()(
     }),
     {
       name: "xmerge_travel_bookings",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useBookingStore.persist.rehydrate();
+});

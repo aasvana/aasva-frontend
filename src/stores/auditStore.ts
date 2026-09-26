@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const AUDIT_ACTIONS = [
   "created",
@@ -512,7 +513,11 @@ export const useAuditLogStore = create<AuditLogState>()(
     }),
     {
       name: "xmerge_audit_log",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useAuditLogStore.persist.rehydrate();
+});

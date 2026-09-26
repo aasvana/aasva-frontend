@@ -4,6 +4,7 @@ import type { UserRole } from '@/constants/roles';
 import { ROLE_MODULES } from '@/constants/roles';
 import { useCompanyStore } from '@/stores/companyStore';
 import { useCvStore } from '@/stores/useCvStore';
+import { setActiveTenantId } from '@/lib/tenant-storage';
 
 let storeHydrated = false;
 
@@ -122,7 +123,7 @@ export const useAuthStore = create<AuthState>()(
               : state.companyComplete,
           modules: user?.modules ?? [],
         })),
-      setAuth: (token, refreshToken, user, subscription) =>
+      setAuth: (token, refreshToken, user, subscription) => {
         set((state) => {
           const userId = user?.id ?? null;
           const tenantId = user?.tenantId ?? null;
@@ -155,9 +156,11 @@ export const useAuthStore = create<AuthState>()(
               subscription ??
               (sameUser && sameTenant ? state.subscription : null),
           };
-        }),
+        });
+        setActiveTenantId(user?.tenantId ?? null);
+      },
       clearToken: () => set({ token: null }),
-      restoreAuth: (token, refreshToken, user, subscription) =>
+      restoreAuth: (token, refreshToken, user, subscription) => {
         set((state) => ({
           token,
           refreshToken,
@@ -172,19 +175,24 @@ export const useAuthStore = create<AuthState>()(
               ? user.companyComplete
               : state.companyComplete,
           subscription: subscription ?? state.subscription,
-        })),
-      clearAuth: () =>
+        }));
+        setActiveTenantId(user?.tenantId ?? null);
+      },
+      clearAuth: () => {
         set((state) => ({
           token: null,
           refreshToken: null,
           user: null,
           lastUserId: state.user?.id ?? null,
           lastTenantId: state.user?.tenantId ?? null,
-        })),
+        }));
+        setActiveTenantId(null);
+      },
     }),
     {
       name: 'auth-token',
-      onRehydrateStorage: () => {
+      onRehydrateStorage: (state) => {
+        setActiveTenantId(state?.lastTenantId ?? null);
         storeHydrated = true;
       },
     }

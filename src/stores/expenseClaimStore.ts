@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const EXPENSE_CLAIM_CATEGORIES = [
   "Travel",
@@ -117,7 +118,11 @@ export const useExpenseClaimStore = create<ExpenseClaimState>()(
     }),
     {
       name: "xmerge_expense_claims",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useExpenseClaimStore.persist.rehydrate();
+});

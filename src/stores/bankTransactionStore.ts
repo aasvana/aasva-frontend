@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const BANK_TRANSACTION_TYPES = ["inflow", "outflow"] as const;
 
@@ -131,7 +132,11 @@ export const useBankTransactionStore = create<BankTransactionState>()(
     }),
     {
       name: "xmerge_bank_transactions",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useBankTransactionStore.persist.rehydrate();
+});

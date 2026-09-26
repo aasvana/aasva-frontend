@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const DOCUMENT_CATEGORIES = [
   "Passport",
@@ -103,7 +104,11 @@ export const useTravelDocumentStore = create<TravelDocumentState>()(
     }),
     {
       name: "xmerge_travel_documents",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useTravelDocumentStore.persist.rehydrate();
+});

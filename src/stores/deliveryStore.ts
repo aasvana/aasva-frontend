@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const DELIVERY_STATUSES = [
   "Pending",
@@ -617,7 +618,11 @@ export const useDeliveryStore = create<DeliveryState>()(
     }),
     {
       name: "xmerge_delivery",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useDeliveryStore.persist.rehydrate();
+});

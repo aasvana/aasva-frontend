@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const SUPPLIER_PAYMENT_MODES = [
   "Bank Transfer",
@@ -103,7 +104,11 @@ export const useSupplierPaymentStore = create<SupplierPaymentState>()(
     }),
     {
       name: "xmerge_supplier_payments",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useSupplierPaymentStore.persist.rehydrate();
+});

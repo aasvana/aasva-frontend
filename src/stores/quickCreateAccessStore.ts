@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { ALL_ROLES, type UserRole } from "@/constants/roles";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type QuickCreateAction = "invoice" | "confirmation-voucher";
 
@@ -46,6 +47,15 @@ export const useQuickCreateAccessStore = create<QuickCreateAccessState>()(
         })),
       resetAccess: () => set({ access: createDefaults() }),
     }),
-    { name: "xmerge_quick_create_access" }
+    {
+      name: "aasvana_quick_create_access",
+      storage: createJSONStorage(() =>
+        createTenantStorage(["xmerge_quick_create_access"])
+      ),
+    }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useQuickCreateAccessStore.persist.rehydrate();
+});

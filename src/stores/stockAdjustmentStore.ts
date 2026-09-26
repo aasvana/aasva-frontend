@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const ADJUSTMENT_REASONS = [
   "Restock",
@@ -60,7 +61,11 @@ export const useStockAdjustmentStore = create<StockAdjustmentState>()(
     }),
     {
       name: "xmerge_stock_adjustments",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useStockAdjustmentStore.persist.rehydrate();
+});

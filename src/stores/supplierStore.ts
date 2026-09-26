@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type SupplierCategory = "hotel" | "airline" | "transport" | "activity";
 
@@ -204,7 +205,11 @@ export const useSupplierStore = create<SupplierState>()(
             : [],
         };
       },
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useSupplierStore.persist.rehydrate();
+});

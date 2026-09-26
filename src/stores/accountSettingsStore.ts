@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const NUMBERING_DOCS = [
   "estimate",
@@ -150,7 +151,11 @@ export const useAccountSettingsStore = create<AccountSettingsState>()(
     }),
     {
       name: "xmerge_account_settings",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useAccountSettingsStore.persist.rehydrate();
+});

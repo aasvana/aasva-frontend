@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { SEED_CUSTOMERS, Customer } from "./customerStore";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type PersonalInfo = {
   preferredName: string;
@@ -765,9 +766,13 @@ export const useCustomerProfileStore = create<CustomerProfileState>()(
     }),
     {
       name: "xmerge_customer_profiles",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
 
 export const CUSTOMER_STATUS_OPTIONS = CUSTOMER_STATUSES;
+
+registerTenantScopedStore(() => {
+  void useCustomerProfileStore.persist.rehydrate();
+});

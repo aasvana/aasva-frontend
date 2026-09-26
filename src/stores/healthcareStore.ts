@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type Gender = "Male" | "Female" | "Other";
 
@@ -265,7 +266,11 @@ export const useHealthcareStore = create<HealthcareState>()(
     }),
     {
       name: "xmerge_healthcare",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useHealthcareStore.persist.rehydrate();
+});

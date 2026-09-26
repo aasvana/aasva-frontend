@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const REQUEST_CATEGORIES = [
   "support",
@@ -318,7 +319,11 @@ export const useUserRequestStore = create<UserRequestState>()(
     }),
     {
       name: "xmerge_user_requests",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useUserRequestStore.persist.rehydrate();
+});

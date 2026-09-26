@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type PosSettings = {
   lowStockThreshold: number;
@@ -29,7 +30,11 @@ export const usePosSettingsStore = create<PosSettingsState>()(
     }),
     {
       name: "xmerge_pos_settings",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void usePosSettingsStore.persist.rehydrate();
+});

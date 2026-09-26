@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { CURRENCIES } from "@/modules/invoice";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export type Outlet = {
   id: string;
@@ -109,7 +110,11 @@ export const useOutletStore = create<OutletState>()(
     }),
     {
       name: "xmerge_outlets",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useOutletStore.persist.rehydrate();
+});

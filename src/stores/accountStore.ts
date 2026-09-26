@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const ACCOUNT_KINDS = ["bank", "cash"] as const;
 
@@ -103,7 +104,11 @@ export const useAccountStore = create<AccountState>()(
     }),
     {
       name: "xmerge_accounts",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useAccountStore.persist.rehydrate();
+});

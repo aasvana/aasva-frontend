@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const BILL_STATUSES = [
   "Pending",
@@ -112,7 +113,11 @@ export const useBillStore = create<BillState>()(
     }),
     {
       name: "xmerge_bills",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useBillStore.persist.rehydrate();
+});

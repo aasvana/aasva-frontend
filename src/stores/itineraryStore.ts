@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { SupplierCategory } from "./supplierStore";
+import { createTenantStorage, registerTenantScopedStore } from "@/lib/tenant-storage";
 
 export const ITINERARY_STATUSES = [
   "Draft",
@@ -127,7 +128,11 @@ export const useItineraryStore = create<ItineraryState>()(
     }),
     {
       name: "xmerge_travel_itineraries",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => createTenantStorage()),
     }
   )
 );
+
+registerTenantScopedStore(() => {
+  void useItineraryStore.persist.rehydrate();
+});
