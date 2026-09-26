@@ -291,6 +291,8 @@ export function BrandingSection() {
   const [logo, setLogo] = useState<string | null>(company.logo);
   const [tagline, setTagline] = useState(company.tagline);
   const [uploading, setUploading] = useState(false);
+  const [taglineOptions, setTaglineOptions] = useState<string[]>([]);
+  const [previousTagline, setPreviousTagline] = useState<string | null>(null);
 
   useEffect(() => {
     setLogo(company.logo);
@@ -299,12 +301,20 @@ export function BrandingSection() {
 
   const handleEnhanceTagline = async () => {
     try {
-      const enhanced = await enhanceTagline.mutateAsync(tagline);
-      setTagline(enhanced);
+      const result = await enhanceTagline.mutateAsync(tagline);
+      setPreviousTagline(tagline);
+      setTagline(result.enhanced);
+      setTaglineOptions(result.options);
       toast.success("Tagline enhanced with AI!");
     } catch (err: any) {
       toast.error(err?.message || "Failed to enhance tagline.");
     }
+  };
+
+  const handleTaglineChange = (value: string) => {
+    setTagline(value);
+    setTaglineOptions([]);
+    setPreviousTagline(null);
   };
 
   const handleLogoFile = async (file: File | undefined) => {
@@ -386,7 +396,7 @@ export function BrandingSection() {
             </div>
             <p className="text-xs text-muted-foreground">
               PNG or JPG. Large images are compressed automatically, then
-              uploaded to ImageKit and shown on your invoices and documents.
+              shown on your invoices and documents.
             </p>
           </div>
           <input
@@ -404,10 +414,10 @@ export function BrandingSection() {
         <Field label="Tagline">
           <Input
             value={tagline}
-            onChange={(e) => setTagline(e.target.value)}
+            onChange={(e) => handleTaglineChange(e.target.value)}
             placeholder="A short description of your company"
           />
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <Button
               type="button"
               variant="outline"
@@ -418,11 +428,46 @@ export function BrandingSection() {
               <Sparkles className="size-4" />
               {enhanceTagline.isPending ? "Enhancing..." : "Enhance with AI"}
             </Button>
+            {previousTagline !== null && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setTagline(previousTagline);
+                  setPreviousTagline(null);
+                  setTaglineOptions([]);
+                }}
+              >
+                Undo
+              </Button>
+            )}
             <p className="text-xs text-muted-foreground">
-              Powered by Gemini&rsquo;s &mdash; AI rewrites your
-              tagline.
+              Powered by Gemini&rsquo;s &mdash; AI rewrites your tagline.
             </p>
           </div>
+          {taglineOptions.length > 1 && (
+            <div className="pt-2 space-y-1.5">
+              <p className="text-xs text-muted-foreground">
+                Other suggestions
+              </p>
+              {taglineOptions
+                .filter((option) => option !== tagline)
+                .map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => {
+                      setPreviousTagline(tagline);
+                      setTagline(option);
+                    }}
+                    className="block w-full text-left text-xs text-muted-foreground hover:text-foreground border rounded-lg px-3 py-2 transition-colors hover:bg-muted/50"
+                  >
+                    {option}
+                  </button>
+                ))}
+            </div>
+          )}
         </Field>
       </CardContent>
       <CardActions onSave={handleSave} />

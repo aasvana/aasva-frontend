@@ -7,6 +7,7 @@ import { Reveal } from "@/components/generic/landing/motion-primitives";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { brand } from "@/constants/brand";
 import { useAuthStore } from "@/stores/AuthStore";
+import { useLogout } from "@/hooks/useLogout";
 import { Logo } from "@/resources/assets/imgs";
 import { motion } from "motion/react";
 import {
@@ -16,6 +17,7 @@ import {
   Check,
   LayoutDashboard,
   Lock,
+  LogOut,
   MousePointerClick,
   Plane,
   Play,
@@ -207,6 +209,7 @@ const GridPattern = () => (
 
 const Nav = () => {
   const token = useAuthStore((state) => state.token);
+  const logout = useLogout();
 
   return (
   <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-brand-night/70 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/10">
@@ -235,6 +238,18 @@ const Nav = () => {
         <Link href={token ? "/dashboard" : "/login"} className="hidden sm:inline-flex py-2 px-3 text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-neutral-300 dark:hover:text-white transition-colors">
           {token ? "Dashboard" : "Sign in"}
         </Link>
+        {token && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={logout}
+            className="rounded-lg text-gray-600 hover:text-gray-900 dark:text-neutral-300 dark:hover:text-white"
+          >
+            <LogOut />
+            Logout
+          </Button>
+        )}
         <ThemeToggle />
         {!token && (
           <Button asChild size="sm" className="rounded-lg bg-brand-orange hover:bg-brand-orange/90 text-white shadow-lg shadow-brand-orange/25 border-0">

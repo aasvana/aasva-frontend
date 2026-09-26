@@ -46,10 +46,17 @@ export async function apiUpdateCompany(
   return coerceNumbers(data);
 }
 
-export async function apiEnhanceTagline(tagline: string): Promise<string> {
-  const { data } = await api.post<{ enhanced: string }>(
+export interface TaglineOptions {
+  enhanced: string;
+  options: string[];
+}
+
+export async function apiEnhanceTagline(
+  tagline: string,
+): Promise<TaglineOptions> {
+  const { data } = await api.post<TaglineOptions>(
     "/company/enhance-tagline",
     { tagline },
   );
-  return data.enhanced;
+  return { enhanced: data.enhanced, options: data.options ?? [data.enhanced] };
 }
