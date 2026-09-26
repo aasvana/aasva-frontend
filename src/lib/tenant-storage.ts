@@ -48,17 +48,26 @@ export const createTenantStorage = (legacyNames: string[] = []): StateStorage =>
     const existing = window.localStorage.getItem(scoped);
     if (existing !== null) return existing;
 
-    const scopedCandidates = legacyNames.map((legacy) =>
-      tenantStorageKey(legacy)
-    );
-    const found = findMigratable([name, ...scopedCandidates, ...legacyNames]);
-    if (found === null) return null;
+    if (activeTenantId === null) return null;
 
-    window.localStorage.setItem(scoped, found);
-    for (const key of [name, ...scopedCandidates, ...legacyNames]) {
+    const noTenantKey = `${name}:${NO_TENANT_SCOPE}`;
+    const legacyScopedKeys = legacyNames.map(
+      (legacy) => `${legacy}:${activeTenantId}`
+    );
+
+    const adopted = findMigratable([
+      noTenantKey,
+      ...legacyScopedKeys,
+      name,
+      ...legacyNames,
+    ]);
+    if (adopted === null) return null;
+
+    window.localStorage.setItem(scoped, adopted);
+    for (const key of [noTenantKey, ...legacyScopedKeys, name, ...legacyNames]) {
       window.localStorage.removeItem(key);
     }
-    return found;
+    return adopted;
   },
   setItem: (name, value) => {
     if (typeof window === "undefined") return;

@@ -171,8 +171,11 @@ export const isPathAllowedForUser = (
   return true;
 };
 
-export const getDefaultModulesForRole = (role: UserRole): string[] =>
-  (ROLE_MODULES[role] ?? []).filter((title) => isModuleEnabled(title));
+export const getDefaultModulesForRole = (role: UserRole): string[] => {
+  const roleModules = ROLE_MODULES[role] ?? [];
+  const enabled = roleModules.filter((title) => isModuleEnabled(title));
+  return enabled.length > 0 ? enabled : roleModules;
+};
 
 const getBackendRole = (user: ReturnType<typeof useAuthStore.getState>): UserRole | null => {
   const normalizeRole = (value: string): string =>
